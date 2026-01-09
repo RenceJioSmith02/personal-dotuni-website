@@ -6,8 +6,9 @@
     <title>Document</title>
 </head>
 <body>
-
-    <h2>Sample Page</h2>
     
+    <h1>Welcome to the Homepage</h1>
+    <p>This is the homepage of the website.</p>
+
 </body>
 </html>
