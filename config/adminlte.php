@@ -63,8 +63,8 @@ return [
     |
     */
 
-    'logo' => '<b>Admin</b>LTE',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+    'logo' => '<b>DOT-UNI</b>',
+    'logo_img' => 'vendor/adminlte/dist/img/clsudotuni_logo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -86,7 +86,7 @@ return [
     'auth_logo' => [
         'enabled' => false,
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            'path' => 'vendor/adminlte/dist/img/clsudotuni_logo.png',
             'alt' => 'Auth Logo',
             'class' => '',
             'width' => 50,
@@ -113,7 +113,7 @@ return [
         'enabled' => true,
         'mode' => 'fullscreen',
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+            'path' => 'vendor/adminlte/dist/img/clsudotuni_logo.png',
             'alt' => 'AdminLTE Preloader Image',
             'effect' => 'animation__shake',
             'width' => 60,
@@ -300,11 +300,11 @@ return [
 
     'menu' => [
         // Navbar items:
-        [
-            'type' => 'navbar-search',
-            'text' => 'search',
-            'topnav_right' => true,
-        ],
+        // [
+        //     'type' => 'navbar-search',
+        //     'text' => 'search',
+        //     'topnav_right' => true,
+        // ],
         [
             'type' => 'fullscreen-widget',
             'topnav_right' => true,
@@ -327,6 +327,45 @@ return [
             'label' => 4,
             'label_color' => 'success',
         ],
+        [
+            'text' => 'User Management',
+            'icon' => 'fas fa-users',
+            'submenu' => [
+                [
+                    'text' => 'Users',
+                    'url' => 'admin/users',
+                    'icon' => 'fas fa-user',
+                ],
+                [
+                    'text' => 'Roles',
+                    'url' => 'admin/roles',
+                    'icon' => 'fas fa-user-shield',
+                ],
+            ],
+        ],
+        [
+            'text' => 'Academic Setup',
+            'icon' => 'fas fa-graduation-cap',
+            'submenu' => [
+                [
+                    'text' => 'Programs',
+                    'url' => 'admin/programs',
+                    'icon' => 'fas fa-layer-group',
+                ],
+                [
+                    'text' => 'Requirement Categories',
+                    'url' => 'admin/program_requirement_categories',
+                    'icon' => 'fas fa-list',
+                ],
+                [
+                    'text' => 'Courses',
+                    'url' => 'admin/courses',
+                    'icon' => 'fas fa-book',
+                ],
+            ],
+        ],
+
+
         ['header' => 'account_settings'],
         [
             'text' => 'My profile',
@@ -430,7 +469,7 @@ return [
 
     'plugins' => [
         'Datatables' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
