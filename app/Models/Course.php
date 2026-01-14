@@ -13,6 +13,8 @@ class Course extends Model
         'code',
         'title',
         'units',
+        'description',
+        'prerequisite',
         'is_active',
         'updated_by',
     ];
@@ -34,25 +36,4 @@ class Course extends Model
             ->withPivot('requirement_category_id', 'sort_order');
     }
 
-    // Course prerequisites
-    public function prerequisites()
-    {
-        return $this->belongsToMany(
-            Course::class,
-            'course_prerequisites',
-            'course_id',
-            'prerequisite_course_id'
-        );
-    }
-
-    // Courses that depend on this
-    public function requiredFor()
-    {
-        return $this->belongsToMany(
-            Course::class,
-            'course_prerequisites',
-            'prerequisite_course_id',
-            'course_id'
-        );
-    }
 }

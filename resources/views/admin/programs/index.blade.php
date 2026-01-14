@@ -19,6 +19,7 @@
         <table id="programsTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>Program Image</th>
                     <th>Title</th>
                     <th>Description</th>
                     <th>Type</th>
@@ -30,6 +31,18 @@
             <tbody>
                 @foreach($programs as $program)
                 <tr>
+                    <td class="text-center">
+                        @if ($program->asset)
+                            <a href="{{ asset('storage/' . $program->asset->storage_path) }}" target="_blank">
+                                <img src="{{ asset('storage/' . $program->asset->storage_path) }}"
+                                    alt="{{ $program->asset->alt_text ?? $program->title }}"
+                                    class="img-thumbnail"
+                                    style="max-width: 100px; max-height: 70px;">
+                            </a>
+                        @else
+                            <span class="text-muted">No Image</span>
+                        @endif
+                    </td>
                     <td>{{ $program->title }}</td>
                     <td>{{ $program->description }}</td>
                     <td>{{ $program->type }}</td>
@@ -76,7 +89,7 @@
             lengthChange: true,
             searching: true,
             columnDefs: [
-                { orderable: false, targets: 4 }
+                { orderable: false, targets: [0, 6] }
             ]
         });
     });

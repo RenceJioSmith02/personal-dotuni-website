@@ -31,11 +31,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::resource('programs', ProgramController::class);
     Route::resource('program_requirement_categories', ProgramRequirementCategoryController::class);
 
-
-
-
     Route::get('programs/{program}/builder', [ProgramBuilderController::class, 'show'])
         ->name('programs.builder');
+
 
     // AJAX endpoints
     Route::post('programs/{program}/requirements/ajax', [ProgramBuilderController::class, 'storeRequirement'])
@@ -50,40 +48,43 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 
 
     // AJAX routes for builder
-    Route::post(
-        'programs/{program}/requirements/ajax',
-        [ProgramRequirementController::class, 'store']
-    )->name('programs.requirements.store.ajax');
+    // Route::post(
+    //     'programs/{program}/requirements/ajax',
+    //     [ProgramRequirementController::class, 'store']
+    // )->name('programs.requirements.store.ajax');
 
-    Route::post(
-        'programs/{program}/courses/ajax',
-        [ProgramCourseController::class, 'store']
-    )->name('programs.courses.store.ajax');
-
+    // Route::post(
+    //     'programs/{program}/courses/ajax',
+    //     [ProgramCourseController::class, 'store']
+    // )->name('programs.courses.store.ajax');
 
 
         
-    Route::get('programs/{program}/requirements', [ProgramRequirementController::class, 'index']);
-    Route::post('programs/{program}/requirements', [ProgramRequirementController::class, 'store']);
-    Route::delete('programs/{program}/requirements/{id}', [ProgramRequirementController::class, 'destroy']);
+    // Route::get('programs/{program}/requirements', [ProgramRequirementController::class, 'index']);
+    // Route::post('programs/{program}/requirements', [ProgramRequirementController::class, 'store']);
+    // Route::delete('programs/{program}/requirements/{id}', [ProgramRequirementController::class, 'destroy']);
 
-    Route::get('programs/{program}/courses', [ProgramCourseController::class, 'index']);
-    Route::post('programs/{program}/courses', [ProgramCourseController::class, 'store']);
-    Route::delete('programs/{program}/courses/{id}', [ProgramCourseController::class, 'destroy']);
+    // Route::get('programs/{program}/courses', [ProgramCourseController::class, 'index']);
+    // Route::post('programs/{program}/courses', [ProgramCourseController::class, 'store']);
+    // Route::delete('programs/{program}/courses/{id}', [ProgramCourseController::class, 'destroy']);
 
-    Route::get(
-        'courses/{course}/prerequisites',
-        [CoursePrerequisiteController::class, 'index']
-    )->name('courses.prerequisites.index');
 
-    Route::post(
-        'courses/{course}/prerequisites',
-        [CoursePrerequisiteController::class, 'store']
-    )->name('courses.prerequisites.store');
 
-    Route::delete(
-        'courses/{course}/prerequisites/{prerequisite}',
-        [CoursePrerequisiteController::class, 'destroy']
-    )->name('courses.prerequisites.destroy');
+    // Route::get(
+    //     'courses/{course}/prerequisites',
+    //     [CoursePrerequisiteController::class, 'index']
+    // )->name('courses.prerequisites.index');
+
+    // Route::post(
+    //     'courses/{course}/prerequisites',
+    //     [CoursePrerequisiteController::class, 'store']
+    // )->name('courses.prerequisites.store');
+
+    // Route::delete(
+    //     'courses/{course}/prerequisites/{prerequisite}',
+    //     [CoursePrerequisiteController::class, 'destroy']
+    // )->name('courses.prerequisites.destroy');
+
+    
 });
 

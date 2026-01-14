@@ -1,0 +1,196 @@
+/* Modern Modal Animation */
+.modern-modal .modal-dialog {
+    transform: translateY(40px) scale(0.96);
+    transition: all 0.35s ease;
+}
+
+.modern-modal.show .modal-dialog {
+    transform: translateY(0) scale(1);
+}
+
+/* Modal Card */
+.modern-modal .modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 45px rgba(0,0,0,.18);
+}
+
+/* Header */
+.modern-modal .modal-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.modern-modal .modal-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Close button animation */
+.modern-modal .close {
+    font-size: 1.5rem;
+    opacity: 0.6;
+    transition: all 0.25s ease;
+}
+
+.modern-modal .close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+/* Body */
+.modern-modal .modal-body {
+    padding: 1.5rem;
+}
+
+/* Footer */
+.modern-modal .modal-footer {
+    border-top: 1px solid #f1f1f1;
+    padding: 1rem 1.5rem;
+}
+
+/* Buttons */
+.modern-modal .btn {
+    border-radius: 10px;
+    padding: 0.55rem 1.3rem;
+    font-weight: 500;
+}
+
+.modern-modal .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0,123,255,.35);
+}
+
+/* Backdrop blur */
+.modal-backdrop {
+    background-color: rgba(0,0,0,.35);
+    backdrop-filter: blur(5px);
+}
+
+
+/* ================================
+   MODAL ANIMATION CORE
+================================ */
+
+/* Initial hidden state */
+.animated-modal .modal-dialog {
+    opacity: 0;
+    transform: translateY(50px) scale(0.96);
+    transition:
+        opacity 0.35s ease,
+        transform 0.35s cubic-bezier(.22,.61,.36,1);
+}
+
+/* Modal opening */
+.animated-modal.show .modal-dialog {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Modal closing (before hidden) */
+.animated-modal.modal-closing .modal-dialog {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+}
+
+/* ================================
+   MODAL CONTENT STYLING
+================================ */
+
+.animated-modal .modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 25px 60px rgba(0,0,0,.22);
+}
+
+/* Header animation */
+.animated-modal .modal-header {
+    animation: headerFade 0.4s ease;
+}
+
+@keyframes headerFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================================
+   BACKDROP ANIMATION
+================================ */
+
+.modal-backdrop {
+    animation: backdropFadeIn 0.35s ease forwards;
+}
+
+@keyframes backdropFadeIn {
+    from { opacity: 0; }
+    to { opacity: 0.35; }
+}
+
+/* ================================
+   BUTTON MICRO-INTERACTIONS
+================================ */
+
+.animated-modal .btn {
+    transition: all 0.2s ease;
+}
+
+.animated-modal .btn:active {
+    transform: scale(0.97);
+}
+
+/* ================================
+   SUCCESS FEEDBACK (OPTIONAL)
+================================ */
+
+.modal-success .modal-content {
+    animation: successGlow 0.45s ease;
+}
+
+@keyframes successGlow {
+    0% { box-shadow: 0 0 0 rgba(40,167,69,0); }
+    50% { box-shadow: 0 0 30px rgba(40,167,69,.6); }
+    100% { box-shadow: 0 25px 60px rgba(0,0,0,.22); }
+}
+
+/* ================================
+   SHAKE ERROR (OPTIONAL)
+================================ */
+
+.modal-error .modal-dialog {
+    animation: shake 0.35s ease;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-6px); }
+    100% { transform: translateX(0); }
+}
+
+
+/* ================================
+   MODAL EXIT (OUT STATE)
+================================ */
+
+/* When closing */
+.animated-modal.is-closing .modal-dialog {
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s cubic-bezier(.22,.61,.36,1);
+}
+
+/* Backdrop fade out */
+.modal-backdrop.fade-out {
+    opacity: 0 !important;
+    transition: opacity 0.3s ease;
+}
+

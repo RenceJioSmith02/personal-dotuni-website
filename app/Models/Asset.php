@@ -22,6 +22,6 @@ class Asset extends Model
 
     public function programs()
     {
-        return $this->hasMany(Program::class, 'programs_asset_id');
+        return $this->hasMany(Program::class, 'program_asset_id');
     }
 }

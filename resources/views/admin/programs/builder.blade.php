@@ -116,7 +116,9 @@ $(document).ready(function(){
     // Add Requirement Form
     $('#addRequirementForm').submit(function(e){
         e.preventDefault();
-        $.post("{{ route('admin.programs.requirements.store.ajax', $program) }}", $(this).serialize(), function(resp){
+        $.post("{{ route('admin.programs.requirements.store.ajax', $program) }}", 
+            $(this).serialize(), 
+            function(resp){
             // reload table or append row dynamically
             location.reload();
         });
@@ -124,7 +126,9 @@ $(document).ready(function(){
 
     $('#addCourseForm').submit(function(e){
         e.preventDefault();
-        $.post("{{ route('admin.programs.courses.store.ajax', $program) }}", $(this).serialize(), function(resp){
+        $.post("{{ route('admin.programs.courses.store.ajax', $program) }}", 
+        $(this).serialize(), 
+        function(resp){
             location.reload();
         });
     });

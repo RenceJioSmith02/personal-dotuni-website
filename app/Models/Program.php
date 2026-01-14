@@ -16,6 +16,7 @@ class Program extends Model
         'total_units',
         'is_active',
         'updated_by',
+        'program_asset_id',
     ];
 
     protected $casts = [
@@ -48,7 +49,7 @@ class Program extends Model
 
     public function asset()
     {
-        return $this->belongsTo(Asset::class, 'programs_asset_id');
+        return $this->belongsTo(Asset::class, 'program_asset_id');
     }
 
 

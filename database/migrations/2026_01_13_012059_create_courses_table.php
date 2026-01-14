@@ -13,6 +13,7 @@ return new class extends Migration {
             $table->string('code', 20)->unique();
             $table->string('title', 250);
             $table->string('description', 500)->nullable();
+            $table->string('prerequisite', 500)->nullable();
             $table->integer('units')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();

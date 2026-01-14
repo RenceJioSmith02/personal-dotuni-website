@@ -9,8 +9,21 @@
 @section('content')
 <div class="card">
     <div class="card-body">
-        <form action="{{ route('admin.programs.store') }}" method="POST">
+        <form action="{{ route('admin.programs.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
+
+            <div class="form-group">
+                <label for="image">Program Image</label>
+                <input type="file"
+                    name="image"
+                    id="image"
+                    class="form-control-file @error('image') is-invalid @enderror"
+                    accept="image/*">
+
+                @error('image')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
+            </div>
 
             <div class="form-group">
                 <label for="title">Program Title</label>

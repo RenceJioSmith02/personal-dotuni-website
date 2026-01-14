@@ -14,7 +14,7 @@ class ProgramBuilderController extends Controller
     {
         $program->load([
             'requirements.category',
-            'programCourses.course.description',
+            'programCourses.course',
             'programCourses.category',
         ]);
 
@@ -29,16 +29,36 @@ class ProgramBuilderController extends Controller
             'required_units' => 'required|integer|min:0',
         ]);
 
-        $requirement = $program->requirements()->updateOrCreate(
-            ['requirement_category_id' => $request->requirement_category_id],
-            ['required_units' => $request->required_units, 'updated_by' => auth()->id()]
-        );
+        $requirement = $program->requirements()
+            ->withTrashed()
+            ->where('requirement_category_id', $request->requirement_category_id)
+            ->first();
+
+        if ($requirement) {
+            // Restore if soft-deleted
+            if ($requirement->trashed()) {
+                $requirement->restore();
+            }
+
+            $requirement->update([
+                'required_units' => $request->required_units,
+                'updated_by' => auth()->id(),
+            ]);
+        } else {
+            // Create if it never existed
+            $requirement = $program->requirements()->create([
+                'requirement_category_id' => $request->requirement_category_id,
+                'required_units' => $request->required_units,
+                'updated_by' => auth()->id(),
+            ]);
+        }
 
         return response()->json([
             'success' => true,
-            'requirement' => $requirement->load('category')
+            'requirement' => $requirement->load('category'),
         ]);
     }
+
 
     /** AJAX: Delete Requirement */
     public function destroyRequirement(Program $program, ProgramRequirement $requirement)
@@ -46,6 +66,9 @@ class ProgramBuilderController extends Controller
         $requirement->delete();
         return response()->json(['success' => true]);
     }
+
+
+
 
     /** AJAX: Add Course */
     public function storeCourse(Request $request, Program $program)
@@ -56,17 +79,36 @@ class ProgramBuilderController extends Controller
             'sort_order' => 'nullable|integer',
         ]);
 
-        $course = $program->programCourses()->create([
-            'course_id' => $request->course_id,
-            'requirement_category_id' => $request->requirement_category_id,
-            'sort_order' => $request->sort_order ?? 0,
-        ]);
+        $programCourse = $program->programCourses()
+            ->withTrashed()
+            ->where('course_id', $request->course_id)
+            ->where('requirement_category_id', $request->requirement_category_id)
+            ->first();
+
+        if ($programCourse) {
+            // Restore if soft-deleted
+            if ($programCourse->trashed()) {
+                $programCourse->restore();
+            }
+
+            $programCourse->update([
+                'sort_order' => $request->sort_order ?? 0,
+            ]);
+        } else {
+            // Create if it never existed
+            $programCourse = $program->programCourses()->create([
+                'course_id' => $request->course_id,
+                'requirement_category_id' => $request->requirement_category_id,
+                'sort_order' => $request->sort_order ?? 0,
+            ]);
+        }
 
         return response()->json([
             'success' => true,
-            'course' => $course->load('course', 'category')
+            'course' => $programCourse->load('course', 'category'),
         ]);
     }
+
 
     /** AJAX: Delete Course */
     public function destroyCourse(Program $program, ProgramCourse $programCourse)
