@@ -1,4 +1,61 @@
 /* Modern Modal Animation */
+
+/* Center the modal on screen */
+.modal.show {
+    display: flex !important;
+    align-items: center;       
+    justify-content: center;   
+}
+
+/* Remove default Bootstrap margins */
+.modal-dialog {
+    margin: 0;                 
+    max-width: 800px;          
+}
+
+/* Specific modal overrides */
+.modal-dialog {
+    height: 90vh;              
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ensure modal content fills the dialog */
+.modal-content {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make modal body scrollable */
+.modal-body {
+    flex: 1 1 auto;            
+    overflow-y: auto;         
+    padding-right: 1rem;      
+}
+
+#programImagePreview {
+    max-height: 180px;
+    width: auto;
+    display: block;
+    margin-bottom: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .modern-modal .modal-dialog {
     transform: translateY(40px) scale(0.96);
     transition: all 0.35s ease;

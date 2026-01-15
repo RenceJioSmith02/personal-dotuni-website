@@ -29,6 +29,20 @@ class Program extends Model
         return $this->hasMany(ProgramRequirement::class);
     }
 
+    public function requirementCategories()
+    {
+        // Get categories through program_requirements
+        return $this->hasManyThrough(
+            ProgramRequirementCategory::class,
+            ProgramRequirement::class,
+            'program_id', // Foreign key on program_requirements
+            'id',         // Foreign key on program_requirement_categories
+            'id',         // Local key on programs
+            'requirement_category_id' // Local key on program_requirements pointing to category
+        );
+    }
+
+
     // Program structure (courses)
     public function programCourses()
     {

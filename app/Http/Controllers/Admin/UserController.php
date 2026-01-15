@@ -7,79 +7,152 @@ use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    /**
+     * Display a listing of users.
+     */
     public function index()
     {
         $users = User::with('roles')->get();
-        return view('admin.users.index', compact('users'));
+        $roles = Role::all(); // For modal role selection
+
+        return view('admin.users.index', compact('users', 'roles'));
     }
 
-
-    public function create()
-    {
-        $roles = Role::all();
-        return view('admin.users.create', compact('roles'));
-    }
-
+    /**
+     * Store a newly created user (AJAX modal, soft-delete aware).
+     */
     public function store(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email|unique:users,email',
+        $validated = $request->validate([
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->whereNull('deleted_at'),
+            ],
             'password' => 'required|min:6',
             'name' => 'nullable|string',
-            'roles' => 'array'
+            'roles' => 'array',
+            'is_active' => 'sometimes|boolean',
         ]);
 
-        $user = User::create([
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'name' => $request->name,
-            'is_active' => 1
-        ]);
+        // Check if a soft-deleted user exists
+        $existing = User::withTrashed()
+            ->where('email', $validated['email'])
+            ->first();
 
-        $user->roles()->sync($request->roles);
+        if ($existing) {
+            // Restore and update soft-deleted user
+            $existing->restore();
+            $existing->update([
+                'name' => $validated['name'] ?? $existing->name,
+                'password' => Hash::make($validated['password']),
+                'is_active' => 1,
+            ]);
 
-        return redirect()->route('admin.users.index')
-            ->with('success', 'User created successfully');
-    }
+            $existing->roles()->sync($request->roles ?? []);
 
-    public function edit(User $user)
-    {
-        $roles = Role::all();
-        return view('admin.users.edit', compact('user', 'roles'));
-    }
-
-    public function update(Request $request, User $user)
-    {
-        $request->validate([
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'name' => 'nullable|string',
-            'roles' => 'array'
-        ]);
-
-        $user->update([
-            'email' => $request->email,
-            'name' => $request->name,
-            'is_active' => $request->is_active
-        ]);
-
-        if ($request->password) {
-            $user->update([
-                'password' => Hash::make($request->password)
+            return response()->json([
+                'message' => 'User restored successfully',
+                'user' => $existing
             ]);
         }
 
-        $user->roles()->sync($request->roles);
+        // Create new user
+        $user = User::create([
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'name' => $validated['name'] ?? null,
+            'is_active' => $validated['is_active'] ?? 1,
+        ]);
 
-        return redirect()->route('admin.users.index')
-            ->with('success', 'User updated successfully');
+        $user->roles()->sync($request->roles ?? []);
+
+        return response()->json([
+            'message' => 'User created successfully',
+            'user' => $user
+        ], 201);
     }
 
+    /**
+     * Get user data for editing (AJAX modal).
+     */
+    public function edit(User $user)
+    {
+        $user->load('roles'); // include roles relationship
+        return response()->json([
+            'id' => $user->id,
+            'email' => $user->email,
+            'name' => $user->name,
+            'is_active' => $user->is_active,
+            'roles' => $user->roles->pluck('id')->toArray(),
+        ]);
+    }
+
+    /**
+     * Update the specified user (AJAX modal, soft-delete aware).
+     */
+    public function update(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore($user->id)->whereNull('deleted_at'),
+            ],
+            'name' => 'nullable|string',
+            'roles' => 'array',
+            'is_active' => 'required|boolean',
+            'password' => 'nullable|min:6',
+        ]);
+
+        // Check soft-deleted conflicts
+        $conflict = User::withTrashed()
+            ->where('email', $validated['email'])
+            ->where('id', '!=', $user->id)
+            ->first();
+
+        if ($conflict) {
+            return response()->json([
+                'message' => 'A user with this email already exists (including archived records). Please use another email or restore the old user.'
+            ], 422);
+        }
+
+        // Update user info
+        $user->update([
+            'email' => $validated['email'],
+            'name' => $validated['name'] ?? $user->name,
+            'is_active' => $validated['is_active']
+        ]);
+
+        // Update password if provided
+        if (!empty($validated['password'])) {
+            $user->update([
+                'password' => Hash::make($validated['password'])
+            ]);
+        }
+
+        $user->roles()->sync($request->roles ?? []);
+
+        return response()->json([
+            'message' => 'User updated successfully',
+            'user' => $user
+        ]);
+    }
+
+    /**
+     * Soft delete the specified user.
+     */
     public function destroy(User $user)
     {
         $user->delete();
-        return back()->with('success', 'User deleted');
+
+        return response()->json([
+            'message' => 'User deleted successfully',
+            'id' => $user->id
+        ]);
     }
 }

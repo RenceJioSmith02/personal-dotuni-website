@@ -13,19 +13,32 @@ class ProgramRequirement extends Model
         'program_id',
         'requirement_category_id',
         'required_units',
+        'ms',
+        'mps',
         'updated_by',
     ];
+
+
+    public function category()
+    {
+        return $this->belongsTo(ProgramRequirementCategory::class, 'requirement_category_id');
+    }
 
     public function program()
     {
         return $this->belongsTo(Program::class);
     }
 
-    public function category()
-    {
-        return $this->belongsTo(
-            ProgramRequirementCategory::class,
-            'requirement_category_id'
-        );
-    }
+    // public function program()
+    // {
+    //     return $this->belongsTo(Program::class);
+    // }
+
+    // public function category()
+    // {
+    //     return $this->belongsTo(
+    //         ProgramRequirementCategory::class,
+    //         'requirement_category_id'
+    //     );
+    // }
 }

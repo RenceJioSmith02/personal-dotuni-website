@@ -49,6 +49,60 @@ $(document).ready(function () {
     /* ===============================
        FORM SUBMIT (AJAX)
     =============================== */
+    // $(document).on("submit", "form", function (e) {
+    //     if (!$(this).closest(".modal").length) return;
+
+    //     e.preventDefault();
+
+    //     const form = $(this);
+    //     const modal = form.closest(".modal");
+
+    //     $.ajax({
+    //         url: form.attr("action"),
+    //         type: form.find(".form-method").val() || "POST",
+    //         data: form.serialize(),
+
+    //         success: function (res) {
+    //             modal.addClass("modal-success");
+
+    //             setTimeout(() => modal.modal("hide"), 400);
+
+    //             Swal.fire({
+    //                 type: "success",
+    //                 title: "Success",
+    //                 text: res.message || "Saved successfully",
+    //                 timer: 1800,
+    //                 showConfirmButton: false,
+    //             });
+
+    //             setTimeout(() => location.reload(), 1800);
+    //         },
+
+    //         error: function (xhr) {
+    //             modal.addClass("modal-error");
+
+    //             setTimeout(() => {
+    //                 modal.removeClass("modal-error");
+    //             }, 400);
+
+    //             let html = '<ul class="text-left">';
+    //             $.each(xhr.responseJSON.errors, function (_, msg) {
+    //                 html += `<li>${msg[0]}</li>`;
+    //             });
+    //             html += "</ul>";
+
+    //             Swal.fire({
+    //                 type: "error",
+    //                 title: "Validation Error",
+    //                 text: xhr.responseJSON.message,
+    //             });
+    //         },
+    //     });
+    // });
+
+    /* ===============================
+   FORM SUBMIT (AJAX) WITH FILE SUPPORT
+=============================== */
     $(document).on("submit", "form", function (e) {
         if (!$(this).closest(".modal").length) return;
 
@@ -57,11 +111,22 @@ $(document).ready(function () {
         const form = $(this);
         const modal = form.closest(".modal");
 
+        // Use FormData to handle files
+        const formData = new FormData(form[0]);
+
+        // Add _method if present
+        const method = form.find(".form-method").val() || "POST";
+        if (method !== "POST") formData.set("_method", method);
+
         $.ajax({
             url: form.attr("action"),
-            type: form.find(".form-method").val() || "POST",
-            data: form.serialize(),
-
+            type: "POST", // Always POST, Laravel will read _method
+            data: formData,
+            processData: false, // Prevent jQuery from converting to string
+            contentType: false, // Let browser set content-type (multipart/form-data)
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
             success: function (res) {
                 modal.addClass("modal-success");
 
@@ -77,28 +142,28 @@ $(document).ready(function () {
 
                 setTimeout(() => location.reload(), 1800);
             },
-
             error: function (xhr) {
                 modal.addClass("modal-error");
 
-                setTimeout(() => {
-                    modal.removeClass("modal-error");
-                }, 400);
+                setTimeout(() => modal.removeClass("modal-error"), 400);
 
                 let html = '<ul class="text-left">';
-                $.each(xhr.responseJSON.errors, function (_, msg) {
-                    html += `<li>${msg[0]}</li>`;
-                });
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    $.each(xhr.responseJSON.errors, function (_, msg) {
+                        html += `<li>${msg[0]}</li>`;
+                    });
+                }
                 html += "</ul>";
 
                 Swal.fire({
                     type: "error",
                     title: "Validation Error",
-                    text: xhr.responseJSON.message,
+                    html: html,
                 });
             },
         });
     });
+
 
     /* ===============================
        MODAL ANIMATIONS
@@ -156,7 +221,16 @@ $(document).ready(function () {
     function populateForm(form, data) {
         for (const key in data) {
             const input = form.find(`[name="${key}"]`);
-            if (!input.length) continue;
+            if (!input.length) {
+                // Special case: array inputs (checkboxes)
+                if (Array.isArray(data[key])) {
+                    const arr = data[key];
+                    arr.forEach(val => {
+                        form.find(`[name="${key}[]"][value="${val}"]`).prop("checked", true);
+                    });
+                }
+                continue;
+            }
 
             const type = input.attr("type");
             const tag = input.prop("tagName").toLowerCase();
@@ -174,6 +248,19 @@ $(document).ready(function () {
             } else {
                 input.val(value ?? "");
             }
+        }
+
+        // IMAGE PREVIEW (EDIT)
+        if (data.asset && data.asset.storage_path) {
+            $("#programImagePreview").attr(
+                "src",
+                `/storage/${data.asset.storage_path}`
+            );
+        } else {
+            $("#programImagePreview").attr(
+                "src",
+                "https://via.placeholder.com/300x200?text=No+Image"
+            );
         }
     }
 });

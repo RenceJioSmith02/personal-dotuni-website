@@ -5,57 +5,97 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ProgramRequirementCategory;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProgramRequirementCategoryController extends Controller
 {
     public function index()
     {
-        $categories = ProgramRequirementCategory::all();
+        $categories = ProgramRequirementCategory::orderBy('sort_order')->get();
         return view('admin.program_requirement_categories.index', compact('categories'));
-    }
-
-    public function create()
-    {
-        return view('admin.program_requirement_categories.create');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string',
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('program_requirement_categories')
+                    ->whereNull('deleted_at'),
+            ],
             'sort_order' => 'required|integer',
         ]);
 
-        ProgramRequirementCategory::create($request->all());
+        // CHECK FOR SOFT-DELETED RECORD
+        $existing = ProgramRequirementCategory::withTrashed()
+            ->where('name', $validated['name'])
+            ->first();
 
-        return redirect()->route('admin.program_requirement_categories.index')
-            ->with('success', 'Category created successfully.');
+        if ($existing) {
+            $existing->restore();
+            $existing->update($validated);
+
+            return response()->json([
+                'message' => 'Category restored successfully',
+                'category' => $existing
+            ]);
+        }
+
+        $category = ProgramRequirementCategory::create($validated);
+
+        return response()->json([
+            'message' => 'Category created successfully',
+            'category' => $category
+        ], 201);
     }
 
     public function edit(ProgramRequirementCategory $program_requirement_category)
     {
-        return view('admin.program_requirement_categories.edit', [
-            'category' => $program_requirement_category
-        ]);
+        return response()->json($program_requirement_category);
     }
 
     public function update(Request $request, ProgramRequirementCategory $program_requirement_category)
     {
-        $request->validate([
-            'name' => 'required|string|unique:program_requirement_categories,name,' . $program_requirement_category->id,
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('program_requirement_categories')
+                    ->ignore($program_requirement_category->id)
+                    ->whereNull('deleted_at'),
+            ],
             'sort_order' => 'required|integer',
         ]);
 
-        $program_requirement_category->update($request->all());
+        // SAFETY CHECK AGAINST ARCHIVED DUPLICATES
+        $conflict = ProgramRequirementCategory::withTrashed()
+            ->where('name', $validated['name'])
+            ->where('id', '!=', $program_requirement_category->id)
+            ->first();
 
-        return redirect()->route('admin.program_requirement_categories.index')
-            ->with('success', 'Category updated successfully.');
+        if ($conflict) {
+            return response()->json([
+                'message' =>
+                    'A category with this name already exists (including archived records). Please add it again to restore.'
+            ], 422);
+        }
+
+        $program_requirement_category->update($validated);
+
+        return response()->json([
+            'message' => 'Category updated successfully',
+            'category' => $program_requirement_category
+        ]);
     }
 
     public function destroy(ProgramRequirementCategory $program_requirement_category)
     {
         $program_requirement_category->delete();
 
-        return back()->with('success', 'Category deleted successfully.');
+        return response()->json([
+            'message' => 'Category deleted successfully',
+            'id' => $program_requirement_category->id
+        ]);
     }
 }

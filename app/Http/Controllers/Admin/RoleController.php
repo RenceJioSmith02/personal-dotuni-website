@@ -5,62 +5,88 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class RoleController extends Controller
 {
+    /**
+     * Display a listing of roles.
+     */
     public function index()
     {
         $roles = Role::all();
         return view('admin.roles.index', compact('roles'));
     }
 
-    public function create()
-    {
-        return view('admin.roles.create');
-    }
-
+    /**
+     * Store a newly created role (AJAX modal).
+     */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:50|unique:roles,name'
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('roles', 'name'),
+            ],
         ]);
 
-        Role::create([
-            'name' => $request->name
-        ]);
+        $role = Role::create($validated);
 
-        return redirect()->route('admin.roles.index')
-            ->with('success', 'Role created successfully');
+        return response()->json([
+            'message' => 'Role created successfully',
+            'role' => $role
+        ], 201);
     }
 
+    /**
+     * Get role data for editing (AJAX modal).
+     */
     public function edit(Role $role)
     {
-        return view('admin.roles.edit', compact('role'));
+        return response()->json($role);
     }
 
+    /**
+     * Update the specified role (AJAX modal).
+     */
     public function update(Request $request, Role $role)
     {
-        $request->validate([
-            'name' => 'required|string|max:50|unique:roles,name,' . $role->id
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('roles', 'name')->ignore($role->id),
+            ],
         ]);
 
-        $role->update([
-            'name' => $request->name
-        ]);
+        $role->update($validated);
 
-        return redirect()->route('admin.roles.index')
-            ->with('success', 'Role updated successfully');
+        return response()->json([
+            'message' => 'Role updated successfully',
+            'role' => $role
+        ]);
     }
 
+    /**
+     * Delete the specified role (AJAX modal).
+     */
     public function destroy(Role $role)
     {
-        // Optional safety: prevent deleting roles in use
+        // Prevent deleting roles assigned to users
         if ($role->users()->count() > 0) {
-            return back()->with('error', 'Role is assigned to users and cannot be deleted');
+            return response()->json([
+                'message' => 'Role is assigned to users and cannot be deleted'
+            ], 422);
         }
 
         $role->delete();
 
-        return back()->with('success', 'Role deleted');
+        return response()->json([
+            'message' => 'Role deleted successfully',
+            'id' => $role->id
+        ]);
     }
 }

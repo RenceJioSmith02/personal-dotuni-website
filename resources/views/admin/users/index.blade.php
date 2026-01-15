@@ -1,8 +1,8 @@
-@extends('adminlte::page')
+
+@extends('layouts.admin')
 
 @section('plugins.Datatables', true)
 @section('title', 'Users')
-
 
 @section('content_header')
     <h1>User Management</h1>
@@ -11,12 +11,28 @@
 @section('content')
 <div class="card">
     <div class="card-header">
-        <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Add User
-        </a>
+
+        <!-- Add User -->
+        <button
+            class="open-modal btn btn-primary"
+            data-action="add"
+            data-modal="#userModal"
+            data-form="#userForm"
+            data-title="Add User"
+            data-url="/admin/users">
+            <i class="fas fa-plus mr-1"></i> Add User
+        </button>
+
     </div>
 
     <div class="card-body">
+
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <table id="usersTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
@@ -43,20 +59,32 @@
                             : '<span class="badge badge-danger">Inactive</span>' !!}
                     </td>
                     <td>
-                        <a href="{{ route('admin.users.edit', $user) }}"
-                           class="btn btn-sm btn-warning">
-                            Edit
-                        </a>
 
-                        <form action="{{ route('admin.users.destroy', $user) }}"
-                              method="POST" class="d-inline">
+                        <!-- Edit -->
+                        <button
+                            class="open-modal btn btn-sm btn-info"
+                            data-action="edit"
+                            data-modal="#userModal"
+                            data-form="#userForm"
+                            data-title="Edit User"
+                            data-url="/admin/users"
+                            data-id="{{ $user->id }}">
+                            Edit
+                        </button>
+
+                        <!-- Delete -->
+                        <form
+                            action="{{ route('admin.users.destroy', $user) }}"
+                            method="POST"
+                            class="d-inline ajax-delete-user">
                             @csrf
                             @method('DELETE')
-                            <button class="btn btn-sm btn-danger"
-                                onclick="return confirm('Delete user?')">
+
+                            <button type="submit" class="btn btn-sm btn-danger">
                                 Delete
                             </button>
                         </form>
+
                     </td>
                 </tr>
                 @endforeach
@@ -64,23 +92,88 @@
         </table>
     </div>
 </div>
+
+{{-- User Modal --}}
+@include('admin.users.partials.user-modal')
+
 @stop
 
 
-@section('js')
+@push('js')
 <script>
 $(function () {
+
+    /* ================================
+     * DataTable
+     * ================================ */
+    if ($.fn.DataTable.isDataTable('#usersTable')) {
+        $('#usersTable').DataTable().destroy();
+    }
+
     $('#usersTable').DataTable({
         responsive: true,
         autoWidth: false,
         ordering: true,
         pageLength: 10,
-        lengthChange: true,
-        searching: true,
         columnDefs: [
             { orderable: false, targets: 4 }
         ]
     });
+
+
+    /* ================================
+     * AJAX DELETE USER
+     * ================================ */
+    $(document).on("submit", ".ajax-delete-user", function (e) {
+        e.preventDefault();
+
+        const form = $(this);
+        const url = form.attr("action");
+        const row = form.closest("tr");
+        const table = $("#usersTable").DataTable();
+
+        Swal.fire({
+            title: "Delete this user?",
+            text: "This action cannot be undone.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, delete it",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#dc3545",
+            reverseButtons: true
+        }).then((result) => {
+
+            if (!result.value) return;
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr("content"),
+                    _method: "DELETE"
+                },
+                success: function (res) {
+                    Swal.fire({
+                        type: "success",
+                        title: "Deleted",
+                        text: res.message || "User deleted successfully",
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                    table.row(row).remove().draw(false);
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        type: "error",
+                        title: "Delete failed",
+                        text: xhr.responseJSON?.message || "Something went wrong"
+                    });
+                }
+            });
+        });
+    });
+
 });
 </script>
-@stop
+@endpush

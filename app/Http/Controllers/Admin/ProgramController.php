@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -17,24 +18,19 @@ class ProgramController extends Controller
         return view('admin.programs.index', compact('programs'));
     }
 
-    public function create()
-    {
-        return view('admin.programs.create');
-    }
-
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:250',
-            'description' => 'required|string',
-            'type' => 'required|string|max:20',
-            'total_units' => 'required|numeric',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        $validated = $request->validate([
+            'title'        => 'required|string|max:250',
+            'description'  => 'required|string',
+            'type'         => 'required|string|max:50',
+            'total_units'  => 'required|numeric',
+            'is_active'    => 'required|boolean',
+            'image'        => 'nullable|image|max:2048',
         ]);
 
         $assetId = null;
 
-        // Upload image
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $path = $file->store('programs', 'public');
@@ -52,45 +48,39 @@ class ProgramController extends Controller
         }
 
         Program::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'type' => $request->type,
-            'total_units' => $request->total_units,
-            'is_active' => 1,
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'type' => $validated['type'],
+            'total_units' => $validated['total_units'],
+            'is_active' => $validated['is_active'],
             'program_asset_id' => $assetId,
         ]);
 
-        return redirect()
-            ->route('admin.programs.index')
-            ->with('success', 'Program created successfully');
+        return response()->json(['message' => 'Program created successfully']);
     }
 
     public function edit(Program $program)
     {
-        $program->load('asset');
-        return view('admin.programs.edit', compact('program'));
+        return response()->json($program->load('asset'));
     }
 
     public function update(Request $request, Program $program)
     {
-        $request->validate([
-            'title' => 'required|string|max:250',
-            'description' => 'required|string',
-            'type' => 'required|string|max:20',
-            'total_units' => 'required|numeric',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        $validated = $request->validate([
+            'title'        => 'required|string|max:250',
+            'description'  => 'required|string',
+            'type'         => 'required|string|max:50',
+            'total_units'  => 'required|numeric',
+            'is_active'    => 'required|boolean',
+            'image'        => 'nullable|image|max:2048',
         ]);
 
-        // ✅ IMAGE REPLACEMENT LOGIC
         if ($request->hasFile('image')) {
-
-            // Delete old image + asset
             if ($program->asset) {
                 Storage::disk('public')->delete($program->asset->storage_path);
                 $program->asset->delete();
             }
 
-            // Save new image
             $file = $request->file('image');
             $path = $file->store('programs', 'public');
 
@@ -106,23 +96,13 @@ class ProgramController extends Controller
             $program->program_asset_id = $asset->id;
         }
 
-        // Update program fields
-        $program->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'type' => $request->type,
-            'total_units' => $request->total_units,
-            'is_active' => $request->is_active ?? $program->is_active,
-        ]);
+        $program->update($validated);
 
-        return redirect()
-            ->route('admin.programs.index')
-            ->with('success', 'Program updated successfully');
+        return response()->json(['message' => 'Program updated successfully']);
     }
 
     public function destroy(Program $program)
     {
-        // ✅ AUTO DELETE ASSET + FILE
         if ($program->asset) {
             Storage::disk('public')->delete($program->asset->storage_path);
             $program->asset->delete();
@@ -130,6 +110,6 @@ class ProgramController extends Controller
 
         $program->delete();
 
-        return back()->with('success', 'Program deleted successfully');
+        return response()->json(['message' => 'Program deleted successfully']);
     }
 }
