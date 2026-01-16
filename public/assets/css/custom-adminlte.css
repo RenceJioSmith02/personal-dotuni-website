@@ -1,0 +1,242 @@
+/* =========================================================
+   ROOT VARIABLES (DESIGN SYSTEM)
+========================================================= */
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --danger: #ef4444;
+    --info: #0ea5e9;
+    --success: #22c55e;
+    --bg-main: #f6f7fb;
+    --bg-card: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border-soft: #e5e7eb;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
+    --transition: all 0.25s ease;
+}
+
+/* =========================================================
+   BASE
+========================================================= */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+}
+
+.content-wrapper {
+    background-color: var(--bg-main);
+}
+
+/* =========================================================
+   CARDS
+========================================================= */
+.card {
+    background: var(--bg-card);
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--border-soft);
+    font-weight: 600;
+    padding: 16px 20px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+.btn {
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.btn i {
+    transition: transform 0.2s ease;
+}
+
+.btn:hover i {
+    transform: translateX(2px);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+}
+
+.btn-info {
+    background-color: var(--info);
+    border-color: var(--info);
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    border-color: var(--danger);
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+/* =========================================================
+   TABLES
+========================================================= */
+.table {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: #0f172a;
+    color: #fff;
+    font-size: 12px;
+    text-transform: uppercase;
+    border: none;
+    letter-spacing: 0.04em;
+}
+
+.table tbody td {
+    border-color: var(--border-soft);
+    vertical-align: middle;
+}
+
+.table tbody tr {
+    transition: var(--transition);
+}
+
+.table tbody tr:hover {
+    background-color: #f1f5f9;
+}
+
+/* =========================================================
+   DATATABLES
+========================================================= */
+.dataTables_wrapper {
+    font-size: 14px;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-soft);
+    padding: 6px 12px;
+    transition: var(--transition);
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    border-radius: var(--radius-sm) !important;
+    margin: 0 3px;
+    transition: var(--transition);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: var(--primary) !important;
+    color: #fff !important;
+    border: none;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: var(--primary-dark) !important;
+    color: #fff !important;
+}
+
+/* =========================================================
+   BADGES
+========================================================= */
+.badge {
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.badge-success { background-color: var(--success); }
+.badge-danger  { background-color: var(--danger); }
+.badge-info    { background-color: var(--info); }
+
+/* =========================================================
+   ALERTS
+========================================================= */
+.alert {
+    border-radius: var(--radius-md);
+    border: none;
+    box-shadow: var(--shadow-soft);
+    animation: fadeSlideDown 0.4s ease;
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+.main-sidebar {
+    background-color: #020617 !important;
+}
+
+.nav-sidebar .nav-link {
+    color: #cbd5f5;
+    border-radius: var(--radius-sm);
+    margin: 4px 8px;
+    transition: var(--transition);
+}
+
+.nav-sidebar .nav-link.active {
+    background-color: #1e293b !important;
+    color: #fff;
+}
+
+.nav-sidebar .nav-link:hover {
+    background-color: #334155;
+    transform: translateX(4px);
+}
+
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+@keyframes fadeSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleFade {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

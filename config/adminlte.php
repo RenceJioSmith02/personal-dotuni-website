@@ -364,6 +364,23 @@ return [
                 ],
             ],
         ],
+        [
+            'text' => 'Linkages',
+            'icon' => 'fas fa-handshake',
+            'submenu' => [
+                [
+                    'text' => 'Linkage Categories',
+                    'url' => 'admin/linkage_categories',
+                    'icon' => 'fas fa-tags',
+                ],
+                [
+                    'text' => 'Linkages',
+                    'url' => 'admin/linkages',
+                    'icon' => 'fas fa-link',
+                ],
+            ],
+        ],
+
 
 
         ['header' => 'account_settings'],

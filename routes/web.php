@@ -4,9 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\LinkageController;
 use App\Http\Controllers\Admin\ProgramController;
 use App\Http\Controllers\Admin\ProgramCourseController;
 use App\Http\Controllers\Admin\ProgramBuilderController;
+use App\Http\Controllers\Admin\LinkageCategoryController;
 use App\Http\Controllers\Admin\CoursePrerequisiteController;
 use App\Http\Controllers\Admin\ProgramRequirementController;
 use App\Http\Controllers\Admin\ProgramRequirementCategoryController;
@@ -45,6 +47,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         ->name('programs.courses.store.ajax');
     Route::delete('programs/{program}/courses/{programCourse}/ajax', [ProgramBuilderController::class, 'destroyCourse'])
         ->name('programs.courses.destroy.ajax');
+
+
+
+    // LINKAGE ROUTES
+    Route::resource('linkage_categories', LinkageCategoryController::class);
+    Route::resource('linkages', LinkageController::class);
+    
+
+
 
 
     // AJAX routes for builder

@@ -1,12 +1,4 @@
 $(document).ready(function () {
-    /* ===============================
-       CSRF (GLOBAL)
-    =============================== */
-    // $.ajaxSetup({
-    //     headers: {
-    //         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-    //     },
-    // });
 
     /* ===============================
        MODAL OPEN (ADD / EDIT)
@@ -21,6 +13,9 @@ $(document).ready(function () {
 
         // Reset state
         form.trigger("reset");
+
+        resetImagePreviews(form);
+
         modal.removeClass("modal-success modal-error");
 
         // Title
@@ -30,8 +25,11 @@ $(document).ready(function () {
         if (action === "add") {
             form.attr("action", url);
             form.find(".form-method").val("POST");
+
+            modal.removeClass("force-close is-closing fade show");
             modal.modal("show");
         }
+
 
         // EDIT
         if (action === "edit") {
@@ -40,65 +38,11 @@ $(document).ready(function () {
 
                 form.attr("action", `${url}/${id}`);
                 form.find(".form-method").val("PUT");
-
+                modal.removeClass("force-close is-closing fade show");
                 modal.modal("show");
             });
         }
     });
-
-    /* ===============================
-       FORM SUBMIT (AJAX)
-    =============================== */
-    // $(document).on("submit", "form", function (e) {
-    //     if (!$(this).closest(".modal").length) return;
-
-    //     e.preventDefault();
-
-    //     const form = $(this);
-    //     const modal = form.closest(".modal");
-
-    //     $.ajax({
-    //         url: form.attr("action"),
-    //         type: form.find(".form-method").val() || "POST",
-    //         data: form.serialize(),
-
-    //         success: function (res) {
-    //             modal.addClass("modal-success");
-
-    //             setTimeout(() => modal.modal("hide"), 400);
-
-    //             Swal.fire({
-    //                 type: "success",
-    //                 title: "Success",
-    //                 text: res.message || "Saved successfully",
-    //                 timer: 1800,
-    //                 showConfirmButton: false,
-    //             });
-
-    //             setTimeout(() => location.reload(), 1800);
-    //         },
-
-    //         error: function (xhr) {
-    //             modal.addClass("modal-error");
-
-    //             setTimeout(() => {
-    //                 modal.removeClass("modal-error");
-    //             }, 400);
-
-    //             let html = '<ul class="text-left">';
-    //             $.each(xhr.responseJSON.errors, function (_, msg) {
-    //                 html += `<li>${msg[0]}</li>`;
-    //             });
-    //             html += "</ul>";
-
-    //             Swal.fire({
-    //                 type: "error",
-    //                 title: "Validation Error",
-    //                 text: xhr.responseJSON.message,
-    //             });
-    //         },
-    //     });
-    // });
 
     /* ===============================
    FORM SUBMIT (AJAX) WITH FILE SUPPORT
@@ -164,7 +108,6 @@ $(document).ready(function () {
         });
     });
 
-
     /* ===============================
        MODAL ANIMATIONS
     =============================== */
@@ -188,12 +131,15 @@ $(document).ready(function () {
     );
 
     /* Bootstrap hide event override */
-    $(".modal").on("hide.bs.modal", function (e) {
-        if (!$(this).hasClass("force-close")) {
-            e.preventDefault();
-            closeAnimatedModal($(this));
-        }
-    });
+$(".modal").on("hide.bs.modal", function (e) {
+    if (!$(this).hasClass("animated-modal")) return;
+    if ($(this).hasClass("force-close")) return;
+
+    e.preventDefault();
+    closeAnimatedModal($(this));
+});
+
+
 
     /* Reusable close function */
     function closeAnimatedModal(modal) {
@@ -214,6 +160,23 @@ $(document).ready(function () {
         }, 300);
     }
 
+
+function resetImagePreviews(form) {
+    form.find(".preview-img").each(function () {
+        const img = $(this);
+
+        const placeholder =
+            img.attr("data-placeholder") ||
+            "https://via.placeholder.com/300x200?text=No+Image";
+
+        img.attr("src", placeholder);
+    });
+
+    // Reset file inputs safely
+    form.find('input[type="file"]').val("");
+}
+
+    populateForm
     /* ===============================
     FORM AUTO-POPULATE (GENERIC)
     =============================== */
@@ -225,8 +188,11 @@ $(document).ready(function () {
                 // Special case: array inputs (checkboxes)
                 if (Array.isArray(data[key])) {
                     const arr = data[key];
-                    arr.forEach(val => {
-                        form.find(`[name="${key}[]"][value="${val}"]`).prop("checked", true);
+                    arr.forEach((val) => {
+                        form.find(`[name="${key}[]"][value="${val}"]`).prop(
+                            "checked",
+                            true
+                        );
                     });
                 }
                 continue;
@@ -245,22 +211,46 @@ $(document).ready(function () {
                 input.prop("checked", !!value);
             } else if (type === "radio") {
                 input.filter(`[value="${value}"]`).prop("checked", true);
+            } else if (type === "file") {
+                continue;
             } else {
                 input.val(value ?? "");
             }
         }
 
-        // IMAGE PREVIEW (EDIT)
-        if (data.asset && data.asset.storage_path) {
-            $("#programImagePreview").attr(
-                "src",
-                `/storage/${data.asset.storage_path}`
-            );
-        } else {
-            $("#programImagePreview").attr(
-                "src",
-                "https://via.placeholder.com/300x200?text=No+Image"
-            );
-        }
+        // IMAGE PREVIEW (EDIT) UNIVERSAL
+        form.find(".preview-img").each(function () {
+            const img = $(this);
+            const inputSelector = img.data("input-target");
+            const jsonKey = img.data("json-key"); // <-- 'asset' or 'logo'
+
+            if (data[jsonKey] && data[jsonKey].storage_path) {
+                img.attr("src", `/storage/${data[jsonKey].storage_path}`);
+            } else {
+                img.attr(
+                    "src",
+                    img.attr("data-placeholder") ||
+                        "https://via.placeholder.com/300x200?text=No+Image"
+                );
+            }
+        });
+
+
     }
+
+    // Universal image preview
+    $(document).on("change", ".preview-input", function (e) {
+        const input = $(this);
+        const targetSelector = input.data("preview-target");
+        const preview = $(targetSelector);
+
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.attr("src", e.target.result);
+        };
+        reader.readAsDataURL(file);
+    });
 });

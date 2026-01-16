@@ -10,6 +10,7 @@
     {{-- Global CSS --}}
     <link rel="stylesheet" href="{{ asset('assets/css/modal.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/global.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('assets/css/custom-adminlte.css') }}"> --}}
     @stack('css')
 @stop
 

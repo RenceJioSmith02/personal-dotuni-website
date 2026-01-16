@@ -28,16 +28,19 @@
                             <div class="mb-2">
                                 <img
                                     id="programImagePreview"
-                                    src="https://via.placeholder.com/300x200?text=No+Image"
-                                    class="img-thumbnail"
-                                    style="max-height: 180px;">
+                                    class="img-thumbnail preview-img"
+                                    data-input-target="#programImageInput"
+                                    data-json-key="asset"
+                                    data-placeholder="https://via.placeholder.com/200x120?text=No+Logo"
+                                    src="https://via.placeholder.com/300x200?text=No+Image">
+
                             </div>
 
                             <input
                                 type="file"
                                 name="image"
-                                class="form-control-file"
-                                id="programImageInput"
+                                class="form-control-file preview-input"
+                                data-preview-target="#programImagePreview"
                                 accept="image/*">
 
                             <small class="text-muted">
