@@ -6,6 +6,9 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\LinkageController;
 use App\Http\Controllers\Admin\ProgramController;
+use App\Http\Controllers\Admin\ClsuNewsController;
+use App\Http\Controllers\Admin\FaqAnswerController;
+use App\Http\Controllers\Admin\FaqQuestionController;
 use App\Http\Controllers\Admin\ProgramCourseController;
 use App\Http\Controllers\Admin\ProgramBuilderController;
 use App\Http\Controllers\Admin\LinkageCategoryController;
@@ -53,11 +56,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // LINKAGE ROUTES
     Route::resource('linkage_categories', LinkageCategoryController::class);
     Route::resource('linkages', LinkageController::class);
+
+
+    // CLSU NEWS ROUTES
+    Route::resource('clsu_news', ClsuNewsController::class);
+
+    // FAQS ROUTES
+    Route::resource('faqs_questions', FaqQuestionController::class);
+    Route::resource('faqs_answers', FaqAnswerController::class);
+
+
+
     
-
-
-
-
     // AJAX routes for builder
     // Route::post(
     //     'programs/{program}/requirements/ajax',

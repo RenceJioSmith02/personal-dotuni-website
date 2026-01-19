@@ -380,6 +380,40 @@ return [
                 ],
             ],
         ],
+        [
+            'text' => 'CLSU',
+            'icon' => 'fas fa-university',
+            'submenu' => [
+                [
+                    'text' => 'News',
+                    'url' => 'admin/clsu_news',
+                    'icon' => 'fas fa-newspaper',
+                ],
+                [
+                    'text' => 'Announcements',
+                    'url' => 'admin/announcements',
+                    'icon' => 'fas fa-bullhorn',
+                ],
+            ],
+        ],
+        [
+            'text' => 'FAQs',
+            'icon' => 'fas fa-question-circle',
+            'submenu' => [
+                [
+                    'text' => 'Questions',
+                    'url' => 'admin/faqs_questions',
+                    'icon' => 'fas fa-question',
+                ],
+                [
+                    'text' => 'Answers',
+                    'url' => 'admin/faqs_answers',
+                    'icon' => 'fas fa-comment-dots',
+                ],
+            ],
+        ],
+
+
 
 
 

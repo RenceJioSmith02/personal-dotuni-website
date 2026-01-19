@@ -29,16 +29,5 @@ class ProgramRequirement extends Model
         return $this->belongsTo(Program::class);
     }
 
-    // public function program()
-    // {
-    //     return $this->belongsTo(Program::class);
-    // }
 
-    // public function category()
-    // {
-    //     return $this->belongsTo(
-    //         ProgramRequirementCategory::class,
-    //         'requirement_category_id'
-    //     );
-    // }
 }
