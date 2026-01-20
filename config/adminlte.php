@@ -412,6 +412,50 @@ return [
                 ],
             ],
         ],
+        [
+            'text' => 'Prospective Students',
+            'icon' => 'fas fa-user-graduate',
+            'submenu' => [
+                [
+                    'text' => 'Categories',
+                    'url' => 'admin/prospective_student_categories',
+                    'icon' => 'fas fa-folder-open',
+                ],
+                [
+                    'text' => 'Items',
+                    'url' => 'admin/prospective_student_items',
+                    'icon' => 'fas fa-list-alt',
+                ],
+            ],
+        ],
+        [
+            'text' => 'Rules and Regulations',
+            'icon' => 'fas fa-gavel',
+            'submenu' => [
+                [
+                    'text' => 'Articles',
+                    'url' => 'admin/rule_articles',
+                    'icon' => 'fas fa-book',
+                ],
+                [
+                    'text' => 'Sections',
+                    'url' => 'admin/rule_sections',
+                    'icon' => 'fas fa-list-alt',
+                ],
+                [
+                    'text' => 'Sub-Sections',
+                    'url' => 'admin/rule_sub_sections',
+                    'icon' => 'fas fa-list',
+                ],
+                [
+                    'text' => 'Clauses',
+                    'url' => 'admin/rule_clauses',
+                    'icon' => 'fas fa-paragraph',
+                ],
+            ],
+        ],
+
+
 
 
 
