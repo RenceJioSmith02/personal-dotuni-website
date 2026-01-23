@@ -320,12 +320,31 @@ return [
             'url' => 'admin/blog',
             'can' => 'manage-blog',
         ],
+
+        // menus
         [
             'text' => 'pages',
             'url' => 'admin/pages',
             'icon' => 'far fa-fw fa-file',
             'label' => 4,
             'label_color' => 'success',
+        ],
+        [
+            'text' => 'E-Resources',
+            'url' => 'admin/e_resources',
+            'icon' => 'fas fa-book', 
+            // 'label' => \App\Models\EResource::count(), 
+            'label_color' => 'info', 
+        ],
+        [
+            'text' => 'Gallery',
+            'route' => 'admin.gallery.index',
+            'icon' => 'far fa-fw fa-images',
+        ],
+        [
+            'text' => 'DotUni News',
+            'route' => 'admin.dotuni_news.index',
+            'icon' => 'far fa-fw fa-newspaper',
         ],
         [
             'text' => 'User Management',
@@ -454,6 +473,23 @@ return [
                 ],
             ],
         ],
+        [
+            'text' => 'Form Management',
+            'icon' => 'fas fa-file-alt',
+            'submenu' => [
+                [
+                    'text' => 'Categories',
+                    'url' => 'admin/form_categories',
+                    'icon' => 'fas fa-folder',
+                ],
+                [
+                    'text' => 'Forms',
+                    'url' => 'admin/forms',
+                    'icon' => 'fas fa-wpforms',
+                ],
+            ],
+        ],
+
 
 
 

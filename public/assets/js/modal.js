@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
     /* ===============================
        MODAL OPEN (ADD / EDIT)
     =============================== */
@@ -29,7 +28,6 @@ $(document).ready(function () {
             modal.removeClass("force-close is-closing fade show");
             modal.modal("show");
         }
-
 
         // EDIT
         if (action === "edit") {
@@ -127,19 +125,17 @@ $(document).ready(function () {
             const modal = $(this).closest(".modal");
 
             closeAnimatedModal(modal);
-        }
+        },
     );
 
     /* Bootstrap hide event override */
-$(".modal").on("hide.bs.modal", function (e) {
-    if (!$(this).hasClass("animated-modal")) return;
-    if ($(this).hasClass("force-close")) return;
+    $(".modal").on("hide.bs.modal", function (e) {
+        if (!$(this).hasClass("animated-modal")) return;
+        if ($(this).hasClass("force-close")) return;
 
-    e.preventDefault();
-    closeAnimatedModal($(this));
-});
-
-
+        e.preventDefault();
+        closeAnimatedModal($(this));
+    });
 
     /* Reusable close function */
     function closeAnimatedModal(modal) {
@@ -160,23 +156,154 @@ $(".modal").on("hide.bs.modal", function (e) {
         }, 300);
     }
 
+    function resetImagePreviews(form) {
+        form.find(".preview-img").each(function () {
+            const img = $(this);
 
-function resetImagePreviews(form) {
-    form.find(".preview-img").each(function () {
-        const img = $(this);
+            const placeholder =
+                img.attr("data-placeholder") ||
+                "https://via.placeholder.com/300x200?text=No+Image";
 
-        const placeholder =
-            img.attr("data-placeholder") ||
-            "https://via.placeholder.com/300x200?text=No+Image";
+            img.attr("src", placeholder);
+        });
 
-        img.attr("src", placeholder);
+        // Reset file inputs safely
+        form.find('input[type="file"]').val("");
+    }
+
+    window.newsMediaHelper = {
+        rowIndex: 0,
+
+        // Generate a media row HTML
+        makeRow: function (index, mediaData = null) {
+            const isOdd = index % 2 === 0; // Row 1 => index 0 => image left, caption right
+            const rowId = `newsMediaRow_${index}`;
+
+            const imageSrc = mediaData?.image_path
+                ? `/storage/${mediaData.image_path}`
+                : "https://via.placeholder.com/600x350?text=No+Image";
+
+            const isThumbnail = mediaData?.is_thumbnail ? "checked" : "";
+            const hiddenThumbnail = mediaData?.is_thumbnail ? "1" : "0";
+            const caption = mediaData?.caption || "";
+
+            // Include hidden input for existing media ID if it exists
+            const existingIdInput = mediaData?.id
+                ? `<input type="hidden" name="existing_media_ids[]" value="${mediaData.id}">`
+                : "";
+
+            const imageCol = `
+        <div>
+            <label class="mb-1">Image</label>
+            <div class="mb-2">
+                <img
+                    src="${imageSrc}"
+                    class="media-preview"
+                    id="mediaPreview_${index}"
+                    data-placeholder="https://via.placeholder.com/600x350?text=No+Image"
+                    alt="Preview">
+            </div>
+
+            <input
+                type="file"
+                name="media[${index}][image]"
+                class="form-control-file media-input"
+                data-preview="#mediaPreview_${index}"
+                accept="image/*">
+        </div>
+    `;
+
+            const captionCol = `
+        <div>
+            <label class="mb-1">Caption</label>
+            <textarea
+                name="media[${index}][caption]"
+                class="form-control"
+                rows="6"
+                maxlength="500"
+                placeholder="Write a caption (optional)...">${caption}</textarea>
+
+            <div class="mt-2 d-flex align-items-center justify-content-between">
+                <div>
+                    <label class="thumb-flag mb-0">
+                        <input type="radio" name="thumbnail_choice" value="${index}" ${isThumbnail}>
+                        Set as Thumbnail
+                    </label>
+                </div>
+            </div>
+
+            <input type="hidden" name="media[${index}][is_thumbnail]" value="${hiddenThumbnail}">
+            <input type="hidden" name="media[${index}][is_cover]" value="0">
+            ${existingIdInput}
+        </div>
+    `;
+
+            const first = isOdd ? imageCol : captionCol;
+            const second = isOdd ? captionCol : imageCol;
+
+            return `
+        <div class="media-row" id="${rowId}" data-index="${index}">
+            <div class="media-actions">
+                <span class="badge badge-light">Row ${index + 1}</span>
+                <button type="button" class="btn btn-sm btn-outline-danger remove-media-row">
+                    <i class="fas fa-trash mr-1"></i> Remove
+                </button>
+            </div>
+
+            <div class="media-grid">
+                ${first}
+                ${second}
+            </div>
+        </div>
+    `;
+    },
+        // Refresh the row badges
+        refreshBadges: function () {
+            $("#newsMediaContainer .media-row").each(function (i) {
+                $(this)
+                    .find(".badge")
+                    .text(`Row ${i + 1}`);
+            });
+        },
+
+        // Add a new row
+        addRow: function () {
+            $("#newsMediaContainer").append(this.makeRow(this.rowIndex));
+            this.rowIndex++;
+            this.refreshBadges();
+            $("#newsMediaContainer").sortable("refresh");
+        },
+
+        // Remove a row
+        removeRow: function (row) {
+            const removedIndex = row.data("index");
+
+            // Clear thumbnail selection if removed
+            const selected = $('input[name="thumbnail_choice"]:checked').val();
+            if (String(selected) === String(removedIndex)) {
+                $('input[name="thumbnail_choice"]').prop("checked", false);
+            }
+
+            row.remove();
+            this.refreshBadges();
+        },
+    };
+
+    // ==========================
+    // Event listeners
+    // ==========================
+
+    // Add new row
+    $(document).on("click", "#addNewsMediaRow", function () {
+        window.newsMediaHelper.addRow();
     });
 
-    // Reset file inputs safely
-    form.find('input[type="file"]').val("");
-}
+    // Remove row
+    $(document).on("click", ".remove-media-row", function () {
+        const row = $(this).closest(".media-row");
+        window.newsMediaHelper.removeRow(row);
+    });
 
-    populateForm
     /* ===============================
     FORM AUTO-POPULATE (GENERIC)
     =============================== */
@@ -191,7 +318,7 @@ function resetImagePreviews(form) {
                     arr.forEach((val) => {
                         form.find(`[name="${key}[]"][value="${val}"]`).prop(
                             "checked",
-                            true
+                            true,
                         );
                     });
                 }
@@ -211,6 +338,12 @@ function resetImagePreviews(form) {
                 input.prop("checked", !!value);
             } else if (type === "radio") {
                 input.filter(`[value="${value}"]`).prop("checked", true);
+            } else if (type === "datetime-local") {
+                if (value) {
+                    // Convert "YYYY-MM-DD HH:MM:SS" → "YYYY-MM-DDTHH:MM"
+                    value = value.replace(" ", "T").slice(0, 16);
+                    input.val(value);
+                }
             } else if (type === "file") {
                 continue;
             } else {
@@ -222,7 +355,7 @@ function resetImagePreviews(form) {
         form.find(".preview-img").each(function () {
             const img = $(this);
             const inputSelector = img.data("input-target");
-            const jsonKey = img.data("json-key"); // <-- 'asset' or 'logo'
+            const jsonKey = img.data("json-key");
 
             if (data[jsonKey] && data[jsonKey].storage_path) {
                 img.attr("src", `/storage/${data[jsonKey].storage_path}`);
@@ -230,11 +363,27 @@ function resetImagePreviews(form) {
                 img.attr(
                     "src",
                     img.attr("data-placeholder") ||
-                        "https://via.placeholder.com/300x200?text=No+Image"
+                        "https://via.placeholder.com/300x200?text=No+Image",
                 );
             }
         });
 
+        if (Array.isArray(data.media)) {
+            const container = $("#newsMediaContainer");
+            container.empty();
+            window.newsMediaHelper.rowIndex = 0;
+
+            data.media.forEach((media) => {
+                const html = window.newsMediaHelper.makeRow(
+                    window.newsMediaHelper.rowIndex,
+                    media, // pass existing media data
+                );
+                container.append(html);
+                window.newsMediaHelper.rowIndex++;
+            });
+
+            window.newsMediaHelper.refreshBadges();
+        }
 
     }
 
