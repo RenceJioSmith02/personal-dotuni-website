@@ -40,14 +40,14 @@ $(document).ready(function () {
 
                 if (data.layout === "layout_5" && Array.isArray(data.media)) {
                     resetLayout5Media(); 
-                    window.existingNewsMedia = data.media.map((m) => ({
-                        id: m.id,
-                        url: `/storage/${m.image_path}`,
-                        caption: m.caption,
-                        sort_order: m.sort_order,
-                        is_thumbnail: m.is_thumbnail,
-                    }));
-                    renderExistingMedia();
+
+                    if (
+                        data.layout === "layout_5" &&
+                        Array.isArray(data.media)
+                    ) {
+                        loadExistingLayout5(data.media);
+                    }
+
                 }
 
 
@@ -489,11 +489,129 @@ $(document).ready(function () {
     
             // media script for layout 5
 
+            // ===============================
+// LAYOUT 5 — STABLE MEDIA SYSTEM
+// ===============================
+
+window.layout5Media = [];
+
+
+function renderLayout5() {
+    const grid = $("#mediaGrid");
+    grid.find(".image-card").remove();
+
+    window.layout5Media.forEach((m, i) => {
+        const card = $(`
+            <div class="media-card image-card" data-key="${i}">
+                <span class="remove-btn">&times;</span>
+                <img src="${m.url}">
+            </div>
+        `);
+
+        $("#addMediaCard").before(card);
+    });
+
+    updateLayout5Inputs();
+}
+
+
+
+function updateLayout5Inputs() {
+    const form = $("#dotuniNewsForm");
+
+    // Clear only layout 5 inputs
+    form.find('input[name="existing_media_ids[]"]').remove();
+    form.find('input[name^="media["]').remove();
+
+    window.layout5Media.forEach((m, index) => {
+        if (m.type === "existing") {
+            form.append(`
+                <input type="hidden" name="existing_media_ids[]" value="${m.id}">
+            `);
+        }
+
+        if (m.type === "new") {
+            const input = $(
+                `<input type="file" name="media[${index}][image]" hidden>`,
+            );
+            input[0].files = createFileList(m.file);
+            form.append(input);
+        }
+
+        form.append(`
+            <input type="hidden" name="media[${index}][caption]" value="${m.caption ?? ""}">
+            <input type="hidden" name="media[${index}][sort_order]" value="${index}">
+            <input type="hidden" name="media[${index}][is_thumbnail]" value="${index === 0 ? 1 : 0}">
+        `);
+    });
+}
+
+
+
+$("#mediaInput").on("change", function (e) {
+    [...e.target.files].forEach((file) => {
+        window.layout5Media.push({
+            type: "new",
+            file,
+            url: URL.createObjectURL(file),
+            caption: "",
+        });
+    });
+
+    renderLayout5();
+    this.value = "";
+});
+
+
+$(document).on("click", ".remove-btn", function () {
+    const key = $(this).closest(".image-card").data("key");
+    window.layout5Media.splice(key, 1);
+    renderLayout5();
+});
+
+
+
+$("#mediaGrid").sortable({
+    items: ".image-card",
+    cancel: "#addMediaCard",
+    tolerance: "pointer",
+
+    update() {
+        const reordered = [];
+
+        $("#mediaGrid .image-card").each(function () {
+            const key = $(this).data("key");
+            reordered.push(window.layout5Media[key]);
+        });
+
+        window.layout5Media = reordered;
+        renderLayout5(); // re-render to reset keys
+    },
+});
+
+
+
+function loadExistingLayout5(media) {
+    window.layout5Media = media
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map((m) => ({
+            type: "existing",
+            id: m.id,
+            url: `/storage/${m.image_path}`,
+            caption: m.caption,
+        }));
+
+    renderLayout5();
+}
+
+
+
+
+
+
+
             // Add selected images
-            $('#mediaInput').on('change', function (e) {
-                [...e.target.files].forEach(file => addMediaCard(file));
-                this.value = '';
-            });
+
 
             function createFileList(file) {
                 const dataTransfer = new DataTransfer();
@@ -502,125 +620,17 @@ $(document).ready(function () {
             }
 
 
-            function addMediaCard(file) {
-                const index = $('.media-card.image-card').length;
-
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const card = $(`
-                        <div class="media-card image-card" draggable="true">
-                            <span class="remove-btn">&times;</span>
-                            <img src="${e.target.result}">
-                            <input type="file" name="media[${index}][image]" hidden>
-                            <input type="hidden" name="media[${index}][sort_order]" value="${index}">
-                        </div>
-                    `);
-
-                    card.find('input[type="file"]')[0].files = createFileList(file);
-
-                    $('#addMediaCard').before(card);
-                    refreshSortOrder();
-                };
-                reader.readAsDataURL(file);
-            }
-
-            // Remove image
-$(document).on("click", ".remove-btn", function () {
-    const card = $(this).closest(".media-card");
-    const index = card.data("index");
-
-    // Remove hidden inputs with this index
-    const form = $("#dotuniNewsForm");
-    form.find(`input[data-index="${index}"]`).remove();
-
-    // Remove card
-    card.remove();
-
-    // Refresh remaining indexes and hidden inputs
-    refreshSortOrder();
-    
-});
 
 
 
 
-            // Drag & Drop Reordering
-            let dragged;
-
-            $(document).on('dragstart', '.image-card', function () {
-                dragged = this;
-            });
-
-            $(document).on('dragover', '.image-card', function (e) {
-                e.preventDefault();
-            });
-
-            $(document).on('drop', '.image-card', function () {
-                if (dragged !== this) {
-                    $(this).before(dragged);
-                    refreshSortOrder();
-                }
-            });
-
-            // Update sort_order + media indexes
-function refreshSortOrder() {
-    $(".media-card.image-card").each(function (i) {
-        const card = $(this);
-        card.attr("data-index", i);
-
-        // Update hidden inputs inside form
-        const form = $("#dotuniNewsForm");
-        form.find(`input[data-index]`).each(function () {
-            const oldIndex = $(this).data("index");
-            if (oldIndex === undefined) return;
-
-            // Only update inputs that correspond to this card
-            if (oldIndex === oldIndex) {
-                $(this).attr("data-index", i);
-
-                const name = $(this).attr("name");
-                if (name.startsWith("media[")) {
-                    const newName = name.replace(/media\[\d+]/, `media[${i}]`);
-                    $(this).attr("name", newName);
-                }
-            }
-        });
-    });
-}
 
 
 
 
-       
-function renderExistingMedia() {
-    const grid = $("#mediaGrid");
-    grid.find(".media-card.image-card").remove();
 
-    const form = $("#dotuniNewsForm");
 
-    window.existingNewsMedia.forEach((m, index) => {
-        const card = $(`
-            <div class="media-card image-card" data-index="${index}">
-                <img src="${m.url}">
-                <span class="remove-btn">×</span>
-            </div>
-        `);
 
-        // Append card
-        $("#addMediaCard").before(card);
-
-        // Add hidden inputs inside the form
-        form.append(
-            `<input type="hidden" name="existing_media_ids[]" value="${m.id}" data-index="${index}">`,
-        );
-        form.append(
-            `<input type="hidden" name="media[${index}][caption]" value="${m.caption ?? ""}" data-index="${index}">`,
-        );
-        form.append(
-            `<input type="hidden" name="media[${index}][sort_order]" value="${index}" data-index="${index}">`,
-        );
-    });
-}
 
 
 
@@ -629,20 +639,17 @@ function renderExistingMedia() {
     // $('#dotuniNewsModal').on('shown.bs.modal', function () {
     //     renderExistingMedia();
     // });
-function resetLayout5Media() {
-    window.existingNewsMedia = []; // clear existing data
 
-    // Remove all current media cards
-    $("#mediaGrid .media-card.image-card").remove();
 
-    // Remove all hidden inputs for layout5
-    const form = $("#dotuniNewsForm");
-    form.find('input[name="existing_media_ids[]"]').remove();
-    form.find('input[name^="media["]').remove();
+    function resetLayout5Media() {
+        window.layout5Media = [];
+        $("#mediaGrid .image-card").remove();
 
-    // Reset index counter
-    window.newsMediaHelper.rowIndex = 0;
-}
+        const form = $("#dotuniNewsForm");
+        form.find('input[name="existing_media_ids[]"]').remove();
+        form.find('input[name^="media["]').remove();
+    }
+
 
 
 
