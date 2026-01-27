@@ -20,10 +20,13 @@ $(document).ready(function () {
         // Title
         modal.find(".modal-title").text(btn.data("title"));
 
-        // ADD
         if (action === "add") {
             form.attr("action", url);
             form.find(".form-method").val("POST");
+
+            unlockLayoutSelection();
+
+            resetLayout5Media();
 
             modal.removeClass("force-close is-closing fade show");
             modal.modal("show");
@@ -33,6 +36,26 @@ $(document).ready(function () {
         if (action === "edit") {
             $.get(`${url}/${id}/edit`, function (data) {
                 populateForm(form, data);
+                applyLayout(data.layout || "layout_1");
+
+                if (data.layout === "layout_5" && Array.isArray(data.media)) {
+                    resetLayout5Media(); 
+                    window.existingNewsMedia = data.media.map((m) => ({
+                        id: m.id,
+                        url: `/storage/${m.image_path}`,
+                        caption: m.caption,
+                        sort_order: m.sort_order,
+                        is_thumbnail: m.is_thumbnail,
+                    }));
+                    renderExistingMedia();
+                }
+
+
+                lockLayoutSelection(data.layout);
+
+                // go to step 2 if media exists
+                if (Array.isArray(data.media) && data.media.length) setStep(2);
+                else setStep(1);
 
                 form.attr("action", `${url}/${id}`);
                 form.find(".form-method").val("PUT");
@@ -223,14 +246,7 @@ $(document).ready(function () {
                 maxlength="500"
                 placeholder="Write a caption (optional)...">${caption}</textarea>
 
-            <div class="mt-2 d-flex align-items-center justify-content-between">
-                <div>
-                    <label class="thumb-flag mb-0">
-                        <input type="radio" name="thumbnail_choice" value="${index}" ${isThumbnail}>
-                        Set as Thumbnail
-                    </label>
-                </div>
-            </div>
+
 
             <input type="hidden" name="media[${index}][is_thumbnail]" value="${hiddenThumbnail}">
             <input type="hidden" name="media[${index}][is_cover]" value="0">
@@ -250,13 +266,13 @@ $(document).ready(function () {
                 </button>
             </div>
 
-            <div class="media-grid">
+            <div class="media-grid-generated">
                 ${first}
                 ${second}
             </div>
         </div>
     `;
-    },
+        },
         // Refresh the row badges
         refreshBadges: function () {
             $("#newsMediaContainer .media-row").each(function (i) {
@@ -278,12 +294,6 @@ $(document).ready(function () {
         removeRow: function (row) {
             const removedIndex = row.data("index");
 
-            // Clear thumbnail selection if removed
-            const selected = $('input[name="thumbnail_choice"]:checked').val();
-            if (String(selected) === String(removedIndex)) {
-                $('input[name="thumbnail_choice"]').prop("checked", false);
-            }
-
             row.remove();
             this.refreshBadges();
         },
@@ -303,6 +313,34 @@ $(document).ready(function () {
         const row = $(this).closest(".media-row");
         window.newsMediaHelper.removeRow(row);
     });
+
+    /* ===============================
+    layout scripts
+    =============================== */
+
+    const NEWS_LAYOUTS = {
+        layout_1: {
+            label: "Layout 1 – Image & Captions",
+            panel: "#layoutClassic",
+        },
+        layout_2: {
+            label: "Layout 2 – Big Image + Article",
+            panel: "#layoutHero",
+        },
+        layout_3: {
+            label: "Layout 3 – Image + Text (Split)",
+            panel: "#layoutSplit",
+        },
+        layout_4: {
+            label: "Layout 4 – Article Only",
+            panel: "#layoutArticle",
+        },
+
+        layout_5: {
+            label: "Layout 5 – Image Slider + Article",
+            panel: "#layoutGalleryArticle",
+        },
+    };
 
     /* ===============================
     FORM AUTO-POPULATE (GENERIC)
@@ -385,7 +423,304 @@ $(document).ready(function () {
             window.newsMediaHelper.refreshBadges();
         }
 
+        // Layout 2 preview
+        if (data.hero_image) {
+            $("#heroPreview").attr("src", `/storage/${data.hero_image}`);
+        }
+        if (data.hero_caption) {
+            $('textarea[name="hero_caption"]').val(data.hero_caption);
+        }
+
+        // Layout 3 preview
+        if (data.split_left_image) {
+            $("#splitLeftPreview").attr(
+                "src",
+                `/storage/${data.split_left_image}`,
+            );
+        }
+        if (data.split_right_caption) {
+            $('textarea[name="split_right_caption"]').val(
+                data.split_right_caption,
+            );
+        }
     }
+
+    function setStep(step) {
+        const isStep1 = step === 1;
+
+        $("#newsStep1").toggle(isStep1);
+        $("#newsStep2").toggle(!isStep1);
+
+        $("#newsNextBtn").toggle(isStep1);
+        $("#newsSaveBtn").toggle(!isStep1);
+        $("#newsBackBtn").toggle(!isStep1);
+
+        $("#stepBadge").text(isStep1 ? "Step 1 of 2" : "Step 2 of 2");
+        $("#stepHint").text(
+            isStep1
+                ? "Fill details then choose a layout"
+                : "Fill layout content then save",
+        );
+    }
+
+    function applyLayout(layoutKey) {
+        const config = NEWS_LAYOUTS[layoutKey];
+        if (!config) return;
+
+        // save to hidden input
+        $("#newsLayout").val(layoutKey);
+
+        // label
+        $("#selectedLayoutLabel").text(config.label);
+
+        // panels
+        $(".layout-panel").hide();
+        if (config.panel) {
+            $(config.panel).show();
+        }
+
+        // card highlight
+        $(".layout-card").removeClass("active");
+        $(`.layout-card[data-layout="${layoutKey}"]`).addClass("active");
+    }
+
+
+
+    
+            // media script for layout 5
+
+            // Add selected images
+            $('#mediaInput').on('change', function (e) {
+                [...e.target.files].forEach(file => addMediaCard(file));
+                this.value = '';
+            });
+
+            function createFileList(file) {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                return dataTransfer.files;
+            }
+
+
+            function addMediaCard(file) {
+                const index = $('.media-card.image-card').length;
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const card = $(`
+                        <div class="media-card image-card" draggable="true">
+                            <span class="remove-btn">&times;</span>
+                            <img src="${e.target.result}">
+                            <input type="file" name="media[${index}][image]" hidden>
+                            <input type="hidden" name="media[${index}][sort_order]" value="${index}">
+                        </div>
+                    `);
+
+                    card.find('input[type="file"]')[0].files = createFileList(file);
+
+                    $('#addMediaCard').before(card);
+                    refreshSortOrder();
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // Remove image
+$(document).on("click", ".remove-btn", function () {
+    const card = $(this).closest(".media-card");
+    const index = card.data("index");
+
+    // Remove hidden inputs with this index
+    const form = $("#dotuniNewsForm");
+    form.find(`input[data-index="${index}"]`).remove();
+
+    // Remove card
+    card.remove();
+
+    // Refresh remaining indexes and hidden inputs
+    refreshSortOrder();
+    
+});
+
+
+
+
+            // Drag & Drop Reordering
+            let dragged;
+
+            $(document).on('dragstart', '.image-card', function () {
+                dragged = this;
+            });
+
+            $(document).on('dragover', '.image-card', function (e) {
+                e.preventDefault();
+            });
+
+            $(document).on('drop', '.image-card', function () {
+                if (dragged !== this) {
+                    $(this).before(dragged);
+                    refreshSortOrder();
+                }
+            });
+
+            // Update sort_order + media indexes
+function refreshSortOrder() {
+    $(".media-card.image-card").each(function (i) {
+        const card = $(this);
+        card.attr("data-index", i);
+
+        // Update hidden inputs inside form
+        const form = $("#dotuniNewsForm");
+        form.find(`input[data-index]`).each(function () {
+            const oldIndex = $(this).data("index");
+            if (oldIndex === undefined) return;
+
+            // Only update inputs that correspond to this card
+            if (oldIndex === oldIndex) {
+                $(this).attr("data-index", i);
+
+                const name = $(this).attr("name");
+                if (name.startsWith("media[")) {
+                    const newName = name.replace(/media\[\d+]/, `media[${i}]`);
+                    $(this).attr("name", newName);
+                }
+            }
+        });
+    });
+}
+
+
+
+
+       
+function renderExistingMedia() {
+    const grid = $("#mediaGrid");
+    grid.find(".media-card.image-card").remove();
+
+    const form = $("#dotuniNewsForm");
+
+    window.existingNewsMedia.forEach((m, index) => {
+        const card = $(`
+            <div class="media-card image-card" data-index="${index}">
+                <img src="${m.url}">
+                <span class="remove-btn">×</span>
+            </div>
+        `);
+
+        // Append card
+        $("#addMediaCard").before(card);
+
+        // Add hidden inputs inside the form
+        form.append(
+            `<input type="hidden" name="existing_media_ids[]" value="${m.id}" data-index="${index}">`,
+        );
+        form.append(
+            `<input type="hidden" name="media[${index}][caption]" value="${m.caption ?? ""}" data-index="${index}">`,
+        );
+        form.append(
+            `<input type="hidden" name="media[${index}][sort_order]" value="${index}" data-index="${index}">`,
+        );
+    });
+}
+
+
+
+
+    // Call it when modal opens for editing
+    // $('#dotuniNewsModal').on('shown.bs.modal', function () {
+    //     renderExistingMedia();
+    // });
+function resetLayout5Media() {
+    window.existingNewsMedia = []; // clear existing data
+
+    // Remove all current media cards
+    $("#mediaGrid .media-card.image-card").remove();
+
+    // Remove all hidden inputs for layout5
+    const form = $("#dotuniNewsForm");
+    form.find('input[name="existing_media_ids[]"]').remove();
+    form.find('input[name^="media["]').remove();
+
+    // Reset index counter
+    window.newsMediaHelper.rowIndex = 0;
+}
+
+
+
+    // -----------------------------------------------------------------------------
+
+
+    function lockLayoutSelection(activeLayout) {
+        // Disable all layout cards
+        $(".layout-card").addClass("disabled").css({
+            pointerEvents: "none",
+            opacity: 0.5,
+        });
+
+        // Re-enable & highlight the active one
+        $(`.layout-card[data-layout="${activeLayout}"]`)
+            .removeClass("disabled")
+            .css({
+                pointerEvents: "auto",
+                opacity: 1,
+            });
+
+        // Hide ALL panels first
+        $(".layout-panel").hide();
+
+        // Show ONLY the panel for the current layout
+        const config = NEWS_LAYOUTS[activeLayout];
+        if (config?.panel) {
+            $(config.panel).show();
+        }
+
+        // Optional UX hint
+        $("#stepHint").text("Layout is locked for existing news");
+    }
+
+    function unlockLayoutSelection() {
+        $(".layout-card").removeClass("disabled").css({
+            pointerEvents: "auto",
+            opacity: 1,
+        });
+
+        $("#stepHint").text("Fill details then choose a layout");
+    }
+
+    // click layout card
+    $(document).on("click", ".layout-card", function () {
+        applyLayout($(this).data("layout"));
+    });
+
+    // Next / Back
+    $(document).on("click", "#newsNextBtn", function () {
+        // minimal validation: required fields in step 1
+        const form = $("#dotuniNewsForm")[0];
+        // validate only visible required fields (simple approach)
+        let valid = true;
+        $("#newsStep1 :input[required]").each(function () {
+            if (!this.value) valid = false;
+        });
+        if (!valid) {
+            Swal.fire({
+                icon: "warning",
+                title: "Missing fields",
+                text: "Please complete required fields before continuing.",
+            });
+            return;
+        }
+
+        setStep(2);
+    });
+
+    $(document).on("click", "#newsBackBtn", function () {
+        setStep(1);
+    });
+
+    // reset wizard when modal opens/closes
+    $("#dotuniNewsModal").on("shown.bs.modal", function () {
+        setStep(1);
+        applyLayout($("#newsLayout").val() || "layout_1");
+    });
 
     // Universal image preview
     $(document).on("change", ".preview-input", function (e) {

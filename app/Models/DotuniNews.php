@@ -19,6 +19,8 @@ class DotuniNews extends Model
         'seo_description',
         'status',
         'visibility',
+        'layout',
+        'article_body', 
         'author_id',
         'published_at',
         'updated_by',

@@ -157,7 +157,7 @@ $(document).on("submit", ".ajax-delete-dotuni-news", function (e) {
     Swal.fire({
         title: "Delete this news?",
         text: "This action cannot be undone.",
-        icon: "warning",
+        type: "warning",
         showCancelButton: true,
         confirmButtonText: "Yes, delete it",
         confirmButtonColor: "#dc3545",
@@ -174,7 +174,7 @@ $(document).on("submit", ".ajax-delete-dotuni-news", function (e) {
             },
             success: function (res) {
                 Swal.fire({
-                    icon: "success",
+                    type: "success",
                     title: "Deleted",
                     text: res.message || "News deleted successfully",
                     timer: 1200,
@@ -185,7 +185,7 @@ $(document).on("submit", ".ajax-delete-dotuni-news", function (e) {
             },
             error: function () {
                 Swal.fire({
-                    icon: "error",
+                    type: "error",
                     title: "Error",
                     text: "Failed to delete news."
                 });
