@@ -1,0 +1,147 @@
+/* ===============================
+   MODERN DATATABLE (SaaS STYLE)
+================================ */
+
+.dataTables_wrapper {
+    font-size: 14px;
+}
+
+/* Remove default borders */
+table.dataTable {
+    border-collapse: separate !important;
+    border-spacing: 0;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Header */
+table.dataTable thead th {
+    background: #f7fafc;
+    color: #1f2937;
+    font-weight: 600;
+    border-bottom: 1px solid #e5e7eb !important;
+    padding: 14px 16px;
+    vertical-align: middle;
+}
+
+/* Sorting icons */
+table.dataTable thead th.sorting:after,
+table.dataTable thead th.sorting_asc:after,
+table.dataTable thead th.sorting_desc:after {
+    color: #3b82f6;
+    opacity: 1;
+}
+
+/* Body cells */
+table.dataTable tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+    color: #111827;
+}
+
+/* Row hover */
+table.dataTable tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Remove last row border */
+table.dataTable tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ===============================
+   SEARCH INPUT
+================================ */
+.dataTables_filter input {
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    padding: 8px 12px;
+    margin-left: 8px;
+    outline: none;
+}
+
+.dataTables_filter input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59,130,246,.15);
+}
+
+/* ===============================
+   PAGINATION
+================================ */
+.dataTables_paginate .paginate_button {
+    border-radius: 6px !important;
+    margin: 0 2px;
+    padding: 6px 10px;
+    border: none !important;
+    background: transparent !important;
+}
+
+.dataTables_paginate .paginate_button.current {
+    background: #3b82f6 !important;
+    color: #fff !important;
+}
+
+.dataTables_paginate .paginate_button:hover {
+    background: #e0e7ff !important;
+    color: #1e3a8a !important;
+}
+
+/* ===============================
+   STATUS BADGES (PILLS)
+================================ */
+.badge {
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.badge-success {
+    background-color: #e6f4ea;
+    color: #1e7f3f;
+}
+
+.badge-danger {
+    background-color: #fdecec;
+    color: #b42318;
+}
+
+.badge-info {
+    background-color: #e8f1fd;
+    color: #1d4ed8;
+}
+
+/* ===============================
+   ACTION BUTTONS
+================================ */
+table td .btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+}
+
+table td .btn-info {
+    background: #e8f1fd;
+    color: #1d4ed8;
+    border: none;
+}
+
+table td .btn-danger {
+    background: #fdecec;
+    color: #b42318;
+    border: none;
+}
+
+table td .btn:hover {
+    opacity: 0.85;
+}
+
+/* ===============================
+   CHECKBOX ALIGNMENT (if added later)
+================================ */
+table.dataTable input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}

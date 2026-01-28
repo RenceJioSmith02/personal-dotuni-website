@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/modal.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/global.css') }}">
     {{-- <link rel="stylesheet" href="{{ asset('assets/css/custom-adminlte.css') }}"> --}}
+    <link rel="stylesheet" href="{{ asset('assets/css/data-table.css') }}">
     @stack('css')
 @stop
 

@@ -39,7 +39,7 @@ $(document).ready(function () {
                 applyLayout(data.layout || "layout_1");
 
                 if (data.layout === "layout_5" && Array.isArray(data.media)) {
-                    resetLayout5Media(); 
+                    resetLayout5Media();
 
                     if (
                         data.layout === "layout_5" &&
@@ -47,9 +47,7 @@ $(document).ready(function () {
                     ) {
                         loadExistingLayout5(data.media);
                     }
-
                 }
-
 
                 lockLayoutSelection(data.layout);
 
@@ -484,162 +482,125 @@ $(document).ready(function () {
         $(`.layout-card[data-layout="${layoutKey}"]`).addClass("active");
     }
 
+    // media script for layout 5
 
+    // ===============================
+    // LAYOUT 5 — STABLE MEDIA SYSTEM
+    // ===============================
 
-    
-            // media script for layout 5
+    window.layout5Media = [];
 
-            // ===============================
-// LAYOUT 5 — STABLE MEDIA SYSTEM
-// ===============================
+    function renderLayout5() {
+        const grid = $("#mediaGrid");
+        grid.find(".image-card").remove();
 
-window.layout5Media = [];
-
-
-function renderLayout5() {
-    const grid = $("#mediaGrid");
-    grid.find(".image-card").remove();
-
-    window.layout5Media.forEach((m, i) => {
-        const card = $(`
+        window.layout5Media.forEach((m, i) => {
+            const card = $(`
             <div class="media-card image-card" data-key="${i}">
                 <span class="remove-btn">&times;</span>
                 <img src="${m.url}">
             </div>
         `);
 
-        $("#addMediaCard").before(card);
-    });
+            $("#addMediaCard").before(card);
+        });
 
-    updateLayout5Inputs();
-}
+        updateLayout5Inputs();
+    }
 
+    function updateLayout5Inputs() {
+        const form = $("#dotuniNewsForm");
 
+        // Clear only layout 5 inputs
+        form.find('input[name="existing_media_ids[]"]').remove();
+        form.find('input[name^="media["]').remove();
 
-function updateLayout5Inputs() {
-    const form = $("#dotuniNewsForm");
-
-    // Clear only layout 5 inputs
-    form.find('input[name="existing_media_ids[]"]').remove();
-    form.find('input[name^="media["]').remove();
-
-    window.layout5Media.forEach((m, index) => {
-        if (m.type === "existing") {
-            form.append(`
+        window.layout5Media.forEach((m, index) => {
+            if (m.type === "existing") {
+                form.append(`
                 <input type="hidden" name="existing_media_ids[]" value="${m.id}">
             `);
-        }
+            }
 
-        if (m.type === "new") {
-            const input = $(
-                `<input type="file" name="media[${index}][image]" hidden>`,
-            );
-            input[0].files = createFileList(m.file);
-            form.append(input);
-        }
+            if (m.type === "new") {
+                const input = $(
+                    `<input type="file" name="media[${index}][image]" hidden>`,
+                );
+                input[0].files = createFileList(m.file);
+                form.append(input);
+            }
 
-        form.append(`
+            form.append(`
             <input type="hidden" name="media[${index}][caption]" value="${m.caption ?? ""}">
             <input type="hidden" name="media[${index}][sort_order]" value="${index}">
             <input type="hidden" name="media[${index}][is_thumbnail]" value="${index === 0 ? 1 : 0}">
         `);
-    });
-}
-
-
-
-$("#mediaInput").on("change", function (e) {
-    [...e.target.files].forEach((file) => {
-        window.layout5Media.push({
-            type: "new",
-            file,
-            url: URL.createObjectURL(file),
-            caption: "",
         });
-    });
+    }
 
-    renderLayout5();
-    this.value = "";
-});
-
-
-$(document).on("click", ".remove-btn", function () {
-    const key = $(this).closest(".image-card").data("key");
-    window.layout5Media.splice(key, 1);
-    renderLayout5();
-});
-
-
-
-$("#mediaGrid").sortable({
-    items: ".image-card",
-    cancel: "#addMediaCard",
-    tolerance: "pointer",
-
-    update() {
-        const reordered = [];
-
-        $("#mediaGrid .image-card").each(function () {
-            const key = $(this).data("key");
-            reordered.push(window.layout5Media[key]);
+    $("#mediaInput").on("change", function (e) {
+        [...e.target.files].forEach((file) => {
+            window.layout5Media.push({
+                type: "new",
+                file,
+                url: URL.createObjectURL(file),
+                caption: "",
+            });
         });
 
-        window.layout5Media = reordered;
-        renderLayout5(); // re-render to reset keys
-    },
-});
+        renderLayout5();
+        this.value = "";
+    });
 
+    $(document).on("click", ".remove-btn", function () {
+        const key = $(this).closest(".image-card").data("key");
+        window.layout5Media.splice(key, 1);
+        renderLayout5();
+    });
 
+    $("#mediaGrid").sortable({
+        items: ".image-card",
+        cancel: "#addMediaCard",
+        tolerance: "pointer",
 
-function loadExistingLayout5(media) {
-    window.layout5Media = media
-        .sort((a, b) => a.sort_order - b.sort_order)
-        .map((m) => ({
-            type: "existing",
-            id: m.id,
-            url: `/storage/${m.image_path}`,
-            caption: m.caption,
-        }));
+        update() {
+            const reordered = [];
 
-    renderLayout5();
-}
+            $("#mediaGrid .image-card").each(function () {
+                const key = $(this).data("key");
+                reordered.push(window.layout5Media[key]);
+            });
 
+            window.layout5Media = reordered;
+            renderLayout5(); // re-render to reset keys
+        },
+    });
 
+    function loadExistingLayout5(media) {
+        window.layout5Media = media
+            .sort((a, b) => a.sort_order - b.sort_order)
+            .map((m) => ({
+                type: "existing",
+                id: m.id,
+                url: `/storage/${m.image_path}`,
+                caption: m.caption,
+            }));
 
+        renderLayout5();
+    }
 
+    // Add selected images
 
-
-
-            // Add selected images
-
-
-            function createFileList(file) {
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(file);
-                return dataTransfer.files;
-            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    function createFileList(file) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        return dataTransfer.files;
+    }
 
     // Call it when modal opens for editing
     // $('#dotuniNewsModal').on('shown.bs.modal', function () {
     //     renderExistingMedia();
     // });
-
 
     function resetLayout5Media() {
         window.layout5Media = [];
@@ -650,11 +611,7 @@ function loadExistingLayout5(media) {
         form.find('input[name^="media["]').remove();
     }
 
-
-
-
     // -----------------------------------------------------------------------------
-
 
     function lockLayoutSelection(activeLayout) {
         // Disable all layout cards

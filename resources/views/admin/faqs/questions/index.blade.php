@@ -49,7 +49,7 @@
 
                     <td>
                         <button
-                            class="open-modal btn btn-sm btn-warning"
+                            class="open-modal btn btn-sm btn-info"
                             data-action="edit"
                             data-id="{{ $question->id }}"
                             data-modal="#faqQuestionModal"

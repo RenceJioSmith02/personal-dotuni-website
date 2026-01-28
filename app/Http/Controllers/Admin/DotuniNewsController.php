@@ -1,16 +1,16 @@
 <?php
 
-
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\DotuniNews;
-use App\Models\DotuniNewsAsset;
 use App\Models\Asset;
+use App\Models\Gallery;
+use App\Models\DotuniNews;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\DotuniNewsAsset;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class DotuniNewsController extends Controller
 {
@@ -194,34 +194,6 @@ class DotuniNewsController extends Controller
      * MEDIA ROWS (layout_1) and (layout_5)
      * ========================== */
 
-    // private function syncMediaRows(Request $request, DotuniNews $news): void
-    // {
-    //     $existingIds = $request->input('existing_media_ids', []);
-
-    //     // Delete attachments that are no longer in the request
-    //     $news->attachments()
-    //         ->whereNotIn('id', $existingIds)
-    //         ->get()
-    //         ->each(fn($a) => $this->deleteAttachment($a));
-
-    //     foreach ($existingIds as $index => $id) {
-    //         if ($row = DotuniNewsAsset::find($id)) {
-    //             $data = $request->input("media.$index", []);
-
-    //             // Determine sort_order, default to $index if not set
-    //             $sortOrder = $data['sort_order'] ?? $index;
-
-    //             $row->update([
-    //                 'caption' => $data['caption'] ?? null,
-    //                 // First item (sort_order = 0) is always thumbnail
-    //                 'is_thumbnail' => $sortOrder == 0,
-    //                 'sort_order' => $sortOrder,
-    //             ]);
-    //         }
-    //     }
-    // }
-
-
     private function syncMediaRows(Request $request, DotuniNews $news): void
     {
         $existingIds = $request->input('existing_media_ids', []);
@@ -261,45 +233,17 @@ class DotuniNewsController extends Controller
     }
 
 
-    // private function syncMediaRows(Request $request, DotuniNews $news): void
-    // {
-    //     $existingIds = $request->input('existing_media_ids', []);
-
-    //     // Delete removed media
-    //     $news->attachments()
-    //         ->whereNotIn('id', $existingIds)
-    //         ->get()
-    //         ->each(fn($a) => $this->deleteAttachment($a));
-
-    //     // Update remaining media
-    //     foreach ($existingIds as $index => $id) {
-    //         $row = DotuniNewsAsset::find($id);
-    //         if (!$row)
-    //             continue;
-
-    //         $data = $request->input("media.$index", []);
-
-    //         $sortOrder = $data['sort_order'] ?? $index;
-
-    //         $row->update([
-    //             'caption' => $data['caption'] ?? null,
-    //             'sort_order' => $sortOrder,
-    //             'is_thumbnail' => $sortOrder === 0,
-    //         ]);
-    //     }
-    // }
-
-
     private function handleMediaUploads(Request $request, DotuniNews $news): void
     {
         if (!$request->has('media'))
             return;
 
-        // Collect uploaded media with sort_order
         $mediaData = [];
+
         foreach ($request->media as $index => $media) {
             if (!isset($media['image']))
                 continue;
+
             $mediaData[] = [
                 'image' => $media['image'],
                 'caption' => $media['caption'] ?? null,
@@ -307,22 +251,30 @@ class DotuniNewsController extends Controller
             ];
         }
 
-        // Sort by sort_order
         usort($mediaData, fn($a, $b) => $a['sort_order'] <=> $b['sort_order']);
 
         foreach ($mediaData as $i => $media) {
             $asset = $this->storeImageAsAsset($media['image'], 'dotuni_news');
 
+            // NEWS ASSET
             DotuniNewsAsset::create([
                 'news_id' => $news->id,
                 'asset_id' => $asset->id,
                 'caption' => $media['caption'],
                 'sort_order' => $media['sort_order'],
-                'is_thumbnail' => $i === 0, // First image by sort_order
+                'is_thumbnail' => $i === 0,
                 'is_cover' => false,
+            ]);
+
+            // 👉 ADD TO GALLERY
+            Gallery::create([
+                'asset_id' => $asset->id,
+                'sort_order' => $media['sort_order'],
+                'updated_by' => Auth::id(),
             ]);
         }
     }
+
 
 
     // private function handleMediaUploads(Request $request, DotuniNews $news): void
@@ -330,65 +282,31 @@ class DotuniNewsController extends Controller
     //     if (!$request->has('media'))
     //         return;
 
+    //     // Collect uploaded media with sort_order
+    //     $mediaData = [];
     //     foreach ($request->media as $index => $media) {
     //         if (!isset($media['image']))
     //             continue;
-
-    //         $asset = $this->storeImageAsAsset($media['image'], 'dotuni_news');
-
-    //         // Determine sort_order, default to $index if not set
-    //         $sortOrder = $media['sort_order'] ?? $index;
-
-    //         DotuniNewsAsset::create([
-    //             'news_id' => $news->id,
-    //             'asset_id' => $asset->id,
+    //         $mediaData[] = [
+    //             'image' => $media['image'],
     //             'caption' => $media['caption'] ?? null,
-    //             // First uploaded image (sort_order = 0) becomes thumbnail
-    //             'is_thumbnail' => $sortOrder == 0,
-    //             'is_cover' => false,
-    //             'sort_order' => $sortOrder,
-    //         ]);
-    //     }
-    // }
-
-
-    // private function syncMediaRows(Request $request, DotuniNews $news): void
-    // {
-    //     $existingIds = $request->input('existing_media_ids', []);
-
-    //     $news->attachments()
-    //         ->whereNotIn('id', $existingIds)
-    //         ->get()
-    //         ->each(fn($a) => $this->deleteAttachment($a));
-
-    //     foreach ($existingIds as $index => $id) {
-    //         if ($row = DotuniNewsAsset::find($id)) {
-    //             $data = $request->input("media.$index", []);
-    //             $row->update([
-    //                 'caption' => $data['caption'] ?? null,
-    //                 'is_thumbnail' => !empty($data['is_thumbnail']) || ($data['sort_order'] == 0 || $index == 0),
-    //                 'sort_order' => $data['sort_order'] ?? $index,
-    //             ]);
-    //         }
-    //     }
-    // }
-
-    // private function handleMediaUploads(Request $request, DotuniNews $news): void
-    // {
-    //     if (!$request->has('media')) return;
-
-    //     foreach ($request->media as $index => $media) {
-    //         if (!isset($media['image'])) continue;
-
-    //         $asset = $this->storeImageAsAsset($media['image'], 'dotuni_news');
-
-    //         DotuniNewsAsset::create([
-    //             'news_id' => $news->id,
-    //             'asset_id' => $asset->id,
-    //             'caption' => $media['caption'] ?? null,
-    //             'is_thumbnail' => !empty($media['is_thumbnail']) || ($media['sort_order'] == 0 || $index == 0),
-    //             'is_cover' => false,
     //             'sort_order' => $media['sort_order'] ?? $index,
+    //         ];
+    //     }
+
+    //     // Sort by sort_order
+    //     usort($mediaData, fn($a, $b) => $a['sort_order'] <=> $b['sort_order']);
+
+    //     foreach ($mediaData as $i => $media) {
+    //         $asset = $this->storeImageAsAsset($media['image'], 'dotuni_news');
+
+    //         DotuniNewsAsset::create([
+    //             'news_id' => $news->id,
+    //             'asset_id' => $asset->id,
+    //             'caption' => $media['caption'],
+    //             'sort_order' => $media['sort_order'],
+    //             'is_thumbnail' => $i === 0, // First image by sort_order
+    //             'is_cover' => false,
     //         ]);
     //     }
     // }
@@ -403,14 +321,33 @@ class DotuniNewsController extends Controller
             ->each(fn($a) => $this->deleteAttachment($a));
     }
 
+
     private function deleteAttachment(DotuniNewsAsset $attachment): void
     {
         if ($attachment->asset) {
+
+            // DELETE FROM GALLERY FIRST
+            Gallery::where('asset_id', $attachment->asset_id)->delete();
+
+            // DELETE FILE
             Storage::disk('public')->delete($attachment->asset->storage_path);
+
+            // DELETE ASSET
             $attachment->asset->delete();
         }
+
         $attachment->delete();
     }
+
+
+    // private function deleteAttachment(DotuniNewsAsset $attachment): void
+    // {
+    //     if ($attachment->asset) {
+    //         Storage::disk('public')->delete($attachment->asset->storage_path);
+    //         $attachment->asset->delete();
+    //     }
+    //     $attachment->delete();
+    // }
 
     private function deleteAllMedia(DotuniNews $news): void
     {
