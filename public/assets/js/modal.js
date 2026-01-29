@@ -35,32 +35,87 @@ $(document).ready(function () {
         // EDIT
         if (action === "edit") {
             $.get(`${url}/${id}/edit`, function (data) {
-                populateForm(form, data);
-                applyLayout(data.layout || "layout_1");
-
-                if (data.layout === "layout_5" && Array.isArray(data.media)) {
-                    resetLayout5Media();
+                // ======================
+                // NEWS
+                // ======================
+                if (form.attr("id") === "dotuniNewsForm") {
+                    populateForm(form, data);
+                    applyLayout(data.layout || "layout_1");
 
                     if (
                         data.layout === "layout_5" &&
                         Array.isArray(data.media)
                     ) {
+                        resetLayout5Media();
                         loadExistingLayout5(data.media);
+                    }
+
+                    lockLayoutSelection(data.layout);
+
+                    if (Array.isArray(data.media) && data.media.length)
+                        setStep(2);
+                    else setStep(1);
+                }
+
+                // ======================
+                // ANNOUNCEMENT
+                // ======================
+                if (form.attr("id") === "announcementForm") {
+                    populateAnnouncementForm(form, data);
+                    applyAnnouncementLayout(data.layout || "layout_1");
+
+                    if (
+                        data.layout === "layout_5" &&
+                        Array.isArray(data.media)
+                    ) {
+                        resetAnnouncementLayout5Media();
+                        loadExistingAnnouncementLayout5(data.media);
+                    }
+
+                    // step wizard
+                    if (Array.isArray(data.media) && data.media.length) {
+                        setAnnouncementStep(2);
+                    } else {
+                        setAnnouncementStep(1);
                     }
                 }
 
-                lockLayoutSelection(data.layout);
-
-                // go to step 2 if media exists
-                if (Array.isArray(data.media) && data.media.length) setStep(2);
-                else setStep(1);
-
                 form.attr("action", `${url}/${id}`);
                 form.find(".form-method").val("PUT");
+
                 modal.removeClass("force-close is-closing fade show");
                 modal.modal("show");
             });
         }
+
+        // if (action === "edit") {
+        //     $.get(`${url}/${id}/edit`, function (data) {
+        //         populateForm(form, data);
+        //         applyLayout(data.layout || "layout_1");
+
+        //         if (data.layout === "layout_5" && Array.isArray(data.media)) {
+        //             resetLayout5Media();
+
+        //             if (
+        //                 data.layout === "layout_5" &&
+        //                 Array.isArray(data.media)
+        //             ) {
+        //                 loadExistingLayout5(data.media);
+        //             }
+        //         }
+
+        //         lockLayoutSelection(data.layout);
+
+        //         // go to step 2 if media exists
+        //         if (Array.isArray(data.media) && data.media.length) setStep(2);
+        //         else setStep(1);
+
+        //         form.attr("action", `${url}/${id}`);
+        //         form.find(".form-method").val("PUT");
+        //         modal.removeClass("force-close is-closing fade show");
+        //         modal.modal("show");
+        //     });
+        // }
     });
 
     /* ===============================
@@ -191,6 +246,35 @@ $(document).ready(function () {
         // Reset file inputs safely
         form.find('input[type="file"]').val("");
     }
+
+
+
+
+
+$(document).on("change", ".media-input", function (e) {
+    const input = $(this);
+    const preview = $(input.data("preview"));
+
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => preview.attr("src", e.target.result);
+    reader.readAsDataURL(file);
+});
+
+
+
+
+
+
+
+
+
+
+    /* ===============================
+    NEWS MODULE SCRIPTS
+    =============================== */
 
     window.newsMediaHelper = {
         rowIndex: 0,
@@ -482,7 +566,7 @@ $(document).ready(function () {
         $(`.layout-card[data-layout="${layoutKey}"]`).addClass("active");
     }
 
-    // media script for layout 5
+
 
     // ===============================
     // LAYOUT 5 — STABLE MEDIA SYSTEM
@@ -597,11 +681,6 @@ $(document).ready(function () {
         return dataTransfer.files;
     }
 
-    // Call it when modal opens for editing
-    // $('#dotuniNewsModal').on('shown.bs.modal', function () {
-    //     renderExistingMedia();
-    // });
-
     function resetLayout5Media() {
         window.layout5Media = [];
         $("#mediaGrid .image-card").remove();
@@ -685,6 +764,479 @@ $(document).ready(function () {
         setStep(1);
         applyLayout($("#newsLayout").val() || "layout_1");
     });
+
+    /* ===============================
+    NEWS MODULE END SCRIPT
+    =============================== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    /* ===============================
+ANNOUNCEMENT MODULE SCRIPTS
+=============================== */
+
+    window.announcementMediaHelper = {
+        rowIndex: 0,
+
+        // Generate a media row HTML
+        makeRow: function (index, mediaData = null) {
+            const isOdd = index % 2 === 0;
+            const rowId = `announcementMediaRow_${index}`;
+
+            const imageSrc = mediaData?.image_path
+                ? `/storage/${mediaData.image_path}`
+                : "https://via.placeholder.com/600x350?text=No+Image";
+
+            const isThumbnail = mediaData?.is_thumbnail ? "checked" : "";
+            const hiddenThumbnail = mediaData?.is_thumbnail ? "1" : "0";
+            const caption = mediaData?.caption || "";
+
+            const existingIdInput = mediaData?.id
+                ? `<input type="hidden" name="existing_media_ids[]" value="${mediaData.id}">`
+                : "";
+
+            const imageCol = `
+        <div>
+            <label class="mb-1">Image</label>
+            <div class="mb-2">
+                <img
+                    src="${imageSrc}"
+                    class="media-preview"
+                    id="announcementMediaPreview_${index}"
+                    data-placeholder="https://via.placeholder.com/600x350?text=No+Image"
+                    alt="Preview">
+            </div>
+
+            <input
+                type="file"
+                name="media[${index}][image]"
+                class="form-control-file media-input"
+                data-preview="#announcementMediaPreview_${index}"
+                accept="image/*">
+        </div>
+    `;
+
+            const captionCol = `
+        <div>
+            <label class="mb-1">Caption</label>
+            <textarea
+                name="media[${index}][caption]"
+                class="form-control"
+                rows="6"
+                maxlength="500"
+                placeholder="Write a caption (optional)...">${caption}</textarea>
+
+            <input type="hidden" name="media[${index}][is_thumbnail]" value="${hiddenThumbnail}">
+            <input type="hidden" name="media[${index}][is_cover]" value="0">
+            ${existingIdInput}
+        </div>
+    `;
+
+            const first = isOdd ? imageCol : captionCol;
+            const second = isOdd ? captionCol : imageCol;
+
+            return `
+        <div class="media-row" id="${rowId}" data-index="${index}">
+            <div class="media-actions">
+                <span class="badge badge-light">Row ${index + 1}</span>
+                <button type="button" class="btn btn-sm btn-outline-danger remove-media-row">
+                    <i class="fas fa-trash mr-1"></i> Remove
+                </button>
+            </div>
+
+            <div class="media-grid-generated">
+                ${first}
+                ${second}
+            </div>
+        </div>
+    `;
+        },
+
+        // Refresh the row badges
+        refreshBadges: function () {
+            $("#announcementMediaContainer .media-row").each(function (i) {
+                $(this)
+                    .find(".badge")
+                    .text(`Row ${i + 1}`);
+            });
+        },
+
+        // Add a new row
+        addRow: function () {
+            $("#announcementMediaContainer").append(
+                this.makeRow(this.rowIndex),
+            );
+            this.rowIndex++;
+            this.refreshBadges();
+            if ($("#announcementMediaContainer").data("ui-sortable")) {
+                $("#announcementMediaContainer").sortable("refresh");
+            }
+        },
+
+        // Remove a row
+        removeRow: function (row) {
+            row.remove();
+            this.refreshBadges();
+        },
+    };
+
+    // ==========================
+    // Event listeners
+    // ==========================
+
+    // Add new row
+    $(document).on("click", "#addAnnouncementMediaRow", function () {
+        window.announcementMediaHelper.addRow();
+    });
+
+    // Remove row
+    $(document).on("click", ".remove-media-row", function () {
+        const row = $(this).closest(".media-row");
+        window.announcementMediaHelper.removeRow(row);
+    });
+
+    /* ===============================
+LAYOUT scripts
+=============================== */
+
+    const ANNOUNCEMENT_LAYOUTS = {
+        layout_1: {
+            label: "Layout 1 – Image & Captions",
+            panel: "#announcementLayoutClassic",
+        },
+        layout_2: {
+            label: "Layout 2 – Big Image + Content",
+            panel: "#announcementLayoutHero",
+        },
+        layout_3: {
+            label: "Layout 3 – Image + Text (Split)",
+            panel: "#announcementLayoutSplit",
+        },
+        layout_4: {
+            label: "Layout 4 – Content Only",
+            panel: "#announcementLayoutContent",
+        },
+        layout_5: {
+            label: "Layout 5 – Image Slider + Content",
+            panel: "#announcementLayoutGallery",
+        },
+    };
+
+    /* ===============================
+FORM AUTO-POPULATE (GENERIC)
+=============================== */
+
+    function populateAnnouncementForm(form, data) {
+        for (const key in data) {
+            const input = form.find(`[name="${key}"]`);
+            if (!input.length) {
+                if (Array.isArray(data[key])) {
+                    data[key].forEach((val) => {
+                        form.find(`[name="${key}[]"][value="${val}"]`).prop(
+                            "checked",
+                            true,
+                        );
+                    });
+                }
+                continue;
+            }
+
+            const type = input.attr("type");
+            const tag = input.prop("tagName").toLowerCase();
+            let value = data[key];
+
+            if (tag === "select") {
+                input
+                    .val(
+                        String(
+                            value === true ? 1 : value === false ? 0 : value,
+                        ),
+                    )
+                    .trigger("change");
+            } else if (type === "checkbox") {
+                input.prop("checked", !!value);
+            } else if (type === "radio") {
+                input.filter(`[value="${value}"]`).prop("checked", true);
+            } else if (type === "datetime-local" && value) {
+                input.val(value.replace(" ", "T").slice(0, 16));
+            } else if (type !== "file") {
+                input.val(value ?? "");
+            }
+        }
+
+        // IMAGE PREVIEW (EDIT)
+        form.find(".preview-img").each(function () {
+            const img = $(this);
+            const jsonKey = img.data("json-key");
+            if (data[jsonKey] && data[jsonKey].storage_path) {
+                img.attr("src", `/storage/${data[jsonKey].storage_path}`);
+            } else {
+                img.attr(
+                    "src",
+                    img.attr("data-placeholder") ||
+                        "https://via.placeholder.com/300x200?text=No+Image",
+                );
+            }
+        });
+
+        // Populate media rows if any
+        if (Array.isArray(data.media)) {
+            const container = $("#announcementMediaContainer");
+            container.empty();
+            window.announcementMediaHelper.rowIndex = 0;
+
+            data.media.forEach((media) => {
+                const html = window.announcementMediaHelper.makeRow(
+                    window.announcementMediaHelper.rowIndex,
+                    media,
+                );
+                container.append(html);
+                window.announcementMediaHelper.rowIndex++;
+            });
+
+            window.announcementMediaHelper.refreshBadges();
+        }
+
+        // Layout previews
+        if (data.hero_image)
+            $("#announcementHeroPreview").attr(
+                "src",
+                `/storage/${data.hero_image}`,
+            );
+        if (data.hero_caption)
+            form.find('textarea[name="hero_caption"]').val(data.hero_caption);
+        if (data.split_left_image)
+            $("#announcementSplitLeftPreview").attr(
+                "src",
+                `/storage/${data.split_left_image}`,
+            );
+        if (data.split_right_caption)
+            form.find('textarea[name="split_right_caption"]').val(
+                data.split_right_caption,
+            );
+    }
+
+    function setAnnouncementStep(step) {
+        const isStep1 = step === 1;
+        $("#announcementStep1").toggle(isStep1);
+        $("#announcementStep2").toggle(!isStep1);
+
+        $("#announcementNextBtn").toggle(isStep1);
+        $("#announcementSaveBtn").toggle(!isStep1);
+        $("#announcementBackBtn").toggle(!isStep1);
+
+        $("#announcementStepBadge").text(
+            isStep1 ? "Step 1 of 2" : "Step 2 of 2",
+        );
+        $("#announcementStepHint").text(
+            isStep1
+                ? "Fill details then choose a layout"
+                : "Fill layout content then save",
+        );
+    }
+
+function applyAnnouncementLayout(layoutKey) {
+    const config = ANNOUNCEMENT_LAYOUTS[layoutKey];
+    if (!config) return;
+
+    $("#announcementLayout").val(layoutKey);
+    $("#announcementSelectedLayoutLabel").text(config.label);
+
+    // hide all panels
+    $("#announcementModal .announcement-layout-panel").hide();
+
+    // show selected
+    if (config.panel) {
+        $(config.panel).show();
+    }
+
+    // active card
+    $("#announcementModal .announcement-layout-card").removeClass("active");
+    $(
+        `#announcementModal .announcement-layout-card[data-layout="${layoutKey}"]`,
+    ).addClass("active");
+}
+
+
+    // ===============================
+    // LAYOUT 5 MEDIA SYSTEM
+    // ===============================
+
+    window.announcementLayout5Media = [];
+
+    function renderAnnouncementLayout5() {
+        const grid = $("#announcementMediaGrid");
+        grid.find(".image-card").remove();
+
+        window.announcementLayout5Media.forEach((m, i) => {
+            const card = $(`
+            <div class="media-card image-card" data-key="${i}">
+                <span class="remove-btn">&times;</span>
+                <img src="${m.url}">
+            </div>
+        `);
+            $("#announcementAddMediaCard").before(card);
+        });
+
+        updateAnnouncementLayout5Inputs();
+    }
+
+    function updateAnnouncementLayout5Inputs() {
+        const form = $("#announcementForm");
+        form.find('input[name="existing_media_ids[]"]').remove();
+        form.find('input[name^="media["]').remove();
+
+        window.announcementLayout5Media.forEach((m, index) => {
+            if (m.type === "existing")
+                form.append(
+                    `<input type="hidden" name="existing_media_ids[]" value="${m.id}">`,
+                );
+            if (m.type === "new") {
+                const input = $(
+                    `<input type="file" name="media[${index}][image]" hidden>`,
+                );
+                input[0].files = createFileList(m.file);
+                form.append(input);
+            }
+
+            form.append(`
+            <input type="hidden" name="media[${index}][caption]" value="${m.caption ?? ""}">
+            <input type="hidden" name="media[${index}][sort_order]" value="${index}">
+            <input type="hidden" name="media[${index}][is_thumbnail]" value="${index === 0 ? 1 : 0}">
+        `);
+        });
+    }
+
+    $("#announcementMediaInput").on("change", function (e) {
+        [...e.target.files].forEach((file) => {
+            window.announcementLayout5Media.push({
+                type: "new",
+                file,
+                url: URL.createObjectURL(file),
+                caption: "",
+            });
+        });
+        renderAnnouncementLayout5();
+        this.value = "";
+    });
+
+    $(document).on("click", "#announcementMediaGrid .remove-btn", function () {
+        const key = $(this).closest(".image-card").data("key");
+        window.announcementLayout5Media.splice(key, 1);
+        renderAnnouncementLayout5();
+    });
+
+    $("#announcementMediaGrid").sortable({
+        items: ".image-card",
+        cancel: "#announcementAddMediaCard",
+        tolerance: "pointer",
+        update() {
+            const reordered = [];
+            $("#announcementMediaGrid .image-card").each(function () {
+                const key = $(this).data("key");
+                reordered.push(window.announcementLayout5Media[key]);
+            });
+            window.announcementLayout5Media = reordered;
+            renderAnnouncementLayout5();
+        },
+    });
+
+    function loadExistingAnnouncementLayout5(media) {
+        window.announcementLayout5Media = media
+            .sort((a, b) => a.sort_order - b.sort_order)
+            .map((m) => ({
+                type: "existing",
+                id: m.id,
+                url: `/storage/${m.image_path}`,
+                caption: m.caption,
+            }));
+        renderAnnouncementLayout5();
+    }
+
+    function resetAnnouncementLayout5Media() {
+        window.announcementLayout5Media = [];
+        $("#announcementMediaGrid .image-card").remove();
+        const form = $("#announcementForm");
+        form.find('input[name="existing_media_ids[]"]').remove();
+        form.find('input[name^="media["]').remove();
+    }
+
+    // Click layout card
+    $(document).on(
+        "click",
+        "#announcementModal .announcement-layout-card",
+        function () {
+            const layout = $(this).data("layout");
+            applyAnnouncementLayout(layout);
+        },
+    );
+
+
+    // Next / Back buttons
+    $(document).on("click", "#announcementNextBtn", function () {
+        let valid = true;
+        $("#announcementStep1 :input[required]").each(function () {
+            if (!this.value) valid = false;
+        });
+        if (!valid) {
+            Swal.fire({
+                icon: "warning",
+                title: "Missing fields",
+                text: "Please complete required fields before continuing.",
+            });
+            return;
+        }
+        setAnnouncementStep(2);
+    });
+
+    $(document).on("click", "#announcementBackBtn", function () {
+        setAnnouncementStep(1);
+    });
+
+    // Reset wizard on modal open
+    $("#announcementModal").on("shown.bs.modal", function () {
+        setAnnouncementStep(1);
+
+        const layout = $("#announcementLayout").val() || "layout_1";
+        applyAnnouncementLayout(layout);
+
+        $(".announcement-layout-card").removeClass("active");
+        $(`.announcement-layout-card[data-layout="${layout}"]`).addClass("active");
+    });
+
+
+    // File list helper
+    function createFileList(file) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        return dt.files;
+    }
+
+    /* ===============================
+    ANNOUNCEMENT MODULE END SCRIPT
+    =============================== */
+
+
+
+
+
+
+
+
+
 
     // Universal image preview
     $(document).on("change", ".preview-input", function (e) {

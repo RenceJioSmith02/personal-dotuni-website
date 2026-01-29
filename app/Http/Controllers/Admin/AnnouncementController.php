@@ -113,104 +113,285 @@ class AnnouncementController extends Controller
      * LAYOUT HANDLER
      * ========================== */
 
+    // private function handleLayout(Request $request, Announcement $announcement, string $layout, bool $isUpdate): void
+    // {
+    //     switch ($layout) {
+
+    //         // Image gallery / mixed media
+    //         case 'layout_1':
+    //         case 'layout_gallery':
+    //             if ($isUpdate) {
+    //                 $this->syncAssets($request, $announcement);
+    //             }
+    //             $this->handleUploads($request, $announcement);
+    //             break;
+
+    //         // Document-based layout
+    //         case 'layout_documents':
+    //             if ($isUpdate) {
+    //                 $this->syncAssets($request, $announcement);
+    //             }
+    //             $this->handleUploads($request, $announcement, true);
+    //             break;
+
+    //         // Article only
+    //         case 'layout_article':
+    //             // no uploads
+    //             break;
+    //     }
+    // }
+
     private function handleLayout(Request $request, Announcement $announcement, string $layout, bool $isUpdate): void
     {
         switch ($layout) {
 
-            // Image gallery / mixed media
             case 'layout_1':
-            case 'layout_gallery':
                 if ($isUpdate) {
-                    $this->syncAssets($request, $announcement);
+                    $this->syncMediaRows($request, $announcement);
                 }
-                $this->handleUploads($request, $announcement);
+                $this->handleMediaUploads($request, $announcement);
                 break;
 
-            // Document-based layout
-            case 'layout_documents':
-                if ($isUpdate) {
-                    $this->syncAssets($request, $announcement);
+            case 'layout_2':
+                if ($request->hasFile('hero_image')) {
+                    $this->replaceCoverAssets($announcement);
+                    $this->handleHeroLayout($request, $announcement);
                 }
-                $this->handleUploads($request, $announcement, true);
                 break;
 
-            // Article only
-            case 'layout_article':
-                // no uploads
+            case 'layout_3':
+                if ($request->hasFile('split_left_image')) {
+                    $this->replaceCoverAssets($announcement);
+                    $this->handleSplitLayout($request, $announcement);
+                }
                 break;
+
+            case 'layout_4':
+                // article only
+                break;
+
+            case 'layout_5':
+                if ($isUpdate) {
+                    $this->syncMediaRows($request, $announcement);
+                }
+                $this->handleMediaUploads($request, $announcement);
+                break;
+        }
+
+        // documents (global)
+        if ($request->hasFile('documents')) {
+            $this->handleDocumentUploads($request, $announcement);
         }
     }
 
-    /* ==========================
-     * ASSET SYNC (UPDATE)
-     * ========================== */
-
-    private function syncAssets(Request $request, Announcement $announcement): void
+    private function handleDocumentUploads(Request $request, Announcement $announcement): void
     {
-        $existingIds = $request->input('existing_asset_ids', []);
+        foreach ($request->file('documents') as $i => $file) {
 
-        $announcement->assets()
-            ->wherePivotNotIn('id', $existingIds)
-            ->get()
-            ->each(fn($asset) => $this->deleteAssetPivot($asset->pivot));
-
-        foreach ($existingIds as $index => $id) {
-            $data = $request->input("assets.$index", []);
-            AnnouncementAsset::where('id', $id)->update([
-                'caption' => $data['caption'] ?? null,
-                'sort_order' => $data['sort_order'] ?? $index,
-                'is_thumbnail' => $index === 0,
-            ]);
-        }
-    }
-
-    /* ==========================
-     * FILE UPLOADS
-     * ========================== */
-
-    private function handleUploads(Request $request, Announcement $announcement, bool $documentsOnly = false): void
-    {
-        if (!$request->has('assets'))
-            return;
-
-        $assets = $request->assets;
-
-        usort(
-            $assets,
-            fn($a, $b) =>
-            ($a['sort_order'] ?? 0) <=> ($b['sort_order'] ?? 0)
-        );
-
-        foreach ($assets as $i => $data) {
-
-            if (!isset($data['file']))
-                continue;
-
-            $asset = $this->storeFileAsAsset($data['file']);
+            $asset = $this->storeFileAsAsset($file);
 
             AnnouncementAsset::create([
                 'announcement_id' => $announcement->id,
                 'asset_id' => $asset->id,
-                'caption' => $data['caption'] ?? null,
-                'sort_order' => $data['sort_order'] ?? $i,
-                'is_thumbnail' => $i === 0,
-                'is_cover' => $i === 0 && !$documentsOnly,
+                'caption' => null,
+                'sort_order' => 1000 + $i,
+                'is_thumbnail' => false,
+                'is_cover' => false,
             ]);
         }
     }
+
+
+    private function replaceCoverAssets(Announcement $announcement): void
+    {
+        $announcement->assets()->where('is_cover', true)->get()
+            ->each(fn($a) => $this->deleteAssetPivot($a->pivot));
+    }
+
+    private function handleHeroLayout(Request $request, Announcement $announcement): void
+    {
+        $asset = $this->storeFileAsAsset($request->file('hero_image'));
+
+        AnnouncementAsset::create([
+            'announcement_id' => $announcement->id,
+            'asset_id' => $asset->id,
+            'caption' => $request->hero_caption,
+            'is_cover' => true,
+            'is_thumbnail' => true,
+            'sort_order' => 0,
+        ]);
+    }
+
+    private function handleSplitLayout(Request $request, Announcement $announcement): void
+    {
+        $asset = $this->storeFileAsAsset($request->file('split_left_image'));
+
+        AnnouncementAsset::create([
+            'announcement_id' => $announcement->id,
+            'asset_id' => $asset->id,
+            'caption' => $request->split_right_caption,
+            'is_cover' => true,
+            'is_thumbnail' => true,
+            'sort_order' => 0,
+        ]);
+    }
+
+
+
+    private function syncMediaRows(Request $request, Announcement $announcement): void
+    {
+        $existingIds = $request->input('existing_media_ids', []);
+
+        if ($existingIds) {
+            $announcement->assets()
+                ->whereNotIn('announcement_assets.id', $existingIds)
+                ->get()
+                ->each(fn($a) => $this->deleteAssetPivot($a->pivot));
+        }
+
+        $mediaData = [];
+
+        foreach ($existingIds as $index => $id) {
+            $data = $request->input("media.$index", []);
+            $mediaData[] = [
+                'id' => $id,
+                'caption' => $data['caption'] ?? null,
+                'sort_order' => $data['sort_order'] ?? $index,
+            ];
+        }
+
+        usort($mediaData, fn($a, $b) => $a['sort_order'] <=> $b['sort_order']);
+
+        foreach ($mediaData as $i => $data) {
+            AnnouncementAsset::where('id', $data['id'])->update([
+                'caption' => $data['caption'],
+                'sort_order' => $data['sort_order'],
+                'is_thumbnail' => $i === 0,
+            ]);
+        }
+    }
+
+
+
+    private function handleMediaUploads(Request $request, Announcement $announcement): void
+    {
+        if (!$request->has('media'))
+            return;
+
+        $mediaData = [];
+
+        foreach ($request->media as $index => $media) {
+            if (!isset($media['image']))
+                continue;
+
+            $mediaData[] = [
+                'image' => $media['image'],
+                'caption' => $media['caption'] ?? null,
+                'sort_order' => $media['sort_order'] ?? $index,
+            ];
+        }
+
+        usort($mediaData, fn($a, $b) => $a['sort_order'] <=> $b['sort_order']);
+
+        foreach ($mediaData as $i => $media) {
+
+            $asset = $this->storeFileAsAsset($media['image']);
+
+            AnnouncementAsset::create([
+                'announcement_id' => $announcement->id,
+                'asset_id' => $asset->id,
+                'caption' => $media['caption'],
+                'sort_order' => $media['sort_order'],
+                'is_thumbnail' => $i === 0,
+                'is_cover' => false,
+            ]);
+        }
+    }
+
+
+
+
+    // /* ==========================
+    //  * ASSET SYNC (UPDATE)
+    //  * ========================== */
+
+    // private function syncAssets(Request $request, Announcement $announcement): void
+    // {
+    //     $existingIds = $request->input('existing_asset_ids', []);
+
+    //     if ($existingIds) {
+    //         $announcement->assets()
+    //             ->whereNotIn('announcement_assets.id', $existingIds)
+    //             ->get()
+    //             ->each(fn($a) => $this->deleteAssetPivot($a->pivot));
+    //     }
+
+    //     foreach ($existingIds as $index => $id) {
+    //         $data = $request->input("assets.$index", []);
+    //         AnnouncementAsset::where('id', $id)->update([
+    //             'caption' => $data['caption'] ?? null,
+    //             'sort_order' => $data['sort_order'] ?? $index,
+    //             'is_thumbnail' => $index === 0,
+    //         ]);
+    //     }
+    // }
+
+    // /* ==========================
+    //  * FILE UPLOADS
+    //  * ========================== */
+
+    // private function handleUploads(Request $request, Announcement $announcement, bool $documentsOnly = false): void
+    // {
+    //     if (!$request->has('assets'))
+    //         return;
+
+    //     $assets = $request->assets;
+
+    //     usort(
+    //         $assets,
+    //         fn($a, $b) =>
+    //         ($a['sort_order'] ?? 0) <=> ($b['sort_order'] ?? 0)
+    //     );
+
+    //     foreach ($assets as $i => $data) {
+
+    //         if (!isset($data['file']))
+    //             continue;
+
+    //         $asset = $this->storeFileAsAsset($data['file']);
+
+    //         AnnouncementAsset::create([
+    //             'announcement_id' => $announcement->id,
+    //             'asset_id' => $asset->id,
+    //             'caption' => $data['caption'] ?? null,
+    //             'sort_order' => $data['sort_order'] ?? $i,
+    //             'is_thumbnail' => $i === 0,
+    //             'is_cover' => $i === 0 && !$documentsOnly,
+    //         ]);
+    //     }
+    // }
 
     /* ==========================
      * DELETE HELPERS
      * ========================== */
 
-    private function deleteAssetPivot(AnnouncementAsset $pivot): void
+    private function deleteAssetPivot($pivot): void
     {
+        if (!$pivot instanceof AnnouncementAsset) {
+            $pivot = AnnouncementAsset::find($pivot->id ?? $pivot);
+        }
+
+        if (!$pivot)
+            return;
+
         if ($pivot->asset) {
             Storage::disk('public')->delete($pivot->asset->storage_path);
             $pivot->asset->delete();
         }
+
         $pivot->delete();
     }
+
 
     private function deleteAllAssets(Announcement $announcement): void
     {
@@ -275,14 +456,36 @@ class AnnouncementController extends Controller
 
     private function transformForEdit(Announcement $announcement): array
     {
+        $cover = $announcement->assets->firstWhere('pivot.is_cover', true);
+
         return array_merge($announcement->toArray(), [
-            'assets' => $announcement->assets->map(fn($asset) => [
-                'pivot_id' => $asset->pivot->id,
-                'file_path' => $asset->storage_path,
-                'caption' => $asset->pivot->caption,
-                'is_thumbnail' => $asset->pivot->is_thumbnail,
-                'sort_order' => $asset->pivot->sort_order,
-            ])->values(),
+            'hero_image' => $announcement->layout === 'layout_2'
+                ? optional($cover)->storage_path
+                : null,
+
+            'hero_caption' => $announcement->layout === 'layout_2'
+                ? optional($cover?->pivot)->caption
+                : null,
+
+            'split_left_image' => $announcement->layout === 'layout_3'
+                ? optional($cover)->storage_path
+                : null,
+
+            'split_right_caption' => $announcement->layout === 'layout_3'
+                ? optional($cover?->pivot)->caption
+                : null,
+
+            'media' => $announcement->assets
+                ->where('pivot.is_cover', false)
+                ->map(fn($asset) => [
+                    'id' => $asset->pivot->id,
+                    'image_path' => $asset->storage_path,
+                    'caption' => $asset->pivot->caption,
+                    'is_thumbnail' => $asset->pivot->is_thumbnail,
+                    'sort_order' => $asset->pivot->sort_order,
+                ])
+                ->values(),
         ]);
     }
+
 }
