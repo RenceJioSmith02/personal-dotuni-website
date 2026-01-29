@@ -1,0 +1,90 @@
+/* ===============================
+   SAAS AUTH LAYOUT
+================================ */
+
+.auth-saas {
+    display: flex;
+    min-height: 100vh;
+}
+
+.auth-saas-left {
+    flex: 1;
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    color: #fff;
+    padding: 60px;
+    display: flex;
+    align-items: center;
+}
+
+.auth-saas-left .brand h2 {
+    font-size: 36px;
+    font-weight: 700;
+}
+
+.auth-saas-left .brand p {
+    font-size: 16px;
+    opacity: .9;
+    max-width: 360px;
+}
+
+.auth-saas-right {
+    flex: 1;
+    background: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.08);
+    animation: fadeUp .5s ease;
+}
+
+/* Floating labels */
+.form-floating > label {
+    color: #6b7280;
+}
+
+.form-control {
+    border-radius: 10px;
+    padding: 14px 12px;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+    border-color: #2563eb;
+}
+
+/* Buttons */
+.btn-primary {
+    border-radius: 10px;
+    padding: 12px;
+    font-weight: 600;
+}
+
+/* Animations */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Password toggle */
+.password-toggle {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6b7280;
+}

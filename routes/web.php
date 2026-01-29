@@ -17,35 +17,41 @@ use App\Http\Controllers\Admin\user\RoleController;
 use App\Http\Controllers\Admin\user\UserController;
 
 // rules and regulations
-use App\Http\Controllers\Admin\DotuniNewsController;
 use App\Http\Controllers\Admin\clsu\ClsuNewsController;
 use App\Http\Controllers\Admin\faqs\FaqAnswerController;
-use App\Http\Controllers\Admin\academic\CourseController;
 
 // academic
+use App\Http\Controllers\Admin\academic\CourseController;
 use App\Http\Controllers\Admin\linkage\LinkageController;
 use App\Http\Controllers\Admin\rule\RuleClauseController;
 use App\Http\Controllers\Admin\academic\ProgramController;
 use App\Http\Controllers\Admin\faqs\FaqQuestionController;
 use App\Http\Controllers\Admin\rule\RuleArticleController;
-use App\Http\Controllers\Admin\rule\RuleSectionController;
 
 // linkage
+use App\Http\Controllers\Admin\rule\RuleSectionController;
 use App\Http\Controllers\Admin\form\FormCategoryController;
-use App\Http\Controllers\Admin\rule\RuleSubSectionController;
 
 // prospective_student
+use App\Http\Controllers\Admin\rule\RuleSubSectionController;
 use App\Http\Controllers\Admin\academic\ProgramCourseController;
-use App\Http\Controllers\Admin\academic\ProgramBuilderController;
 
 // forms
+use App\Http\Controllers\Admin\academic\ProgramBuilderController;
 use App\Http\Controllers\Admin\linkage\LinkageCategoryController;
-use App\Http\Controllers\Admin\academic\ProgramRequirementController;
 
 //EResource
+use App\Http\Controllers\Admin\academic\ProgramRequirementController;
 use App\Http\Controllers\Admin\academic\ProgramRequirementCategoryController;
 use App\Http\Controllers\Admin\prospective_student\ProspectiveStudentItemController;
 use App\Http\Controllers\Admin\prospective_student\ProspectiveStudentCategoryController;
+
+// DotUni News
+use App\Http\Controllers\Admin\DotuniNewsController;
+
+// announcements
+use App\Http\Controllers\Admin\AnnouncementController;
+
 
 Route::get('/', function () {
     return view('homepage');
@@ -119,6 +125,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 
     // DotUni News Routes
     Route::resource('dotuni_news', DotuniNewsController::class);
+
+    // Announcements Routes
+    Route::resource('announcements', AnnouncementController::class);
 
 });
 

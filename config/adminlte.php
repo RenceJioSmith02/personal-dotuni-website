@@ -669,6 +669,16 @@ return [
                 ],
             ],
         ],
+        'AuthSaas' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'css',
+                    'asset' => true,
+                    'location' => 'assets/css/auth-saas.css',
+                ],
+            ],
+        ],
     ],
 
     /*

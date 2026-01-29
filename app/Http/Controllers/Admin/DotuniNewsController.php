@@ -276,41 +276,6 @@ class DotuniNewsController extends Controller
     }
 
 
-
-    // private function handleMediaUploads(Request $request, DotuniNews $news): void
-    // {
-    //     if (!$request->has('media'))
-    //         return;
-
-    //     // Collect uploaded media with sort_order
-    //     $mediaData = [];
-    //     foreach ($request->media as $index => $media) {
-    //         if (!isset($media['image']))
-    //             continue;
-    //         $mediaData[] = [
-    //             'image' => $media['image'],
-    //             'caption' => $media['caption'] ?? null,
-    //             'sort_order' => $media['sort_order'] ?? $index,
-    //         ];
-    //     }
-
-    //     // Sort by sort_order
-    //     usort($mediaData, fn($a, $b) => $a['sort_order'] <=> $b['sort_order']);
-
-    //     foreach ($mediaData as $i => $media) {
-    //         $asset = $this->storeImageAsAsset($media['image'], 'dotuni_news');
-
-    //         DotuniNewsAsset::create([
-    //             'news_id' => $news->id,
-    //             'asset_id' => $asset->id,
-    //             'caption' => $media['caption'],
-    //             'sort_order' => $media['sort_order'],
-    //             'is_thumbnail' => $i === 0, // First image by sort_order
-    //             'is_cover' => false,
-    //         ]);
-    //     }
-    // }
-
     /* ==========================
      * HELPERS
      * ========================== */
@@ -339,15 +304,6 @@ class DotuniNewsController extends Controller
         $attachment->delete();
     }
 
-
-    // private function deleteAttachment(DotuniNewsAsset $attachment): void
-    // {
-    //     if ($attachment->asset) {
-    //         Storage::disk('public')->delete($attachment->asset->storage_path);
-    //         $attachment->asset->delete();
-    //     }
-    //     $attachment->delete();
-    // }
 
     private function deleteAllMedia(DotuniNews $news): void
     {

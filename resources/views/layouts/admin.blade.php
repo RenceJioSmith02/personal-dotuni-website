@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/global.css') }}">
     {{-- <link rel="stylesheet" href="{{ asset('assets/css/custom-adminlte.css') }}"> --}}
     <link rel="stylesheet" href="{{ asset('assets/css/data-table.css') }}">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     @stack('css')
 @stop
 
