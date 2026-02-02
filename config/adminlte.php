@@ -342,6 +342,11 @@ return [
             'icon' => 'far fa-fw fa-images',
         ],
         [
+            'text' => 'Fees',
+            'route' => 'admin.fees.index',
+            'icon' => 'fas fa-fw fa-file-invoice-dollar',
+        ],
+        [
             'text' => 'DotUni News',
             'route' => 'admin.dotuni_news.index',
             'icon' => 'far fa-fw fa-newspaper',

@@ -42,14 +42,14 @@ $(document).ready(function () {
             $.get(`${url}/${id}/edit`, function (data) {
 
                 /* --------------------------------
-                | 1. GENERIC AUTO-POPULATE (ALL MODULES)
+                | GENERIC AUTO-POPULATE (ALL MODULES)
                 |-------------------------------- */
                 if (typeof populateForm === "function") {
                     populateForm(form, data);
                 }
 
                 /* --------------------------------
-                | 2. NEWS MODULE (OPTIONAL)
+                | NEWS MODULE (OPTIONAL)
                 |-------------------------------- */
                 if (form.attr("id") === "dotuniNewsForm") {
 
@@ -72,7 +72,7 @@ $(document).ready(function () {
                 }
 
                 /* --------------------------------
-                | 3. ANNOUNCEMENT MODULE (OPTIONAL)
+                | ANNOUNCEMENT MODULE (OPTIONAL)
                 |-------------------------------- */
                 if (form.attr("id") === "announcementForm") {
 
@@ -96,7 +96,7 @@ $(document).ready(function () {
                 }
 
                 /* --------------------------------
-                | 4. FINALIZE FORM + SHOW MODAL
+                | FINALIZE FORM + SHOW MODAL
                 |-------------------------------- */
                 form.attr("action", `${url}/${id}`);
                 form.find(".form-method").val("PUT");
@@ -106,91 +106,6 @@ $(document).ready(function () {
             });
         }
 
-        // if (action === "edit") {
-        //     $.get(`${url}/${id}/edit`, function (data) {
-        //         // ======================
-        //         // NEWS
-        //         // ======================
-        //         if (form.attr("id") === "dotuniNewsForm") {
-        //             populateForm(form, data);
-        //             applyLayout(data.layout || "layout_1");
-
-        //             if (
-        //                 data.layout === "layout_5" &&
-        //                 Array.isArray(data.media)
-        //             ) {
-        //                 resetLayout5Media();
-        //                 loadExistingLayout5(data.media);
-        //             }
-
-        //             lockLayoutSelection(data.layout);
-
-        //             if (Array.isArray(data.media) && data.media.length)
-        //                 setStep(2);
-        //             else setStep(1);
-        //         }
-
-        //         // ======================
-        //         // ANNOUNCEMENT
-        //         // ======================
-        //         if (form.attr("id") === "announcementForm") {
-        //             populateAnnouncementForm(form, data);
-        //             applyAnnouncementLayout(data.layout || "layout_1");
-
-        //             if (
-        //                 data.layout === "layout_5" &&
-        //                 Array.isArray(data.media)
-        //             ) {
-        //                 resetAnnouncementLayout5Media();
-        //                 loadExistingAnnouncementLayout5(data.media);
-        //             }
-
-        //             lockAnnouncementLayoutSelection(data.layout);
-
-        //             // step wizard
-        //             if (Array.isArray(data.media) && data.media.length) {
-        //                 setAnnouncementStep(2);
-        //             } else {
-        //                 setAnnouncementStep(1);
-        //             }
-        //         }
-
-        //         form.attr("action", `${url}/${id}`);
-        //         form.find(".form-method").val("PUT");
-
-        //         modal.removeClass("force-close is-closing fade show");
-        //         modal.modal("show");
-        //     });
-        // }
-
-        // if (action === "edit") {
-        //     $.get(`${url}/${id}/edit`, function (data) {
-        //         populateForm(form, data);
-        //         applyLayout(data.layout || "layout_1");
-
-        //         if (data.layout === "layout_5" && Array.isArray(data.media)) {
-        //             resetLayout5Media();
-
-        //             if (
-        //                 data.layout === "layout_5" &&
-        //                 Array.isArray(data.media)
-        //             ) {
-        //                 loadExistingLayout5(data.media);
-        //             }
-        //         }
-
-        //         lockLayoutSelection(data.layout);
-
-        //         // go to step 2 if media exists
-        //         if (Array.isArray(data.media) && data.media.length) setStep(2);
-        //         else setStep(1);
-
-        //         form.attr("action", `${url}/${id}`);
-        //         form.find(".form-method").val("PUT");
-        //         modal.removeClass("force-close is-closing fade show");
-        //         modal.modal("show");
-        //     });
-        // }
         
     });
 
@@ -1054,19 +969,21 @@ FORM AUTO-POPULATE (GENERIC)
         }
 
         // IMAGE PREVIEW (EDIT)
-        form.find(".preview-img").each(function () {
-            const img = $(this);
-            const jsonKey = img.data("json-key");
-            if (data[jsonKey] && data[jsonKey].storage_path) {
-                img.attr("src", `/storage/${data[jsonKey].storage_path}`);
-            } else {
-                img.attr(
-                    "src",
-                    img.attr("data-placeholder") ||
-                        "https://via.placeholder.com/300x200?text=No+Image",
-                );
-            }
-        });
+        // form.find(".preview-img").each(function () {
+        //     const img = $(this);
+        //     const jsonKey = img.data("json-key");
+        //     if (data[jsonKey] && data[jsonKey].storage_path) {
+        //         img.attr("src", `/storage/${data[jsonKey].storage_path}`);
+        //     } else {
+        //         img.attr(
+        //             "src",
+        //             img.attr("data-placeholder") ||
+        //                 "https://via.placeholder.com/300x200?text=No+Image",
+        //         );
+        //     }
+        // });
+
+        
 
         // Populate media rows if any
         if (Array.isArray(data.media)) {
@@ -1295,11 +1212,11 @@ function applyAnnouncementLayout(layoutKey) {
 
 
     // File list helper
-    function createFileList(file) {
-        const dt = new DataTransfer();
-        dt.items.add(file);
-        return dt.files;
-    }
+    // function createFileList(file) {
+    //     const dt = new DataTransfer();
+    //     dt.items.add(file);
+    //     return dt.files;
+    // }
 
     function lockAnnouncementLayoutSelection(activeLayout) {
         // Disable all cards
@@ -1374,4 +1291,13 @@ function applyAnnouncementLayout(layoutKey) {
         };
         reader.readAsDataURL(file);
     });
+
+
+
+
+
+
+
+
+    
 });

@@ -23,7 +23,7 @@
                         <select name="sub_section_id" class="form-control" required>
                             @foreach($subSections as $sub)
                                 <option value="{{ $sub->id }}">
-                                    {{ $sub->section->article->number ?? '-' }} - {{ $sub->section->number }} - {{ $sub->number }}
+                                    {{ $sub->section?->article?->number ?? '-' }} - {{ $sub->section?->number ?? '-' }} - {{ $sub->number }}
                                 </option>
                             @endforeach
                         </select>

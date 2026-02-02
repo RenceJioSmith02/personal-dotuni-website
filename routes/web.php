@@ -6,51 +6,54 @@ use Illuminate\Support\Facades\Route;
 // gallery
 use App\Http\Controllers\Admin\GalleryController;
 
+//  fee
+use App\Http\Controllers\Admin\FeeController;
+
 // user management
-use App\Http\Controllers\Admin\EResourceController;
-
-// clsu news
-use App\Http\Controllers\Admin\form\FormController;
-
-// faqs
 use App\Http\Controllers\Admin\user\RoleController;
 use App\Http\Controllers\Admin\user\UserController;
 
+// clsu news
+use App\Http\Controllers\Admin\EResourceController;
+
+// faqs
+use App\Http\Controllers\Admin\form\FormController;
+
 // rules and regulations
-use App\Http\Controllers\Admin\clsu\ClsuNewsController;
-use App\Http\Controllers\Admin\faqs\FaqAnswerController;
+use App\Http\Controllers\Admin\DotuniNewsController;
 
 // academic
+use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\clsu\ClsuNewsController;
+use App\Http\Controllers\Admin\faqs\FaqAnswerController;
 use App\Http\Controllers\Admin\academic\CourseController;
 use App\Http\Controllers\Admin\linkage\LinkageController;
 use App\Http\Controllers\Admin\rule\RuleClauseController;
-use App\Http\Controllers\Admin\academic\ProgramController;
-use App\Http\Controllers\Admin\faqs\FaqQuestionController;
-use App\Http\Controllers\Admin\rule\RuleArticleController;
 
 // linkage
-use App\Http\Controllers\Admin\rule\RuleSectionController;
-use App\Http\Controllers\Admin\form\FormCategoryController;
+use App\Http\Controllers\Admin\academic\ProgramController;
+use App\Http\Controllers\Admin\faqs\FaqQuestionController;
 
 // prospective_student
-use App\Http\Controllers\Admin\rule\RuleSubSectionController;
-use App\Http\Controllers\Admin\academic\ProgramCourseController;
+use App\Http\Controllers\Admin\rule\RuleArticleController;
+use App\Http\Controllers\Admin\rule\RuleSectionController;
 
 // forms
-use App\Http\Controllers\Admin\academic\ProgramBuilderController;
-use App\Http\Controllers\Admin\linkage\LinkageCategoryController;
+use App\Http\Controllers\Admin\form\FormCategoryController;
+use App\Http\Controllers\Admin\rule\RuleSubSectionController;
 
 //EResource
+use App\Http\Controllers\Admin\academic\ProgramCourseController;
+use App\Http\Controllers\Admin\academic\ProgramBuilderController;
+use App\Http\Controllers\Admin\linkage\LinkageCategoryController;
 use App\Http\Controllers\Admin\academic\ProgramRequirementController;
-use App\Http\Controllers\Admin\academic\ProgramRequirementCategoryController;
-use App\Http\Controllers\Admin\prospective_student\ProspectiveStudentItemController;
-use App\Http\Controllers\Admin\prospective_student\ProspectiveStudentCategoryController;
 
 // DotUni News
-use App\Http\Controllers\Admin\DotuniNewsController;
+use App\Http\Controllers\Admin\academic\ProgramRequirementCategoryController;
 
 // announcements
-use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\prospective_student\ProspectiveStudentItemController;
+use App\Http\Controllers\Admin\prospective_student\ProspectiveStudentCategoryController;
 
 
 Route::get('/', function () {
@@ -128,6 +131,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 
     // Announcements Routes
     Route::resource('announcements', AnnouncementController::class);
+
+    // Fee Routes
+    Route::resource('fees', FeeController::class);
 
 });
 
