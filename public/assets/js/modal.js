@@ -25,6 +25,7 @@ $(document).ready(function () {
             form.find(".form-method").val("POST");
 
             unlockLayoutSelection();
+            unlockAnnouncementLayoutSelection();
 
             resetLayout5Media();
 
@@ -33,46 +34,60 @@ $(document).ready(function () {
         }
 
         // EDIT
+
+        // ===============================
+        // EDIT (GENERIC + MODULE-AWARE)
+        // ===============================
         if (action === "edit") {
             $.get(`${url}/${id}/edit`, function (data) {
-                // ======================
-                // NEWS
-                // ======================
-                if (form.attr("id") === "dotuniNewsForm") {
+
+                /* --------------------------------
+                | 1. GENERIC AUTO-POPULATE (ALL MODULES)
+                |-------------------------------- */
+                if (typeof populateForm === "function") {
                     populateForm(form, data);
+                }
+
+                /* --------------------------------
+                | 2. NEWS MODULE (OPTIONAL)
+                |-------------------------------- */
+                if (form.attr("id") === "dotuniNewsForm") {
+
                     applyLayout(data.layout || "layout_1");
 
-                    if (
-                        data.layout === "layout_5" &&
-                        Array.isArray(data.media)
-                    ) {
+                    if (data.layout === "layout_5" && Array.isArray(data.media)) {
                         resetLayout5Media();
                         loadExistingLayout5(data.media);
                     }
 
-                    lockLayoutSelection(data.layout);
+                    if (typeof lockLayoutSelection === "function") {
+                        lockLayoutSelection(data.layout);
+                    }
 
-                    if (Array.isArray(data.media) && data.media.length)
+                    if (Array.isArray(data.media) && data.media.length) {
                         setStep(2);
-                    else setStep(1);
+                    } else {
+                        setStep(1);
+                    }
                 }
 
-                // ======================
-                // ANNOUNCEMENT
-                // ======================
+                /* --------------------------------
+                | 3. ANNOUNCEMENT MODULE (OPTIONAL)
+                |-------------------------------- */
                 if (form.attr("id") === "announcementForm") {
+
                     populateAnnouncementForm(form, data);
                     applyAnnouncementLayout(data.layout || "layout_1");
 
-                    if (
-                        data.layout === "layout_5" &&
-                        Array.isArray(data.media)
-                    ) {
+                    if (data.layout === "layout_5" && Array.isArray(data.media)) {
                         resetAnnouncementLayout5Media();
                         loadExistingAnnouncementLayout5(data.media);
                     }
 
-                    // step wizard
+                    if (typeof lockAnnouncementLayoutSelection === "function") {
+                        lockAnnouncementLayoutSelection(data.layout);
+                    }
+
                     if (Array.isArray(data.media) && data.media.length) {
                         setAnnouncementStep(2);
                     } else {
@@ -80,6 +95,9 @@ $(document).ready(function () {
                     }
                 }
 
+                /* --------------------------------
+                | 4. FINALIZE FORM + SHOW MODAL
+                |-------------------------------- */
                 form.attr("action", `${url}/${id}`);
                 form.find(".form-method").val("PUT");
 
@@ -87,6 +105,63 @@ $(document).ready(function () {
                 modal.modal("show");
             });
         }
+
+        // if (action === "edit") {
+        //     $.get(`${url}/${id}/edit`, function (data) {
+        //         // ======================
+        //         // NEWS
+        //         // ======================
+        //         if (form.attr("id") === "dotuniNewsForm") {
+        //             populateForm(form, data);
+        //             applyLayout(data.layout || "layout_1");
+
+        //             if (
+        //                 data.layout === "layout_5" &&
+        //                 Array.isArray(data.media)
+        //             ) {
+        //                 resetLayout5Media();
+        //                 loadExistingLayout5(data.media);
+        //             }
+
+        //             lockLayoutSelection(data.layout);
+
+        //             if (Array.isArray(data.media) && data.media.length)
+        //                 setStep(2);
+        //             else setStep(1);
+        //         }
+
+        //         // ======================
+        //         // ANNOUNCEMENT
+        //         // ======================
+        //         if (form.attr("id") === "announcementForm") {
+        //             populateAnnouncementForm(form, data);
+        //             applyAnnouncementLayout(data.layout || "layout_1");
+
+        //             if (
+        //                 data.layout === "layout_5" &&
+        //                 Array.isArray(data.media)
+        //             ) {
+        //                 resetAnnouncementLayout5Media();
+        //                 loadExistingAnnouncementLayout5(data.media);
+        //             }
+
+        //             lockAnnouncementLayoutSelection(data.layout);
+
+        //             // step wizard
+        //             if (Array.isArray(data.media) && data.media.length) {
+        //                 setAnnouncementStep(2);
+        //             } else {
+        //                 setAnnouncementStep(1);
+        //             }
+        //         }
+
+        //         form.attr("action", `${url}/${id}`);
+        //         form.find(".form-method").val("PUT");
+
+        //         modal.removeClass("force-close is-closing fade show");
+        //         modal.modal("show");
+        //     });
+        // }
 
         // if (action === "edit") {
         //     $.get(`${url}/${id}/edit`, function (data) {
@@ -116,6 +191,7 @@ $(document).ready(function () {
         //         modal.modal("show");
         //     });
         // }
+        
     });
 
     /* ===============================
@@ -1224,6 +1300,51 @@ function applyAnnouncementLayout(layoutKey) {
         dt.items.add(file);
         return dt.files;
     }
+
+    function lockAnnouncementLayoutSelection(activeLayout) {
+        // Disable all cards
+        $("#announcementModal .announcement-layout-card")
+            .addClass("disabled")
+            .css({
+                pointerEvents: "none",
+                opacity: 0.5,
+            });
+
+        // Enable active one
+        $(
+            `#announcementModal .announcement-layout-card[data-layout="${activeLayout}"]`,
+        )
+            .removeClass("disabled")
+            .css({
+                pointerEvents: "auto",
+                opacity: 1,
+            });
+
+        // Hide all panels
+        $("#announcementModal .announcement-layout-panel").hide();
+
+        // Show only active panel
+        const config = ANNOUNCEMENT_LAYOUTS[activeLayout];
+        if (config?.panel) {
+            $(config.panel).show();
+        }
+
+        $("#announcementStepHint").text(
+            "Layout is locked for existing announcement",
+        );
+    }
+
+    function unlockAnnouncementLayoutSelection() {
+        $("#announcementModal .announcement-layout-card")
+            .removeClass("disabled")
+            .css({
+                pointerEvents: "auto",
+                opacity: 1,
+            });
+
+        $("#announcementStepHint").text("Fill details then choose a layout");
+    }
+
 
     /* ===============================
     ANNOUNCEMENT MODULE END SCRIPT
