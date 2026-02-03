@@ -14,12 +14,15 @@ class ProgramController extends Controller
     ) {
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return view(
-            'admin.academic.programs.index',
-            ['programs' => $this->service->list()]
-        );
+        // If AJAX request (DataTables server-side)
+        if ($request->ajax()) {
+            return response()->json($this->service->datatable($request));
+        }
+
+        // Normal page load
+        return view('admin.academic.programs.index');
     }
 
     public function store(Request $request)

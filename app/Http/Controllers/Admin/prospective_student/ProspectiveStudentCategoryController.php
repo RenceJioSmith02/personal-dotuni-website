@@ -15,15 +15,15 @@ class ProspectiveStudentCategoryController extends Controller
     ) {
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $categories = $this->service->list();
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
 
-        return view(
-            'admin.prospective_student.categories.index',
-            compact('categories')
-        );
+        return view('admin.prospective_student.categories.index');
     }
+
 
     public function store(Request $request)
     {

@@ -32,49 +32,7 @@
                     <th width="160">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($answers as $answer)
-                <tr data-id="{{ $answer->id }}">
-                    <td>
-                        {{ $answer->question->question ?? '—' }}
-                    </td>
 
-                    <td>
-                        {{ Str::limit($answer->answer, 120) }}
-                    </td>
-
-                    <td>
-                        {!! $answer->is_active
-                            ? '<span class="badge badge-success">Active</span>'
-                            : '<span class="badge badge-danger">Inactive</span>' !!}
-                    </td>
-
-                    <td>
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-id="{{ $answer->id }}"
-                            data-modal="#faqAnswerModal"
-                            data-form="#faqAnswerForm"
-                            data-title="Edit FAQ Answer"
-                            data-url="{{ route('admin.faqs_answers.index') }}">
-                            Edit
-                        </button>
-
-                        <form
-                            action="{{ route('admin.faqs_answers.destroy', $answer) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-faq-answer">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -87,21 +45,32 @@
 @push('js')
 <script>
 $(function () {
-
     if ($.fn.DataTable.isDataTable('#faqAnswersTable')) {
         $('#faqAnswersTable').DataTable().destroy();
     }
 
     const table = $('#faqAnswersTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            ulr: "{{ route('admin.faqs_answers.index') }}",
+            type: "GET",
+            dataSrc: function(json) {
+                console.log('Answers returned:', json.data.length);
+                return json.data;
+            }
+        },
         responsive: true,
         autoWidth: false,
         ordering: true,
         pageLength: 10,
-        columnDefs: [
-            { orderable: false, targets: [3] }
+        columns: [
+            { data: 'question' },
+            { data: 'answer' },
+            { data: 'status', orderable: false, searchable: false },
+            { data: 'actions', orderable: false, searchable: false },
         ]
     });
-
 });
 
 

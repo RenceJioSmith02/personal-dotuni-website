@@ -16,10 +16,13 @@ class AnnouncementController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $announcements = $this->service->list();
-        return view('admin.clsu.announcement.index', compact('announcements'));
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
+        return view('admin.clsu.announcement.index');
     }
 
     public function store(Request $request)

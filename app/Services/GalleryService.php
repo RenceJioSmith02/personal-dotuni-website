@@ -20,6 +20,73 @@ class GalleryService
         return Gallery::with('asset')->orderBy('sort_order')->get();
     }
 
+
+    public function datatable(Request $request)
+    {
+        $query = Gallery::with('asset');
+
+        $total = $query->count();
+
+        /* ======================
+         * SEARCH
+         * ====================== */
+        if ($search = $request->input('search.value')) {
+            $query->whereHas('asset', function ($q) use ($search) {
+                $q->where('file_name', 'like', "%{$search}%");
+            });
+        }
+
+        $filtered = $query->count();
+
+        /* ======================
+         * ORDERING
+         * ====================== */
+        $columns = ['image', 'file_name', 'sort_order', 'actions'];
+        $orderIndex = $request->input('order.0.column', 2);
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        if (($columns[$orderIndex] ?? null) === 'sort_order') {
+            $query->orderBy('sort_order', $orderDir);
+        }
+
+        /* ======================
+         * PAGINATION
+         * ====================== */
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $items = $query->offset($start)->limit($length)->get();
+
+        /* ======================
+         * RESPONSE
+         * ====================== */
+        return [
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $items->map(function ($item) {
+
+                return [
+                    'image' => $item->asset
+                        ? '<img src="' . asset('storage/' . $item->asset->storage_path) . '"
+                             class="img-thumbnail"
+                             style="max-width:50px;"
+                             alt="' . e($item->asset->alt_text ?? 'Gallery image') . '">'
+                        : '<span class="text-muted">No Image</span>',
+
+                    'file_name' => $item->asset->file_name ?? '—',
+
+                    'sort_order' => $item->sort_order,
+
+                    'actions' => view(
+                        'admin.gallery.partials.actions',
+                        compact('item')
+                    )->render(),
+                ];
+            }),
+        ];
+    }
+
     /**
      * Create a new gallery item
      */

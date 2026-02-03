@@ -34,40 +34,7 @@
                     <th width="150">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($articles as $article)
-                <tr>
-                    <td>{{ $article->number }}</td>
-                    <td>{{ $article->title }}</td>
-                    <td>{{ $article->sort_order }}</td>
-                    <td>
 
-                        <!-- Edit -->
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-modal="#articleModal"
-                            data-form="#articleForm"
-                            data-title="Edit Article"
-                            data-url="/admin/rule_articles"
-                            data-id="{{ $article->id }}">
-                            Edit
-                        </button>
-
-                        <!-- Delete -->
-                        <form
-                            action="{{ route('admin.rule_articles.destroy', $article) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-article">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                        </form>
-
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -84,13 +51,24 @@ $(function () {
     }
 
     const table = $('#articlesTable').DataTable({
+        processing: true,
+        serverSide: true,
         responsive: true,
         autoWidth: false,
-        ordering: true,
         pageLength: 10,
-        columnDefs: [{ orderable: false, targets: 3 }]
+        ajax: {
+            url: "{{ route('admin.rule_articles.index') }}",
+            type: "GET"
+        },
+        columns: [
+            { data: 'number', name: 'number' },
+            { data: 'title', name: 'title' },
+            { data: 'sort_order', name: 'sort_order' },
+            { data: 'actions', orderable: false, searchable: false }
+        ]
     });
 
+    
     $(document).on("submit", ".ajax-delete-article", function(e) {
         e.preventDefault();
         const form = $(this), url = form.attr("action"), row = form.closest("tr");

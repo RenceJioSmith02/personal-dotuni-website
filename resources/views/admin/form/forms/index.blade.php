@@ -37,57 +37,6 @@
                     <th width="150">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($forms as $form)
-                <tr>
-                    <td>
-                        @if($form->file_url)
-                            <a href="{{ $form->file_url }}" target="_blank">
-                                <i class="fas fa-file-alt"></i>
-                            </a>
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td>{{ $form->name }}</td>
-                    <td>{{ $form->category->name ?? '-' }}</td>
-                    <td>{{ strtoupper($form->asset->mime_type ?? '-') }}</td>
-                    <td>
-                        {!! $form->is_active
-                            ? '<span class="badge badge-success">Active</span>'
-                            : '<span class="badge badge-danger">Inactive</span>' !!}
-                    </td>
-                    <td>
-
-                        <!-- Edit -->
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-id="{{ $form->id }}"
-                            data-modal="#formModal"
-                            data-form="#formForm"
-                            data-title="Edit Form"
-                            data-url="{{ route('admin.forms.index') }}">
-                            Edit
-                        </button>
-
-                        <!-- Delete -->
-                        <form
-                            action="{{ route('admin.forms.destroy', $form) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-form">
-                            @csrf
-                            @method('DELETE')
-
-                            <button type="submit" class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
 
     </div>
@@ -106,12 +55,23 @@ $(function () {
         $('#formsTable').DataTable().destroy();
     }
 
-    const table = $('#formsTable').DataTable({
+    $('#formsTable').DataTable({
+        processing: true,
+        serverSide: true,
         responsive: true,
         autoWidth: false,
         pageLength: 10,
-        columnDefs: [
-            { orderable: false, targets: 5 }
+        ajax: {
+            url: "{{ route('admin.forms.index') }}",
+            type: "GET"
+        },
+        columns: [
+            { data: 'file', orderable: false, searchable: false },
+            { data: 'name' },
+            { data: 'category' },
+            { data: 'type', searchable: false },
+            { data: 'status', orderable: false, searchable: false },
+            { data: 'actions', orderable: false, searchable: false }
         ]
     });
 

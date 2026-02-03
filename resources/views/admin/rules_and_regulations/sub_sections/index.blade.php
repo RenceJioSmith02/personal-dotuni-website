@@ -34,37 +34,7 @@
                     <th width="150">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($subSections as $sub)
-                <tr>
-                    <td>{{ $sub->section->article->number ?? '-' }}</td>
-                    <td>{{ $sub->section->number ?? '-' }}</td>
-                    <td>{{ $sub->number }}</td>
-                    <td>{{ Str::limit($sub->body, 80) }}</td>
-                    <td>{{ $sub->sort_order }}</td>
-                    <td>
-                        <button class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-modal="#subSectionModal"
-                            data-form="#subSectionForm"
-                            data-title="Edit Sub-Section"
-                            data-url="/admin/rule_sub_sections"
-                            data-id="{{ $sub->id }}">
-                            Edit
-                        </button>
 
-                        <form action="{{ route('admin.rule_sub_sections.destroy', $sub) }}"
-                              method="POST"
-                              class="d-inline ajax-delete-subsection">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                        </form>
-
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -77,7 +47,27 @@
 <script>
 $(function () {
     if ($.fn.DataTable.isDataTable('#subSectionsTable')) $('#subSectionsTable').DataTable().destroy();
-    const table = $('#subSectionsTable').DataTable({ responsive: true, autoWidth: false, pageLength: 10, columnDefs: [{ orderable: false, targets: 5 }] });
+
+    const table = $('#subSectionsTable').DataTable({
+        responsive: true,
+        autoWidth: false,
+        pageLength: 10,
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: '/admin/rule_sub_sections',
+            type: 'GET',
+        },
+        columns: [
+            { data: 'article' },
+            { data: 'section' },
+            { data: 'number' },
+            { data: 'body' },
+            { data: 'sort_order' },
+            { data: 'actions', orderable: false, searchable: false },
+        ]
+    });
+
 
     $(document).on("submit", ".ajax-delete-subsection", function(e) {
         e.preventDefault();

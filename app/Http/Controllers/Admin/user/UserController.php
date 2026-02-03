@@ -17,12 +17,16 @@ class UserController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $users = $this->service->list();
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
         $roles = Role::all();
-        return view('admin.user_management.users.index', compact('users', 'roles'));
+        return view('admin.user_management.users.index', compact('roles'));
     }
+
 
     public function store(Request $request)
     {

@@ -318,12 +318,15 @@
 
 @push('js')
 
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
     <script>
+        
         (function () {
 
             // Make rows sortable and draggable
             $('#newsMediaContainer').sortable({
-                handle: '.media-actions', // or remove handle to make the whole row draggable
+                handle: '.media-actions', 
                 axis: 'y',
                 placeholder: "ui-state-highlight",
                 update: function () {
@@ -345,7 +348,6 @@
                 $(target).attr('src', url);
             });
 
-            // When user selects "Set as Thumbnail" radio, set hidden is_thumbnail flags
             $(document).on('change', 'input[name="thumbnail_choice"]', function () {
                 const chosenIndex = $(this).val();
 
@@ -358,11 +360,8 @@
                     .val('1');
             });
 
-            // Reset dynamic section whenever modal opens for ADD
-            // (If your modal.js already handles clearing, you can remove this.)
+
             $('#dotuniNewsModal').on('hidden.bs.modal', function () {
-                // optional: clear dynamic rows on close
-                // comment this out if you want rows to persist while the modal is open/close
                 $('#newsMediaContainer').empty();
                 rowIndex = 0;
 

@@ -2,10 +2,11 @@
 
 namespace App\Services\Faqs;
 
+use DomainException;
 use App\Models\FaqQuestion;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use DomainException;
 
 class FaqQuestionService
 {
@@ -13,6 +14,59 @@ class FaqQuestionService
     {
         return FaqQuestion::orderBy('sort_order')->get();
     }
+
+
+
+    public function datatable(Request $request)
+    {
+        $query = FaqQuestion::query();
+
+        $total = $query->count();
+
+        // Search
+        if ($search = $request->input('search.value')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('question', 'like', "%{$search}%");
+            });
+        }
+
+        $filtered = $query->count();
+
+        // Ordering
+        $columns = ['question', 'sort_order', 'status', 'actions'];
+        $orderColumnIndex = $request->input('order.0.column', 0);
+        $orderColumn = $columns[$orderColumnIndex] ?? 'sort_order';
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $orderDir = $orderDir === 'asc' ? 'asc' : 'desc';
+
+        if (!in_array($orderColumn, ['actions'])) {
+            $query->orderBy($orderColumn, $orderDir);
+        }
+
+        $data = $query->offset($start)->limit($length)->get();
+
+        return [
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $data->map(function ($item) {
+
+                return [
+                    'question' => $item->question,
+                    'sort_order' => $item->sort_order,
+                    'status' => $item->is_active
+                        ? '<span class="badge badge-success">Active</span>'
+                        : '<span class="badge badge-danger">Inactive</span>',
+                    'actions' => view('admin.faqs.questions.partials.actions', compact('item'))->render(),
+                ];
+            }),
+        ];
+    }
+
 
     public function create(array $data): FaqQuestion
     {

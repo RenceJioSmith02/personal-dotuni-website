@@ -19,10 +19,13 @@ class GalleryController extends Controller
     /**
      * List gallery items
      */
-    public function index()
+    public function index(Request $request)
     {
-        $items = $this->service->list();
-        return view('admin.gallery.index', compact('items'));
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
+        return view('admin.gallery.index');
     }
 
     /**

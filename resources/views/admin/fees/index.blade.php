@@ -33,57 +33,7 @@
                     <th width="180">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($fees as $item)
-                <tr data-id="{{ $item->id }}">
-                    <td class="text-center">
-                        @if ($item->asset)
-                            @if ($item->asset->kind === 'image')
-                                <img
-                                    src="{{ asset('storage/' . $item->asset->storage_path) }}"
-                                    class="img-thumbnail"
-                                    style="max-width:50px;"
-                                    alt="{{ $item->title }}">
-                            @else
-                                <span class="text-muted">{{ ucfirst($item->asset->kind) }}</span>
-                            @endif
-                        @else
-                            <span class="text-muted">—</span>
-                        @endif
-                    </td>
 
-                    <td>{{ $item->title }}</td>
-
-                    <td>{{ Str::limit($item->caption, 80) }}</td>
-
-                    <td>{{ $item->sort_order }}</td>
-
-                    <td>
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-id="{{ $item->id }}"
-                            data-modal="#feeModal"
-                            data-form="#feeForm"
-                            data-title="Edit Fee"
-                            data-url="{{ route('admin.fees.index') }}">
-                            Edit
-                        </button>
-
-                        <form
-                            action="{{ route('admin.fees.destroy', $item) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-fee">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -94,21 +44,32 @@
 
 @push('js')
 <script>
+
 $(function () {
 
     if ($.fn.DataTable.isDataTable('#feeTable')) {
         $('#feeTable').DataTable().destroy();
     }
 
-    const table = $('#feeTable').DataTable({
+    $('#feeTable').DataTable({
+        processing: true,
+        serverSide: true,
         responsive: true,
         autoWidth: false,
-        ordering: true,
         pageLength: 10,
-        columnDefs: [{ orderable: false, targets: [0, 4] }]
+        ajax: "{{ route('admin.fees.index') }}",
+
+        columns: [
+            { data: 'asset', orderable: false, searchable: false },
+            { data: 'title' },
+            { data: 'caption', orderable: false },
+            { data: 'sort_order' },
+            { data: 'actions', orderable: false, searchable: false }
+        ]
     });
 
 });
+
 
 /* DELETE FEE (AJAX) */
 $(document).on("submit", ".ajax-delete-fee", function (e) {

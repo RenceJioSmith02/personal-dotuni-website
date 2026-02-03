@@ -35,96 +35,7 @@
                     <th width="180">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($announcements as $item)
-                @php
-                    $thumbnail = $item->assets
-                        ->firstWhere('pivot.is_thumbnail', true);
-                @endphp
-                <tr data-id="{{ $item->id }}">
-                    <td class="text-center">
-                        @if ($thumbnail && $thumbnail->kind === 'image')
-                            <img
-                                src="{{ asset('storage/' . $thumbnail->storage_path) }}"
-                                class="img-thumbnail"
-                                style="max-width:50px;"
-                                alt="{{ $thumbnail->alt_text ?? $item->title }}">
-                        @else
-                            <span class="text-muted">No Image</span>
-                        @endif
-                    </td>
 
-                    <td>{{ $item->title }}</td>
-
-                    <td>{{ Str::limit($item->seo_description, 80) }}</td>
-
-                    <td>
-                        @php
-                            $statusClass = match($item->status) {
-                                'published' => 'badge-success',
-                                'submitted' => 'badge-warning',
-                                'archived' => 'badge-secondary',
-                                default => 'badge-info',
-                            };
-                        @endphp
-                        <span class="badge {{ $statusClass }}">
-                            {{ ucfirst($item->status) }}
-                        </span>
-                    </td>
-
-                    <td>
-                        @php
-                            $visClass = match($item->visibility) {
-                                'public' => 'badge-success',
-                                'unlisted' => 'badge-warning',
-                                default => 'badge-secondary',
-                            };
-                        @endphp
-                        <span class="badge {{ $visClass }}">
-                            {{ ucfirst($item->visibility) }}
-                        </span>
-                    </td>
-
-                    <td>
-                        @if($item->publish_start)
-                            {{ $item->publish_start->format('Y-m-d') }}
-                            @if($item->publish_end)
-                                <br>
-                                <small class="text-muted">
-                                    to {{ $item->publish_end->format('Y-m-d') }}
-                                </small>
-                            @endif
-                        @else
-                            <span class="text-muted">—</span>
-                        @endif
-                    </td>
-
-                    <td>
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-id="{{ $item->id }}"
-                            data-modal="#announcementModal"
-                            data-form="#announcementForm"
-                            data-title="Edit Announcement"
-                            data-url="{{ route('admin.announcements.index') }}">
-                            Edit
-                        </button>
-
-                        <form
-                            action="{{ route('admin.announcements.destroy', $item) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-announcement">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -143,12 +54,30 @@ $(function () {
     }
 
     const table = $('#announcementsTable').DataTable({
+        processing: true,
+        serverSide: true,
         responsive: true,
-        autoWidth: false,
-        ordering: true,
         pageLength: 10,
-        columnDefs: [{ orderable: false, targets: [0, 6] }]
+        lengthMenu: [10, 20, 50, 100],
+        ajax: {
+            url: "{{ route('admin.announcements.index') }}",
+            type: "GET",
+            // dataSrc: function(json) {
+            //     console.log('Announcements returned:', json.data.length);
+            //     return json.data;
+            // }
+        },
+        columns: [
+            { data: 'thumbnail', orderable: false, searchable: false },
+            { data: 'title' },
+            { data: 'seo_description' },
+            { data: 'status' },
+            { data: 'visibility' },
+            { data: 'publish_window' },
+            { data: 'actions', orderable: false, searchable: false }
+        ]
     });
+
 
 });
 

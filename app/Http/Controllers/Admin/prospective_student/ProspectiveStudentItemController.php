@@ -15,16 +15,20 @@ class ProspectiveStudentItemController extends Controller
     ) {
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $items = $this->service->list();
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
         $categories = ProspectiveStudentCategory::orderBy('name')->get();
 
         return view(
             'admin.prospective_student.items.index',
-            compact('items', 'categories')
+            compact('categories')
         );
     }
+
 
     public function store(Request $request)
     {

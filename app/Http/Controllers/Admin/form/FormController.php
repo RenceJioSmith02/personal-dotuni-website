@@ -14,13 +14,19 @@ class FormController extends Controller
     {
     }
 
-    public function index()
+
+    public function index(Request $request)
     {
-        $forms = $this->service->list();
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
+        // still needed for modal dropdowns
         $categories = FormCategory::orderBy('name')->get();
 
-        return view('admin.form.forms.index', compact('forms', 'categories'));
+        return view('admin.form.forms.index', compact('categories'));
     }
+
 
     public function store(Request $request)
     {

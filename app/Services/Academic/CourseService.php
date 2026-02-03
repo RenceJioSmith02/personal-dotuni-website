@@ -6,16 +6,86 @@ use App\Models\Course;
 use Illuminate\Support\Facades\DB;
 use DomainException;
 use Exception;
+use Illuminate\Http\Request;
 
 class CourseService
 {
-    /**
-     * Get all courses
-     */
+
     public function list()
     {
         return Course::all();
     }
+    /**
+     * Get all courses
+     */
+
+    public function datatable(Request $request)
+    {
+        $query = Course::query();
+
+        $total = $query->count();
+
+        /* ======================
+         * SEARCH
+         * ====================== */
+        if ($search = $request->input('search.value')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('code', 'like', "%{$search}%")
+                    ->orWhere('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('prerequisite', 'like', "%{$search}%");
+            });
+        }
+
+        $filtered = $query->count();
+
+        /* ======================
+         * ORDERING
+         * ====================== */
+        $columns = [
+            'code',
+            'title',
+            'description',
+            'units',
+            'prerequisite',
+            'is_active'
+        ];
+
+        $orderColumn = $columns[$request->input('order.0.column', 0)] ?? 'code';
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        $query->orderBy($orderColumn, $orderDir);
+
+        /* ======================
+         * PAGINATION
+         * ====================== */
+        $data = $query
+            ->skip($request->start)
+            ->take($request->length)
+            ->get();
+
+        /* ======================
+         * RESPONSE
+         * ====================== */
+        return response()->json([
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $data->map(fn($c) => [
+                'code' => $c->code,
+                'title' => $c->title,
+                'description' => $c->description,
+                'units' => $c->units,
+                'prerequisite' => $c->prerequisite,
+                'status' => $c->is_active,
+                'actions' => view(
+                    'admin.academic.courses.partials.actions',
+                    compact('c')
+                )->render()
+            ])
+        ]);
+    }
+
 
     /**
      * Create a new course or restore soft-deleted one

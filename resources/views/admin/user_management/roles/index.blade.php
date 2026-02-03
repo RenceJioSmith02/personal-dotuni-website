@@ -37,38 +37,7 @@
                     <th width="150">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($roles as $role)
-                <tr>
-                    <td>{{ $role->name }}</td>
-                    <td>
-                        <!-- Edit -->
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-modal="#roleModal"
-                            data-form="#roleForm"
-                            data-title="Edit Role"
-                            data-url="/admin/roles"
-                            data-id="{{ $role->id }}">
-                            Edit
-                        </button>
 
-                        <!-- Delete -->
-                        <form
-                            action="{{ route('admin.roles.destroy', $role) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-role">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -88,12 +57,17 @@ $(function () {
         $('#rolesTable').DataTable().destroy();
     }
 
-    $('#rolesTable').DataTable({
+    const table = $('#rolesTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: '{{ route("admin.roles.index") }}',
+        columns: [
+            { data: 'name' },
+            { data: 'actions', orderable: false, searchable: false }
+        ],
         responsive: true,
         autoWidth: false,
-        ordering: true,
         pageLength: 10,
-        columnDefs: [{ orderable: false, targets: 1 }]
     });
 
 

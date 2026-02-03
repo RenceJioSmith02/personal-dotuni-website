@@ -35,69 +35,7 @@
                     <th width="180">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($news as $item)
-                <tr data-id="{{ $item->id }}">
-                    <td class="text-center">
-                        @if ($item->thumbnail)
-                            <img
-                                src="{{ asset('storage/' . $item->thumbnail->storage_path) }}"
-                                class="img-thumbnail"
-                                style="max-width:50px;"
-                                alt="{{ $item->title }}">
-                        @else
-                            <span class="text-muted">No Image</span>
-                        @endif
-                    </td>
 
-                    <td>{{ $item->title }}</td>
-
-                    <td>{{ Str::limit($item->description, 80) }}</td>
-
-                    <td>
-                        @if($item->url)
-                            <a href="{{ $item->url }}" target="_blank">
-                                View
-                            </a>
-                        @else
-                            <span class="text-muted">—</span>
-                        @endif
-                    </td>
-
-                    <td>{{ $item->sort_order }}</td>
-
-                    <td>
-                        {!! $item->is_active
-                            ? '<span class="badge badge-success">Active</span>'
-                            : '<span class="badge badge-danger">Inactive</span>' !!}
-                    </td>
-
-                    <td>
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-id="{{ $item->id }}"
-                            data-modal="#clsuNewsModal"
-                            data-form="#clsuNewsForm"
-                            data-title="Edit News"
-                            data-url="{{ route('admin.clsu_news.index') }}">
-                            Edit
-                        </button>
-
-                        <form
-                            action="{{ route('admin.clsu_news.destroy', $item) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-news">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -116,12 +54,30 @@ $(function () {
     }
 
     const table = $('#clsuNewsTable').DataTable({
+        processing: true,
+        serverSide: true,
         responsive: true,
-        autoWidth: false,
-        ordering: true,
         pageLength: 10,
-        columnDefs: [{ orderable: false, targets: [0, 6] }]
+        lengthMenu: [10, 20, 50, 100],
+        ajax: {
+            url: "{{ route('admin.clsu_news.index') }}",
+            type: "GET",
+            dataSrc: function(json) {
+                console.log('CLSU News returned:', json.data.length);
+                return json.data;
+            }
+        },
+        columns: [
+            { data: 'thumbnail', orderable: false, searchable: false },
+            { data: 'title' },
+            { data: 'description' },
+            { data: 'url', orderable: false, searchable: false },
+            { data: 'sort_order' },
+            { data: 'status' },
+            { data: 'actions', orderable: false, searchable: false }
+        ]
     });
+
 
 });
 

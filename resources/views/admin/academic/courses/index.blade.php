@@ -40,45 +40,6 @@
                     <th width="150">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($courses as $course)
-                <tr>
-                    <td>{{ $course->code }}</td>
-                    <td>{{ $course->title }}</td>
-                    <td>{{ $course->description }}</td>
-                    <td>{{ $course->units }}</td>
-                    <td>{{ $course->prerequisite }}</td>
-                    <td>
-                        {!! $course->is_active
-                            ? '<span class="badge badge-success">Active</span>'
-                            : '<span class="badge badge-danger">Inactive</span>' !!}
-                    </td>
-                    <td>
-                        <button
-                        class="open-modal btn btn-sm btn-info"
-                        data-action="edit"
-                        data-modal="#courseModal"
-                        data-form="#courseForm"
-                        data-title="Edit Course"
-                        data-url="/admin/courses"
-                        data-id="{{ $course->id }}">
-                        Edit
-                        </button>
-
-                        <form action="{{ route('admin.courses.destroy', $course) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-course">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -95,15 +56,45 @@
             $('#coursesTable').DataTable().destroy();
         }
 
-        $('#coursesTable').DataTable({
+        const table = $('#coursesTable').DataTable({
+            processing: true,
+            serverSide: true,
             responsive: true,
-            autoWidth: false,
-            ordering: true,
             pageLength: 10,
-            columnDefs: [{ orderable: false, targets: 6 }]
-        });
-    });
+            lengthMenu: [10, 20, 50, 100],
 
+            ajax: {
+                url: "{{ route('admin.courses.index') }}",
+                type: "GET",
+                // dataSrc: function (json) {
+                //     console.log('Courses returned:', json.data.length);
+                //     return json.data;
+                // }
+            },
+
+            columns: [
+                { data: "code" },
+                { data: "title" },
+                { data: "description" },
+                { data: "units" },
+                { data: "prerequisite" },
+                {
+                    data: "status",
+                    render: (data) =>
+                        data
+                            ? '<span class="badge badge-success">Active</span>'
+                            : '<span class="badge badge-danger">Inactive</span>'
+                },
+                {
+                    data: "actions",
+                    orderable: false,
+                    searchable: false
+                }
+            ]
+        });
+
+
+    });
 
 
     $(document).on("submit", ".ajax-delete-course", function (e) {

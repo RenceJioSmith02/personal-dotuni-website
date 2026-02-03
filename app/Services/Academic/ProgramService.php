@@ -2,19 +2,79 @@
 
 namespace App\Services\Academic;
 
-use App\Models\Program;
-use App\Models\Asset;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use DomainException;
+use App\Models\Asset;
+use App\Models\Program;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProgramService
 {
     public function list()
     {
         return Program::with('asset')->get();
+    }
+
+
+    // Server-side DataTables
+    public function datatable(Request $request)
+    {
+        $query = Program::with('asset');
+
+        $total = $query->count();
+
+        /* ======================
+         * SEARCH
+         * ====================== */
+        if ($search = $request->input('search.value')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('type', 'like', "%{$search}%");
+            });
+        }
+
+        $filtered = $query->count();
+
+        /* ======================
+         * ORDERING
+         * ====================== */
+        $columns = ['title', 'description', 'type', 'total_units', 'is_active'];
+        $orderColumn = $columns[$request->input('order.0.column', 1)] ?? 'title';
+        $orderDir = $request->input('order.0.dir', 'asc');
+        $query->orderBy($orderColumn, $orderDir);
+
+        /* ======================
+         * PAGINATION
+         * ====================== */
+        $data = $query->skip($request->start)
+            ->take($request->length)
+            ->get();
+
+        /* ======================
+         * RESPONSE
+         * ====================== */
+        return [
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $data->map(fn($p) => [
+                'image' => $p->image_url
+                    ? '<img src="' . $p->image_url . '" class="img-thumbnail" style="max-width:50px;" alt="' . $p->title . '">'
+                    : '<span class="text-muted">No Image</span>',
+                'title' => $p->title,
+                'description' => $p->description,
+                'type' => $p->type,
+                'total_units' => $p->total_units,
+                'status' => $p->is_active
+                    ? '<span class="badge badge-success">Active</span>'
+                    : '<span class="badge badge-danger">Inactive</span>',
+                'actions' => view('admin.academic.programs.partials.actions', compact('p'))->render()
+            ])
+        ];
     }
 
     public function create(array $data, ?UploadedFile $image): Program

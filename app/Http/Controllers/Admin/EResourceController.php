@@ -19,10 +19,13 @@ class EResourceController extends Controller
     /**
      * List all E-Resources
      */
-    public function index()
+    public function index(Request $request)
     {
-        $resources = $this->service->list();
-        return view('admin.e_resources.index', compact('resources'));
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
+        return view('admin.e_resources.index');
     }
 
     /**

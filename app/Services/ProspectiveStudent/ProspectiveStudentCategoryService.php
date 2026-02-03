@@ -2,16 +2,63 @@
 
 namespace App\Services\ProspectiveStudent;
 
-use App\Models\ProspectiveStudentCategory;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Throwable;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\ProspectiveStudentCategory;
 
 class ProspectiveStudentCategoryService
 {
     public function list()
     {
         return ProspectiveStudentCategory::orderBy('sort_order')->get();
+    }
+
+    public function datatable(Request $request)
+    {
+        $query = ProspectiveStudentCategory::query();
+
+        $total = $query->count();
+
+        /* SEARCH */
+        if ($search = $request->input('search.value')) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        $filtered = $query->count();
+
+        /* ORDER */
+        $columns = ['name', 'sort_order'];
+        $orderCol = $columns[$request->input('order.0.column')] ?? 'sort_order';
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        $query->orderBy($orderCol, $orderDir);
+
+        /* PAGINATION */
+        $items = $query
+            ->skip($request->start)
+            ->take($request->length)
+            ->get();
+
+        return response()->json([
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $items->map(function ($category) {
+                return [
+                    'name' => e($category->name),
+                    'sort_order' => $category->sort_order,
+                    'status' => $category->is_active
+                        ? '<span class="badge badge-success">Active</span>'
+                        : '<span class="badge badge-danger">Inactive</span>',
+                    'actions' => view(
+                        'admin.prospective_student.categories.partials.actions',
+                        compact('category')
+                    )->render()
+                ];
+            })
+        ]);
     }
 
     public function createOrRestore(array $data): ProspectiveStudentCategory

@@ -17,14 +17,17 @@ class RuleClauseController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $clauses = $this->service->list();
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
         $subSections = RuleSubSection::with('section.article')->orderBy('sort_order')->get();
 
         return view(
             'admin.rules_and_regulations.clauses.index',
-            compact('clauses', 'subSections')
+            compact('subSections')
         );
     }
 

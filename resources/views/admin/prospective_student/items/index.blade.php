@@ -37,56 +37,7 @@
                     <th width="150">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($items as $item)
-                <tr>
-                    <td>{{ $item->category->name ?? '-' }}</td>
 
-                    <td>
-                        {{ Str::limit(strip_tags($item->content), 80) }}
-                    </td>
-
-                    <td class="text-center">
-                        {{ $item->sort_order }}
-                    </td>
-
-                    <td>
-                        {!! $item->is_active
-                            ? '<span class="badge badge-success">Active</span>'
-                            : '<span class="badge badge-danger">Inactive</span>' !!}
-                    </td>
-
-                    <td>
-                        <!-- Edit -->
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-id="{{ $item->id }}"
-                            data-modal="#prospectiveStudentItemModal"
-                            data-form="#prospectiveStudentItemForm"
-                            data-title="Edit Item"
-                            data-url="{{ route('admin.prospective_student_items.index') }}">
-                            Edit
-                        </button>
-
-                        <!-- Delete -->
-                        <form
-                            action="{{ route('admin.prospective_student_items.destroy', $item) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-item">
-                            @csrf
-                            @method('DELETE')
-
-                            <button type="submit"
-                                    class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
 
     </div>
@@ -110,12 +61,21 @@ $(function () {
     }
 
     const table = $('#prospectiveStudentItemsTable').DataTable({
+        processing: true,
+        serverSide: true,
         responsive: true,
         autoWidth: false,
-        ordering: true,
         pageLength: 10,
-        columnDefs: [
-            { orderable: false, targets: [4] }
+        ajax: {
+            url: "{{ route('admin.prospective_student_items.index') }}",
+            type: "GET"
+        },
+        columns: [
+            { data: 'category', name: 'category' },
+            { data: 'content', name: 'content' },
+            { data: 'sort_order', name: 'sort_order', className: 'text-center' },
+            { data: 'status', orderable: false, searchable: false },
+            { data: 'actions', orderable: false, searchable: false }
         ]
     });
 

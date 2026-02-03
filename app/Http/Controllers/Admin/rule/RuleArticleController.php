@@ -15,11 +15,14 @@ class RuleArticleController extends Controller
     ) {
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
         return view(
-            'admin.rules_and_regulations.articles.index',
-            ['articles' => $this->service->list()]
+            'admin.rules_and_regulations.articles.index'
         );
     }
 

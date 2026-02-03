@@ -14,13 +14,17 @@ class LinkageController extends Controller
     {
     }
 
-    public function index()
-    {
-        $linkages = $this->service->list();
-        $categories = LinkageCategory::orderBy('name')->get();
 
-        return view('admin.linkage.linkages.index', compact('linkages', 'categories'));
+    public function index(Request $request)
+    {
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
+        $categories = LinkageCategory::orderBy('name')->get();
+        return view('admin.linkage.linkages.index', compact('categories'));
     }
+
 
     public function store(Request $request)
     {

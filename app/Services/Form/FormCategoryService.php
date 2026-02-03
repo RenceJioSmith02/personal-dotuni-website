@@ -6,6 +6,7 @@ use App\Models\FormCategory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use DomainException;
+use Illuminate\Http\Request;
 
 class FormCategoryService
 {
@@ -13,6 +14,69 @@ class FormCategoryService
     {
         return FormCategory::orderBy('sort_order')->get();
     }
+
+
+
+    public function datatable(Request $request)
+    {
+        $query = FormCategory::query();
+
+        $total = $query->count();
+
+        /* ======================
+         * SEARCH
+         * ====================== */
+        if ($search = $request->input('search.value')) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        $filtered = $query->count();
+
+        /* ======================
+         * ORDERING
+         * ====================== */
+        $columns = ['name', 'sort_order', 'status', 'actions'];
+        $orderColumnIndex = $request->input('order.0.column', 0);
+        $orderColumn = $columns[$orderColumnIndex] ?? 'sort_order';
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        $orderDir = $orderDir === 'asc' ? 'asc' : 'desc';
+
+        if (!in_array($orderColumn, ['actions', 'status'])) {
+            $query->orderBy($orderColumn, $orderDir);
+        }
+
+        /* ======================
+         * PAGINATION
+         * ====================== */
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $data = $query->offset($start)->limit($length)->get();
+
+        /* ======================
+         * RESPONSE
+         * ====================== */
+        return [
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $data->map(function ($category) {
+                return [
+                    'name' => $category->name,
+                    'sort_order' => $category->sort_order,
+                    'status' => $category->is_active
+                        ? '<span class="badge badge-success">Active</span>'
+                        : '<span class="badge badge-danger">Inactive</span>',
+                    'actions' => view(
+                        'admin.form.categories.partials.actions',
+                        compact('category')
+                    )->render(),
+                ];
+            }),
+        ];
+    }
+
 
     public function create(array $data): FormCategory
     {

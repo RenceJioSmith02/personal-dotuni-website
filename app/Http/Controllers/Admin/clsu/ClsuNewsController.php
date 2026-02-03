@@ -13,10 +13,13 @@ class ClsuNewsController extends Controller
     {
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $news = $this->service->list();
-        return view('admin.clsu.news.index', compact('news'));
+        if ($request->ajax()) {
+            return response()->json($this->service->datatable($request));
+        }
+
+        return view('admin.clsu.news.index');
     }
 
     public function store(Request $request)

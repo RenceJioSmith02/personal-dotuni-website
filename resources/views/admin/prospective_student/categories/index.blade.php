@@ -35,52 +35,7 @@
                     <th width="160">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($categories as $category)
-                <tr data-id="{{ $category->id }}">
-                    <td>{{ $category->name }}</td>
 
-                    <td class="text-center">
-                        {{ $category->sort_order }}
-                    </td>
-
-                    <td>
-                        {!! $category->is_active
-                            ? '<span class="badge badge-success">Active</span>'
-                            : '<span class="badge badge-danger">Inactive</span>' !!}
-                    </td>
-
-                    <td>
-
-                        <!-- Edit -->
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-modal="#categoryModal"
-                            data-form="#categoryForm"
-                            data-title="Edit Category"
-                            data-url="{{ route('admin.prospective_student_categories.index') }}"
-                            data-id="{{ $category->id }}">
-                            Edit
-                        </button>
-
-                        <!-- Delete -->
-                        <form
-                            action="{{ route('admin.prospective_student_categories.destroy', $category) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-category">
-                            @csrf
-                            @method('DELETE')
-
-                            <button type="submit" class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
 
     </div>
@@ -104,14 +59,23 @@ $(function () {
     }
 
     const table = $('#categoriesTable').DataTable({
+        processing: true,
+        serverSide: true,
         responsive: true,
         autoWidth: false,
-        ordering: true,
         pageLength: 10,
-        columnDefs: [
-            { orderable: false, targets: [3] }
+        ajax: {
+            url: "{{ route('admin.prospective_student_categories.index') }}",
+            type: "GET"
+        },
+        columns: [
+            { data: 'name', name: 'name' },
+            { data: 'sort_order', name: 'sort_order', className: 'text-center' },
+            { data: 'status', name: 'status', orderable: false, searchable: false },
+            { data: 'actions', orderable: false, searchable: false }
         ]
     });
+
 
     /* ================================
      * AJAX DELETE CATEGORY

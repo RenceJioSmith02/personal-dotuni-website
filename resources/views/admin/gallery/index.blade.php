@@ -32,51 +32,7 @@
                     <th width="180">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($items as $item)
-                <tr data-id="{{ $item->id }}">
-                    <td class="text-center">
-                        @if($item->asset)
-                            <img
-                                src="{{ asset('storage/' . $item->asset->storage_path) }}"
-                                class="img-thumbnail"
-                                style="max-width:50px;"
-                                alt="{{ $item->asset->alt_text ?? 'Gallery image' }}">
-                        @else
-                            <span class="text-muted">No Image</span>
-                        @endif
-                    </td>
 
-                    <td>{{ $item->asset->file_name ?? '—' }}</td>
-
-                    <td>{{ $item->sort_order }}</td>
-
-                    <td>
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-id="{{ $item->id }}"
-                            data-modal="#galleryModal"
-                            data-form="#galleryForm"
-                            data-title="Edit Gallery Item"
-                            data-url="{{ route('admin.gallery.index') }}">
-                            Edit
-                        </button>
-
-                        <form
-                            action="{{ route('admin.gallery.destroy', $item) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-gallery">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -93,14 +49,24 @@ $(function () {
         $('#galleryTable').DataTable().destroy();
     }
 
-    const table = $('#galleryTable').DataTable({
+    $('#galleryTable').DataTable({
+        processing: true,
+        serverSide: true,
         responsive: true,
         autoWidth: false,
-        ordering: true,
         pageLength: 10,
-        columnDefs: [{ orderable: false, targets: [0, 3] }]
+        ordering: true,
+        ajax: {
+            url: "{{ route('admin.gallery.index') }}",
+            type: "GET"
+        },
+        columns: [
+            { data: 'image', orderable: false, searchable: false },
+            { data: 'file_name' },
+            { data: 'sort_order' },
+            { data: 'actions', orderable: false, searchable: false }
+        ]
     });
-
 });
 
 /* DELETE GALLERY (AJAX) */

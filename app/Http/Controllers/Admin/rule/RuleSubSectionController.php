@@ -17,16 +17,21 @@ class RuleSubSectionController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $subSections = $this->service->list();
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
+        // Fetch sections for modal dropdowns
         $sections = RuleSection::with('article')->orderBy('sort_order')->get();
 
         return view(
             'admin.rules_and_regulations.sub_sections.index',
-            compact('subSections', 'sections')
+            compact('sections')
         );
     }
+
 
     public function store(Request $request)
     {

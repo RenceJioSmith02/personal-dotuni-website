@@ -35,90 +35,7 @@
                     <th width="180">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($news as $item)
-                @php
-                    $thumbnail = $item->attachments
-                        ->firstWhere('is_thumbnail', true)?->asset;
-                @endphp
-                <tr data-id="{{ $item->id }}">
-                    <td class="text-center">
-                        @if ($thumbnail)
-                            <img
-                                src="{{ asset('storage/' . $thumbnail->storage_path) }}"
-                                class="img-thumbnail"
-                                style="max-width:50px;"
-                                alt="{{ $thumbnail->alt_text ?? $item->title }}">
-                        @else
-                            <span class="text-muted">No Image</span>
-                        @endif
-                    </td>
 
-                    <td>{{ $item->title }}</td>
-
-                    <td>{{ Str::limit($item->seo_description, 80) }}</td>
-
-                    <td>
-                        @php
-                            $statusClass = match($item->status) {
-                                'published' => 'badge-success',
-                                'submitted' => 'badge-warning',
-                                'archived' => 'badge-secondary',
-                                default => 'badge-info', // draft
-                            };
-                        @endphp
-                        <span class="badge {{ $statusClass }}">
-                            {{ ucfirst($item->status) }}
-                        </span>
-                    </td>
-
-                    <td>
-                        @php
-                            $visClass = match($item->visibility) {
-                                'public' => 'badge-success',
-                                'unlisted' => 'badge-warning',
-                                default => 'badge-secondary', // private
-                            };
-                        @endphp
-                        <span class="badge {{ $visClass }}">
-                            {{ ucfirst($item->visibility) }}
-                        </span>
-                    </td>
-
-                    <td>
-                        @if($item->published_at)
-                            {{ $item->published_at->format('Y-m-d H:i') }}
-                        @else
-                            <span class="text-muted">—</span>
-                        @endif
-                    </td>
-
-                    <td>
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-id="{{ $item->id }}"
-                            data-modal="#dotuniNewsModal"
-                            data-form="#dotuniNewsForm"
-                            data-title="Edit DotUni News"
-                            data-url="{{ route('admin.dotuni_news.index') }}">
-                            Edit
-                        </button>
-
-                        <form
-                            action="{{ route('admin.dotuni_news.destroy', $item) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-dotuni-news">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -129,6 +46,7 @@
 @stop
 
 @push('js')
+
 <script>
 $(function () {
 
@@ -137,11 +55,28 @@ $(function () {
     }
 
     const table = $('#dotuniNewsTable').DataTable({
+        processing: true,
+        serverSide: true,
         responsive: true,
         autoWidth: false,
-        ordering: true,
+        ajax: {
+            url: "{{ route('admin.dotuni_news.index') }}",
+            type: "GET",
+            // dataSrc: function(json) {
+            //     console.log('News returned:', json.data.length);
+            //     return json.data;
+            // }
+        },
+        columns: [
+            { data: 'thumbnail', name: 'thumbnail', orderable: false, searchable: false },
+            { data: 'title', name: 'title' },
+            { data: 'seo_description', name: 'seo_description' },
+            { data: 'status', name: 'status' },
+            { data: 'visibility', name: 'visibility' },
+            { data: 'published_at', name: 'published_at' },
+            { data: 'actions', name: 'actions', orderable: false, searchable: false }
+        ],
         pageLength: 10,
-        columnDefs: [{ orderable: false, targets: [0, 6] }]
     });
 
 });

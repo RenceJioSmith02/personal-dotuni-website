@@ -35,63 +35,7 @@
                     <th width="180">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($programs as $program)
-                <tr data-id="{{ $program->id }}">
-                    <td class="text-center">
-                        @if ($program->image_url)
-                            <img
-                                src="{{ $program->image_url }}"
-                                class="img-thumbnail"
-                                style="max-width:50px;"
-                                alt="{{ $program->title }}">
-                        @else
-                            <span class="text-muted">No Image</span>
-                        @endif
-                    </td>
-                    <td>{{ $program->title }}</td>
-                    <td>{{ $program->description }}</td>
-                    <td>{{ $program->type }}</td>
-                    <td>{{ $program->total_units }}</td>
 
-                    <td>
-                        {!! $program->is_active
-                            ? '<span class="badge badge-success">Active</span>'
-                            : '<span class="badge badge-danger">Inactive</span>' !!}
-                    </td>
-
-                    <td>
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-id="{{ $program->id }}"
-                            data-modal="#programModal"
-                            data-form="#programForm"
-                            data-title="Edit Program"
-                            data-url="{{ route('admin.programs.index') }}">
-                            Edit
-                        </button>
-
-                        <a href="{{ route('admin.academic.programs.builder', $program) }}"
-                           class="btn btn-sm btn-info">
-                            <i class="fas fa-cogs"></i>
-                        </a>
-
-                        <form
-                            action="{{ route('admin.programs.destroy', $program) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-program">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -105,20 +49,39 @@
 @push('js')
 <script>
 $(function () {
-
     if ($.fn.DataTable.isDataTable('#programsTable')) {
         $('#programsTable').DataTable().destroy();
     }
 
     const table = $('#programsTable').DataTable({
+        processing: true,
+        serverSide: true,
         responsive: true,
-        autoWidth: false,
-        ordering: true,
         pageLength: 10,
-        columnDefs: [{ orderable: false, targets: [0, 6] }]
+        lengthMenu: [10, 20, 50, 100],
+        columnDefs: [
+            { orderable: false, targets: [0, 6] } // Image + Actions
+        ],
+        ajax: {
+            url: "{{ route('admin.programs.index') }}",
+            type: "GET",
+            // dataSrc: function (json) {
+            //     console.log('Programs returned:', json.data.length);
+            //     return json.data;
+            // }
+        },
+        columns: [
+            { data: 'image', searchable: false, orderable: false },
+            { data: 'title' },
+            { data: 'description' },
+            { data: 'type' },
+            { data: 'total_units' },
+            { data: 'status', searchable: false },
+            { data: 'actions', searchable: false, orderable: false }
+        ]
     });
-
 });
+
 
 /* DELETE PROGRAM (AJAX) */
 $(document).on("submit", ".ajax-delete-program", function (e) {

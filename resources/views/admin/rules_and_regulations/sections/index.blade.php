@@ -35,37 +35,7 @@
                     <th width="150">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($sections as $section)
-                <tr>
-                    <td>{{ $section->article->number ?? '-' }}</td>
-                    <td>{{ $section->number }}</td>
-                    <td>{{ Str::limit($section->body, 80) }}</td>
-                    <td>{{ $section->sort_order }}</td>
-                    <td>
 
-                        <button class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-modal="#sectionModal"
-                            data-form="#sectionForm"
-                            data-title="Edit Section"
-                            data-url="/admin/rule_sections"
-                            data-id="{{ $section->id }}">
-                            Edit
-                        </button>
-
-                        <form action="{{ route('admin.rule_sections.destroy', $section) }}"
-                              method="POST"
-                              class="d-inline ajax-delete-section">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                        </form>
-
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -78,7 +48,22 @@
 <script>
 $(function () {
     if ($.fn.DataTable.isDataTable('#sectionsTable')) $('#sectionsTable').DataTable().destroy();
-    const table = $('#sectionsTable').DataTable({ responsive: true, autoWidth: false, pageLength: 10, columnDefs: [{ orderable: false, targets: 4 }] });
+
+    const table = $('#sectionsTable').DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        autoWidth: false,
+        pageLength: 10,
+        ajax: '{{ route("admin.rule_sections.index") }}', 
+        columns: [
+            { data: 'article', name: 'article', orderable: true },
+            { data: 'number', name: 'rule_sections.number' },
+            { data: 'body', name: 'rule_sections.body' },
+            { data: 'sort_order', name: 'rule_sections.sort_order' },
+            { data: 'actions', name: 'actions', orderable: false, searchable: false }
+        ]
+    });
 
     $(document).on("submit", ".ajax-delete-section", function(e) {
         e.preventDefault();

@@ -2,11 +2,12 @@
 
 namespace App\Services\User;
 
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 use Throwable;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
@@ -14,6 +15,74 @@ class UserService
     {
         return User::with('roles')->get();
     }
+
+    public function datatable(Request $request)
+    {
+        $query = User::with('roles');
+
+        $total = $query->count();
+
+        /* ===============================
+           SEARCH
+        =============================== */
+        if ($search = $request->input('search.value')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('email', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhereHas('roles', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $filtered = $query->count();
+
+        /* ===============================
+           ORDER
+        =============================== */
+        $columns = ['email', 'name', 'roles', 'is_active'];
+        $orderColIndex = $request->input('order.0.column', 0);
+        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderCol = $columns[$orderColIndex] ?? 'email';
+
+        if ($orderCol === 'roles') {
+            $query->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->orderBy('roles.name', $orderDir)
+                ->select('users.*');
+        } else {
+            $query->orderBy('users.' . $orderCol, $orderDir);
+        }
+
+        /* ===============================
+           PAGINATION
+        =============================== */
+        $users = $query
+            ->skip($request->start)
+            ->take($request->length)
+            ->get();
+
+        /* ===============================
+           RESPONSE
+        =============================== */
+        return response()->json([
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $users->map(function ($user) {
+                return [
+                    'email' => e($user->email),
+                    'name' => e($user->name),
+                    'roles' => $user->roles->map(fn($r) => '<span class="badge badge-info">' . $r->name . '</span>')->implode(' '),
+                    'status' => $user->is_active
+                        ? '<span class="badge badge-success">Active</span>'
+                        : '<span class="badge badge-danger">Inactive</span>',
+                    'actions' => view('admin.user_management.users.partials.actions', compact('user'))->render(),
+                ];
+            }),
+        ]);
+    }
+
 
     public function storeOrRestore(array $data, array $roleIds = []): User
     {

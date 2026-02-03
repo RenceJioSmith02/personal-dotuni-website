@@ -17,10 +17,13 @@ class RoleController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $roles = $this->service->list();
-        return view('admin.user_management.roles.index', compact('roles'));
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
+        return view('admin.user_management.roles.index');
     }
 
     public function store(Request $request)

@@ -15,10 +15,13 @@ class FormCategoryController extends Controller
     {
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $categories = $this->service->list();
-        return view('admin.form.categories.index', compact('categories'));
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
+        return view('admin.form.categories.index');
     }
 
     public function store(Request $request)

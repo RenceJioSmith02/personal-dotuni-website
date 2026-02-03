@@ -43,52 +43,7 @@
                     <th width="150">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($users as $user)
-                <tr>
-                    <td>{{ $user->email }}</td>
-                    <td>{{ $user->name }}</td>
-                    <td>
-                        @foreach($user->roles as $role)
-                            <span class="badge badge-info">{{ $role->name }}</span>
-                        @endforeach
-                    </td>
-                    <td>
-                        {!! $user->is_active
-                            ? '<span class="badge badge-success">Active</span>'
-                            : '<span class="badge badge-danger">Inactive</span>' !!}
-                    </td>
-                    <td>
 
-                        <!-- Edit -->
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-modal="#userModal"
-                            data-form="#userForm"
-                            data-title="Edit User"
-                            data-url="/admin/users"
-                            data-id="{{ $user->id }}">
-                            Edit
-                        </button>
-
-                        <!-- Delete -->
-                        <form
-                            action="{{ route('admin.users.destroy', $user) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-user">
-                            @csrf
-                            @method('DELETE')
-
-                            <button type="submit" class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -110,14 +65,20 @@ $(function () {
         $('#usersTable').DataTable().destroy();
     }
 
-    $('#usersTable').DataTable({
+    const table = $('#usersTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: '{{ route("admin.users.index") }}',
+        columns: [
+            { data: 'email' },
+            { data: 'name' },
+            { data: 'roles', orderable: false, searchable: false },
+            { data: 'status', orderable: false, searchable: false },
+            { data: 'actions', orderable: false, searchable: false }
+        ],
         responsive: true,
         autoWidth: false,
-        ordering: true,
         pageLength: 10,
-        columnDefs: [
-            { orderable: false, targets: 4 }
-        ]
     });
 
 

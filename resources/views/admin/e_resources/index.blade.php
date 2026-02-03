@@ -34,53 +34,7 @@
                     <th width="180">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($resources as $item)
-                <tr data-id="{{ $item->id }}">
-                    <td>{{ $item->name }}</td>
 
-                    <td>{{ Str::limit($item->description, 80) }}</td>
-
-                    <td>
-                        @if($item->link_url)
-                            <a href="{{ $item->link_url }}" target="_blank">View</a>
-                        @else
-                            <span class="text-muted">—</span>
-                        @endif
-                    </td>
-
-                    <td>{{ $item->sort_order }}</td>
-
-                    <td>
-                        {!! $item->is_active
-                            ? '<span class="badge badge-success">Active</span>'
-                            : '<span class="badge badge-danger">Inactive</span>' !!}
-                    </td>
-
-                    <td>
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-id="{{ $item->id }}"
-                            data-modal="#eResourceModal"
-                            data-form="#eResourceForm"
-                            data-title="Edit E-Resource"
-                            data-url="{{ route('admin.e_resources.index') }}">
-                            Edit
-                        </button>
-
-                        <form
-                            action="{{ route('admin.e_resources.destroy', $item) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-resource">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -98,14 +52,31 @@ $(function () {
     }
 
     const table = $('#eResourcesTable').DataTable({
+        processing: true,
+        serverSide: true,
         responsive: true,
         autoWidth: false,
-        ordering: true,
         pageLength: 10,
-        columnDefs: [{ orderable: false, targets: [5] }] // actions column
+        ajax: {
+            url: "{{ route('admin.e_resources.index') }}",
+            type: "GET",
+            dataSrc: function(json) {
+                console.log('Eresources returned:', json.data.length);
+                return json.data;
+            }
+        },
+        columns: [
+            { data: 'name' },
+            { data: 'description' },
+            { data: 'link_url', orderable: false, searchable: false },
+            { data: 'sort_order' },
+            { data: 'status', orderable: false, searchable: false },
+            { data: 'actions', orderable: false, searchable: false },
+        ]
     });
 
 });
+
 
 /* DELETE E-RESOURCE (AJAX) */
 $(document).on("submit", ".ajax-delete-resource", function (e) {

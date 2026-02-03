@@ -8,15 +8,82 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
+
 
 class LinkageService
 {
+
     public function list()
     {
         return Linkage::with(['category', 'logo'])
             ->orderBy('sort_order')
             ->get();
     }
+
+    public function datatable(Request $request)
+    {
+        $query = Linkage::with(['category', 'logo']);
+
+        $total = $query->count();
+
+        /* ======================
+         * SEARCH
+         * ====================== */
+        if ($search = $request->input('search.value')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('url', 'like', "%{$search}%")
+                    ->orWhereHas(
+                        'category',
+                        fn($c) =>
+                        $c->where('name', 'like', "%{$search}%")
+                    );
+            });
+        }
+
+        $filtered = $query->count();
+
+        /* ======================
+         * ORDERING
+         * ====================== */
+        $columns = ['id', 'title', 'category_id', 'url', 'is_active'];
+        $orderColumn = $columns[$request->input('order.0.column', 0)] ?? 'id';
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        $query->orderBy($orderColumn, $orderDir);
+
+        /* ======================
+         * PAGINATION
+         * ====================== */
+        $data = $query
+            ->skip($request->start)
+            ->take($request->length) 
+            ->get();
+
+        /* ======================
+         * FORMAT RESPONSE
+         * ====================== */
+        return response()->json([
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $data->map(fn($l) => [
+                'image' => $l->image_url
+                    ? "<img src='{$l->image_url}' style='max-height:50px'>"
+                    : '-',
+                'title' => $l->title,
+                'category' => $l->category->name ?? '-',
+                'url' => $l->url,
+                'status' => $l->is_active,
+                'actions' => view(
+                    'admin.linkage.linkages.partials.actions',
+                    compact('l')
+                )->render()
+            ])
+        ]);
+    }
+
 
     public function create(array $data, ?UploadedFile $logo): Linkage
     {

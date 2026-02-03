@@ -37,62 +37,8 @@
                     <th width="150">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($linkages as $linkage)
-                <tr>
-                    <td>
-                        @if($linkage->image_url)
-                            <img
-                                src="{{ $linkage->image_url }}"
-                                alt="{{ $linkage->title }}"
-                                style="max-height: 50px;">
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td>{{ $linkage->title }}</td>
-                    <td>{{ $linkage->category->name ?? '-' }}</td>
-                    <td>
-                        <a href="{{ $linkage->url }}" target="_blank">
-                            {{ Str::limit($linkage->url, 40) }}
-                        </a>
-                    </td>
-                    <td>
-                        {!! $linkage->is_active
-                            ? '<span class="badge badge-success">Active</span>'
-                            : '<span class="badge badge-danger">Inactive</span>' !!}
-                    </td>
-                    <td>
-                        <!-- Edit -->
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-id="{{ $linkage->id }}"
-                            data-modal="#linkageModal"
-                            data-form="#linkageForm"
-                            data-title="Edit Linkage"
-                            data-url="{{ route('admin.linkages.index') }}">
-                            Edit
-                        </button>
-
-                        <!-- Delete -->
-                        <form
-                            action="{{ route('admin.linkages.destroy', $linkage) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-linkage">
-                            @csrf
-                            @method('DELETE')
-
-                            <button type="submit" class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
+
 
     </div>
 </div>
@@ -115,14 +61,55 @@ $(function () {
     }
 
     const table = $('#linkagesTable').DataTable({
+        processing: true,
+        serverSide: true,
         responsive: true,
-        autoWidth: false,
-        ordering: true,
         pageLength: 10,
-        columnDefs: [
-            { orderable: false, targets: 4 }
+        lengthMenu: [10, 20, 50, 100],
+
+        ajax: {
+            url: "{{ route('admin.linkages.index') }}",
+            type: "GET",
+            // dataSrc: function (json) {
+            //     console.log('Linkages returned:', json.data.length);
+            //     return json.data;
+            // }
+        },
+
+        ajax: {
+            url: "{{ route('admin.linkages.index') }}",
+            type: "GET",
+        },
+
+        columns: [
+            {
+                data: "image",
+                orderable: false,
+                searchable: false
+            },
+            { data: "title" },
+            { data: "category" },
+            {
+                data: "url",
+                render: (data) =>
+                    `<a href="${data}" target="_blank">${data.substring(0,40)}</a>`
+            },
+            {
+                data: "status",
+                render: (data) =>
+                    data
+                        ? '<span class="badge badge-success">Active</span>'
+                        : '<span class="badge badge-danger">Inactive</span>'
+            },
+            {
+                data: "actions",
+                orderable: false,
+                searchable: false
+            }
         ]
     });
+
+
 
     /* ================================
      * AJAX DELETE LINKAGE

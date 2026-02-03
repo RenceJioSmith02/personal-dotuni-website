@@ -32,47 +32,7 @@
                     <th width="160">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($questions as $question)
-                <tr data-id="{{ $question->id }}">
-                    <td>{{ $question->question }}</td>
 
-                    <td class="text-center">
-                        {{ $question->sort_order }}
-                    </td>
-
-                    <td>
-                        {!! $question->is_active
-                            ? '<span class="badge badge-success">Active</span>'
-                            : '<span class="badge badge-danger">Inactive</span>' !!}
-                    </td>
-
-                    <td>
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-id="{{ $question->id }}"
-                            data-modal="#faqQuestionModal"
-                            data-form="#faqQuestionForm"
-                            data-title="Edit FAQ Question"
-                            data-url="{{ route('admin.faqs_questions.index') }}">
-                            Edit
-                        </button>
-
-                        <form
-                            action="{{ route('admin.faqs_questions.destroy', $question) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-faq-question">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -84,6 +44,7 @@
 
 @push('js')
 <script>
+
 $(function () {
 
     if ($.fn.DataTable.isDataTable('#faqQuestionsTable')) {
@@ -91,16 +52,77 @@ $(function () {
     }
 
     const table = $('#faqQuestionsTable').DataTable({
+        processing: true,
+        serverSide: true,
         responsive: true,
         autoWidth: false,
-        ordering: true,
         pageLength: 10,
-        columnDefs: [
-            { orderable: false, targets: [3] }
+        ajax: {
+            ulr: "{{ route('admin.faqs_questions.index') }}",
+            type: "GET",
+            dataSrc: function(json) {
+                console.log('Questions returned:', json.data.length);
+                return json.data;
+            }
+        },
+        columns: [
+            { data: 'question' },
+            { data: 'sort_order' },
+            { data: 'status', orderable: false, searchable: false },
+            { data: 'actions', orderable: false, searchable: false },
         ]
     });
 
 });
+
+/* DELETE FAQ QUESTION (AJAX) */
+$(document).on("submit", ".ajax-delete-faq-question", function (e) {
+    e.preventDefault();
+
+    const form = $(this);
+    const row = form.closest("tr");
+    const table = $("#faqQuestionsTable").DataTable();
+
+    Swal.fire({
+        title: "Delete this FAQ question?",
+        text: "This action cannot be undone.",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it",
+        confirmButtonColor: "#dc3545",
+        reverseButtons: true
+    }).then((result) => {
+        if (!result.value) return;
+
+        $.ajax({
+            url: form.attr("action"),
+            type: "POST",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr("content"),
+                _method: "DELETE"
+            },
+            success: function (res) {
+                Swal.fire({
+                    type: "success",
+                    title: "Deleted",
+                    text: res.message,
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                table.ajax.reload(null, false);
+            },
+            error: function () {
+                Swal.fire({
+                    type: "error",
+                    title: "Error",
+                    text: "Failed to delete FAQ question."
+                });
+            }
+        });
+    });
+});
+
 
 
 /* DELETE FAQ QUESTION (AJAX) */

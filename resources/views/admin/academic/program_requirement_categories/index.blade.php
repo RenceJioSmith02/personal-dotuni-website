@@ -30,37 +30,7 @@
                     <th width="150">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($categories as $category)
-                <tr>
-                    <td>{{ $category->name }}</td>
-                    <td>{{ $category->sort_order }}</td>
-                    <td>
-                        <button
-                            class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-modal="#categoryModal"
-                            data-form="#categoryForm"
-                            data-title="Edit Requirement Category"
-                            data-url="{{ route('admin.program_requirement_categories.index') }}"
-                            data-id="{{ $category->id }}">
-                            Edit
-                        </button>
 
-                        <form
-                            action="{{ route('admin.program_requirement_categories.destroy', $category) }}"
-                            method="POST"
-                            class="d-inline ajax-delete-category">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger">
-                                Delete
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -75,13 +45,34 @@ $(function () {
         $('#categoriesTable').DataTable().destroy();
     }
 
-    $('#categoriesTable').DataTable({
+    const table = $('#categoriesTable').DataTable({
+        processing: true,
+        serverSide: true,
         responsive: true,
-        autoWidth: false,
-        ordering: true,
         pageLength: 10,
-        columnDefs: [{ orderable: false, targets: 2 }]
+        lengthMenu: [10, 20, 50, 100],
+
+        ajax: {
+            url: "{{ route('admin.program_requirement_categories.index') }}",
+            type: "GET",
+            // dataSrc: function (json) {
+            //     console.log('Requirement categories returned:', json.data.length);
+            //     return json.data;
+            // }
+        },
+
+        columns: [
+            { data: "name" },
+            { data: "sort_order" },
+            {
+                data: "actions",
+                orderable: false,
+                searchable: false
+            }
+        ]
     });
+
+
 });
 
 /* DELETE (AJAX) */

@@ -16,12 +16,17 @@ class DotuniNewsController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+
+    public function index(Request $request)
     {
-        $news = $this->service->list();
-        return view('admin.dotuni_news.index', compact('news'));
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
+        return view('admin.dotuni_news.index');
     }
 
+    
     public function store(Request $request)
     {
         $news = $this->service->create($request);

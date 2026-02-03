@@ -2,10 +2,12 @@
 
 namespace App\Services\Rule;
 
-use App\Models\RuleSubSection;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Throwable;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Models\RuleSubSection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class RuleSubSectionService
 {
@@ -15,6 +17,73 @@ class RuleSubSectionService
             ->orderBy('sort_order')
             ->get();
     }
+
+    public function datatable(Request $request)
+    {
+        $query = RuleSubSection::with('section.article');
+
+        $total = $query->count();
+
+        /* SEARCH */
+        if ($search = $request->input('search.value')) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('section.article', function ($q2) use ($search) {
+                    $q2->where('rule_articles.number', 'like', "%{$search}%")
+                        ->orWhere('rule_articles.title', 'like', "%{$search}%");
+                })
+                    ->orWhereHas('section', function ($q2) use ($search) {
+                        $q2->where('rule_sections.number', 'like', "%{$search}%");
+                    })
+                    ->orWhere('rule_sub_sections.number', 'like', "%{$search}%")
+                    ->orWhere('rule_sub_sections.body', 'like', "%{$search}%");
+            });
+        }
+
+        $filtered = $query->count();
+
+        /* ORDER */
+        $columns = ['article', 'section', 'number', 'body', 'sort_order'];
+        $orderColIndex = $request->input('order.0.column', 4);
+        $orderDir = $request->input('order.0.dir', 'asc');
+        $orderCol = $columns[$orderColIndex] ?? 'sort_order';
+
+        if ($orderCol === 'article') {
+            $query->join('rule_sections', 'rule_sections.id', '=', 'rule_sub_sections.section_id')
+                ->join('rule_articles', 'rule_articles.id', '=', 'rule_sections.article_id')
+                ->orderBy('rule_articles.number', $orderDir)
+                ->select('rule_sub_sections.*');
+        } elseif ($orderCol === 'section') {
+            $query->join('rule_sections', 'rule_sections.id', '=', 'rule_sub_sections.section_id')
+                ->orderBy('rule_sections.number', $orderDir)
+                ->select('rule_sub_sections.*');
+        } else {
+            $query->orderBy('rule_sub_sections.' . $orderCol, $orderDir);
+        }
+
+        /* PAGINATION */
+        $subSections = $query->skip($request->start)->take($request->length)->get();
+
+        /* RESPONSE */
+        return response()->json([
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $subSections->map(function ($sub) {
+                return [
+                    'article' => $sub->section->article->number ?? '-',
+                    'section' => $sub->section->number ?? '-',
+                    'number' => e($sub->number),
+                    'body' => Str::limit($sub->body, 80),
+                    'sort_order' => $sub->sort_order,
+                    'actions' => view(
+                        'admin.rules_and_regulations.sub_sections.partials.actions',
+                        compact('sub')
+                    )->render()
+                ];
+            })
+        ]);
+    }
+
 
     public function storeOrRestore(array $data): RuleSubSection
     {

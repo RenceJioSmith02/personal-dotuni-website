@@ -18,6 +18,63 @@ class EResourceService
         return EResource::orderBy('sort_order')->get();
     }
 
+    public function datatable(Request $request)
+    {
+        $query = EResource::query();
+
+        $total = $query->count();
+
+        // Search
+        if ($search = $request->input('search.value')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('link_url', 'like', "%{$search}%");
+            });
+        }
+
+        $filtered = $query->count();
+
+        // Ordering
+        $columns = ['name', 'description', 'link_url', 'sort_order', 'status', 'actions'];
+        $orderColumnIndex = $request->input('order.0.column', 0);
+        $orderColumn = $columns[$orderColumnIndex] ?? 'sort_order';
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $orderDir = $orderDir === 'asc' ? 'asc' : 'desc';
+
+        if (!in_array($orderColumn, ['actions'])) {
+            $query->orderBy($orderColumn, $orderDir);
+        }
+
+        $data = $query->offset($start)->limit($length)->get();
+
+        return [
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $data->map(function ($item) {
+
+                return [
+                    'name' => $item->name,
+                    'description' => \Str::limit($item->description, 80),
+                    'link_url' => $item->link_url
+                        ? '<a href="' . $item->link_url . '" target="_blank">View</a>'
+                        : '<span class="text-muted">—</span>',
+                    'sort_order' => $item->sort_order,
+                    'status' => $item->is_active
+                        ? '<span class="badge badge-success">Active</span>'
+                        : '<span class="badge badge-danger">Inactive</span>',
+                    'actions' => view('admin.e_resources.partials.actions', compact('item'))->render(),
+                ];
+            }),
+        ];
+    }
+
+
     /**
      * Create a new E-Resource
      */

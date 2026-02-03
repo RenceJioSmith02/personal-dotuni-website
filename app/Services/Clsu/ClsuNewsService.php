@@ -2,20 +2,80 @@
 
 namespace App\Services\Clsu;
 
-use App\Models\ClsuNews;
-use App\Models\Asset;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use DomainException;
+use App\Models\Asset;
+use App\Models\ClsuNews;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ClsuNewsService
 {
     public function list()
     {
-        return ClsuNews::with('thumbnail')->orderBy('sort_order')->get();
+        return ClsuNews::with('thumbnail')->orderBy('sort_order');
     }
+
+
+    public function datatable(Request $request)
+    {
+        $query = $this->list(); // query builder
+
+        $total = $query->count();
+
+        // Search
+        if ($search = $request->input('search.value')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('url', 'like', "%{$search}%");
+            });
+        }
+
+        $filtered = $query->count();
+
+        // Ordering
+        $columns = ['thumbnail', 'title', 'description', 'url', 'sort_order', 'status'];
+        $orderColumnIndex = $request->input('order.0.column', 1);
+        $orderColumn = $columns[$orderColumnIndex] ?? 'sort_order';
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        // Only order by DB columns
+        if (!in_array($orderColumn, ['thumbnail', 'status', 'url'])) {
+            $query->orderBy($orderColumn, $orderDir);
+        }
+
+        // Pagination: call skip() and take() **before get()**
+        $data = $query
+            ->skip($request->start)
+            ->take($request->length)
+            ->get();
+
+        // Format JSON for DataTables
+        return [
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $data->map(function ($item) {
+                return [
+                    'thumbnail' => $item->thumbnail
+                        ? '<img src="' . asset('storage/' . $item->thumbnail->storage_path) . '" class="img-thumbnail" style="max-width:50px;" alt="' . $item->title . '">'
+                        : '<span class="text-muted">No Image</span>',
+                    'title' => $item->title,
+                    'description' => \Str::limit($item->description, 80),
+                    'url' => $item->url ? '<a href="' . $item->url . '" target="_blank">View</a>' : '<span class="text-muted">—</span>',
+                    'sort_order' => $item->sort_order,
+                    'status' => $item->is_active
+                        ? '<span class="badge badge-success">Active</span>'
+                        : '<span class="badge badge-danger">Inactive</span>',
+                    'actions' => view('admin.clsu.news.partials.actions', compact('item'))->render()
+                ];
+            })
+        ];
+    }
+    
 
     public function create(array $data, ?UploadedFile $image): ClsuNews
     {

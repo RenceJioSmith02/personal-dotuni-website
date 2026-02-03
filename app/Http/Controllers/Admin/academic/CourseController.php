@@ -15,13 +15,16 @@ class CourseController extends Controller
         protected CourseService $service
     ) {}
 
-    public function index()
+
+    public function index(Request $request)
     {
-        return view(
-            'admin.academic.courses.index',
-            ['courses' => $this->service->list()]
-        );
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
+        return view('admin.academic.courses.index');
     }
+
 
     public function store(Request $request)
     {

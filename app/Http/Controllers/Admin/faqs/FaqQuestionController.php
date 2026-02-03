@@ -14,10 +14,13 @@ class FaqQuestionController extends Controller
 {
     public function __construct(protected FaqQuestionService $service) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        $questions = $this->service->list();
-        return view('admin.faqs.questions.index', compact('questions'));
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
+        return view('admin.faqs.questions.index');
     }
 
     public function store(Request $request)

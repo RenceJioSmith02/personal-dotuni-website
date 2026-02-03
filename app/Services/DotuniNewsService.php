@@ -27,6 +27,77 @@ class DotuniNewsService
             ->get();
     }
 
+    public function datatable(Request $request)
+    {
+        $query = DotuniNews::with(['author:id,name', 'attachments.asset']);
+
+        $total = $query->count();
+
+        // Search
+        if ($search = $request->input('search.value')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('seo_description', 'like', "%{$search}%");
+            });
+        }
+
+        $filtered = $query->count();
+
+        // Ordering
+        $columns = ['thumbnail', 'title', 'seo_description', 'status', 'visibility', 'published_at', 'actions'];
+        $orderColumnIndex = $request->input('order.0.column', 1);
+        $orderColumn = $columns[$orderColumnIndex] ?? 'published_at';
+        $orderDir = $request->input('order.0.dir', 'desc');
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $orderDir = $orderDir === 'asc' ? 'asc' : 'desc';
+
+        if (!in_array($orderColumn, ['thumbnail', 'actions'])) {
+            $query->orderBy($orderColumn, $orderDir);
+        }
+
+        $data = $query->offset($start)->limit($length)->get();
+
+        return [
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $data->map(function ($item) {
+                $thumbnail = $item->attachments->firstWhere('is_thumbnail', true)?->asset;
+
+                // Status badge
+                $statusClass = match ($item->status) {
+                    'published' => 'badge-success',
+                    'submitted' => 'badge-warning',
+                    'archived' => 'badge-secondary',
+                    default => 'badge-info',
+                };
+
+                // Visibility badge
+                $visClass = match ($item->visibility) {
+                    'public' => 'badge-success',
+                    'unlisted' => 'badge-warning',
+                    default => 'badge-secondary',
+                };
+
+                return [
+                    'thumbnail' => $thumbnail
+                        ? '<img src="' . asset('storage/' . $thumbnail->storage_path) . '" class="img-thumbnail" style="max-width:50px;" alt="' . ($thumbnail->alt_text ?? $item->title) . '">'
+                        : '<span class="text-muted">No Image</span>',
+                    'title' => $item->title,
+                    'seo_description' => \Str::limit($item->seo_description, 80),
+                    'status' => '<span class="badge ' . $statusClass . '">' . ucfirst($item->status) . '</span>',
+                    'visibility' => '<span class="badge ' . $visClass . '">' . ucfirst($item->visibility) . '</span>',
+                    'published_at' => $item->published_at ? $item->published_at->format('Y-m-d H:i') : '<span class="text-muted">—</span>',
+                    'actions' => view('admin.dotuni_news.partials.actions', compact('item'))->render()
+                ];
+            }),
+        ];
+    }
+
+
     /**
      * Create news with layout & media
      */

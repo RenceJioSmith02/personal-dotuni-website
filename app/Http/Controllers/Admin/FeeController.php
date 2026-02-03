@@ -16,11 +16,15 @@ class FeeController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $fees = $this->service->list();
-        return view('admin.fees.index', compact('fees'));
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
+        return view('admin.fees.index');
     }
+
 
     public function store(Request $request)
     {

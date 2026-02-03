@@ -17,16 +17,22 @@ class RuleSectionController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $sections = $this->service->list();
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
+
+        // pass articles for the modal dropdown
         $articles = RuleArticle::orderBy('sort_order')->get();
 
         return view(
             'admin.rules_and_regulations.sections.index',
-            compact('sections', 'articles')
+            compact('articles')
         );
     }
+
+
 
     public function store(Request $request)
     {

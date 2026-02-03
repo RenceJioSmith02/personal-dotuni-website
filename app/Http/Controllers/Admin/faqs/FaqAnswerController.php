@@ -15,12 +15,14 @@ class FaqAnswerController extends Controller
     {
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $answers = $this->service->list();
-        $questions = FaqQuestion::where('is_active', 1)->orderBy('sort_order')->get();
+        if ($request->ajax()) {
+            return $this->service->datatable($request);
+        }
 
-        return view('admin.faqs.answers.index', compact('answers', 'questions'));
+        $questions = FaqQuestion::where('is_active', 1)->orderBy('sort_order')->get();
+        return view('admin.faqs.answers.index', compact('questions'));
     }
 
     public function store(Request $request)

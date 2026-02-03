@@ -35,38 +35,7 @@
                     <th width="150">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($clauses as $clause)
-                <tr>
-                    <td>{{ $clause->subSection->section->article->number ?? '-' }}</td>
-                    <td>{{ $clause->subSection->section->number ?? '-' }}</td>
-                    <td>{{ $clause->subSection->number ?? '-' }}</td>
-                    <td>{{ $clause->number }}</td>
-                    <td>{{ Str::limit($clause->body, 80) }}</td>
-                    <td>{{ $clause->sort_order }}</td>
-                    <td>
-                        <button class="open-modal btn btn-sm btn-info"
-                            data-action="edit"
-                            data-modal="#clauseModal"
-                            data-form="#clauseForm"
-                            data-title="Edit Clause"
-                            data-url="/admin/rule_clauses"
-                            data-id="{{ $clause->id }}">
-                            Edit
-                        </button>
 
-                        <form action="{{ route('admin.rule_clauses.destroy', $clause) }}"
-                              method="POST"
-                              class="d-inline ajax-delete-clause">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                        </form>
-
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
         </table>
     </div>
 </div>
@@ -79,8 +48,28 @@
 <script>
 $(function () {
     if ($.fn.DataTable.isDataTable('#clausesTable')) $('#clausesTable').DataTable().destroy();
-    const table = $('#clausesTable').DataTable({ responsive: true, autoWidth: false, pageLength: 10, columnDefs: [{ orderable: false, targets: 6 }] });
 
+    const table = $('#clausesTable').DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        autoWidth: false,
+        pageLength: 10,
+        ajax: {
+            url: "{{ route('admin.rule_clauses.index') }}",
+            type: "GET"
+        },
+        columns: [
+            { data: 'article', name: 'article' },
+            { data: 'section', name: 'section' },
+            { data: 'sub_section', name: 'sub_section' },
+            { data: 'number', name: 'number' },
+            { data: 'body', name: 'body' },
+            { data: 'sort_order', name: 'sort_order' },
+            { data: 'actions', orderable: false, searchable: false }
+        ]
+    });
+    
     $(document).on("submit", ".ajax-delete-clause", function(e) {
         e.preventDefault();
         const form = $(this), url = form.attr("action"), row = form.closest("tr");

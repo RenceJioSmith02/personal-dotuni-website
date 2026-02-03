@@ -32,5 +32,6 @@
 
     <script src="{{ asset('assets/js/modal.js') }}"></script>
     <script src="{{ asset('assets/js/global.js') }}"></script>
+    
     @stack('js')
 @stop

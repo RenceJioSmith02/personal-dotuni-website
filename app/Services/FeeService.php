@@ -4,10 +4,12 @@ namespace App\Services;
 
 use App\Models\Fee;
 use App\Models\Asset;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class FeeService
 {
@@ -15,6 +17,88 @@ class FeeService
     {
         return Fee::with('asset')->orderBy('sort_order')->get();
     }
+
+    public function datatable(Request $request)
+    {
+        $query = Fee::with('asset');
+
+        $total = $query->count();
+
+        /* ===============================
+           SEARCH
+        =============================== */
+        if ($search = $request->input('search.value')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('caption', 'like', "%{$search}%")
+                    ->orWhere('sort_order', 'like', "%{$search}%");
+            });
+        }
+
+        $filtered = $query->count();
+
+        /* ===============================
+           ORDERING
+        =============================== */
+        $columns = [
+            'asset',
+            'title',
+            'caption',
+            'sort_order',
+            'actions'
+        ];
+
+        $orderColumnIndex = $request->input('order.0.column', 3);
+        $orderColumn = $columns[$orderColumnIndex] ?? 'sort_order';
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        $orderDir = $orderDir === 'asc' ? 'asc' : 'desc';
+
+        if (!in_array($orderColumn, ['asset', 'actions'])) {
+            $query->orderBy($orderColumn, $orderDir);
+        }
+
+        /* ===============================
+           PAGINATION
+        =============================== */
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $data = $query
+            ->offset($start)
+            ->limit($length)
+            ->get();
+
+        /* ===============================
+           RESPONSE
+        =============================== */
+        return [
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $data->map(function ($item) {
+
+                return [
+                    'asset' => view(
+                        'admin.fees.partials.asset',
+                        compact('item')
+                    )->render(),
+
+                    'title' => e($item->title),
+
+                    'caption' => Str::limit($item->caption, 80),
+
+                    'sort_order' => $item->sort_order,
+
+                    'actions' => view(
+                        'admin.fees.partials.actions',
+                        compact('item')
+                    )->render(),
+                ];
+            }),
+        ];
+    }
+
 
     public function create(array $data, ?UploadedFile $image): Fee
     {

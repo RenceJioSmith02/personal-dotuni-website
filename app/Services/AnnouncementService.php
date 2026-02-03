@@ -26,6 +26,74 @@ class AnnouncementService
             ->get();
     }
 
+
+
+    public function datatable(Request $request)
+    {
+        $query = Announcement::with(['author:id,name', 'assets']);
+
+        $total = $query->count();
+
+        // SEARCH
+        if ($search = $request->input('search.value')) {
+            $query->where('title', 'like', "%{$search}%")
+                ->orWhere('seo_description', 'like', "%{$search}%");
+        }
+
+        $filtered = $query->count();
+
+        // ORDERING
+        $columns = ['title', 'seo_description', 'status', 'visibility', 'publish_start'];
+        $orderColumn = $columns[$request->input('order.0.column', 0)] ?? 'publish_start';
+        $orderDir = $request->input('order.0.dir', 'desc');
+
+        $query->orderBy($orderColumn, $orderDir);
+
+        // PAGINATION
+        $data = $query->skip($request->start)
+            ->take($request->length)
+            ->get();
+
+        // RESPONSE
+        return response()->json([
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $data->map(function ($item) {
+                $thumbnail = $item->assets->firstWhere('pivot.is_thumbnail', true);
+
+                $statusClass = match ($item->status) {
+                    'published' => 'badge-success',
+                    'submitted' => 'badge-warning',
+                    'archived' => 'badge-secondary',
+                    default => 'badge-info',
+                };
+
+                $visClass = match ($item->visibility) {
+                    'public' => 'badge-success',
+                    'unlisted' => 'badge-warning',
+                    default => 'badge-secondary',
+                };
+
+                return [
+                    'thumbnail' => $thumbnail && $thumbnail->kind === 'image'
+                        ? '<img src="' . asset('storage/' . $thumbnail->storage_path) . '" class="img-thumbnail" style="max-width:50px;" alt="' . ($thumbnail->alt_text ?? $item->title) . '">'
+                        : '<span class="text-muted">No Image</span>',
+                    'title' => $item->title,
+                    'seo_description' => Str::limit($item->seo_description, 80),
+                    'status' => '<span class="badge ' . $statusClass . '">' . ucfirst($item->status) . '</span>',
+                    'visibility' => '<span class="badge ' . $visClass . '">' . ucfirst($item->visibility) . '</span>',
+                    'publish_window' => $item->publish_start
+                        ? $item->publish_start->format('Y-m-d') .
+                        ($item->publish_end ? '<br><small class="text-muted">to ' . $item->publish_end->format('Y-m-d') . '</small>' : '')
+                        : '<span class="text-muted">—</span>',
+                    'actions' => view('admin.clsu.announcement.partials.actions', compact('item'))->render(),
+                ];
+            }),
+        ]);
+    }
+
+
     /**
      * Create a new announcement with layout & assets.
      */
