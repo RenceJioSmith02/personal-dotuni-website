@@ -26,6 +26,7 @@
         <table id="clausesTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Article</th>
                     <th>Section</th>
                     <th>Sub-Section</th>
@@ -60,6 +61,14 @@ $(function () {
             type: "GET"
         },
         columns: [
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
             { data: 'article', name: 'article' },
             { data: 'section', name: 'section' },
             { data: 'sub_section', name: 'sub_section' },

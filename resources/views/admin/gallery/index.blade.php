@@ -26,6 +26,7 @@
         <table id="galleryTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Image</th>
                     <th>File Name</th>
                     <th>Order</th>
@@ -61,6 +62,14 @@ $(function () {
             type: "GET"
         },
         columns: [
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
             { data: 'image', orderable: false, searchable: false },
             { data: 'file_name' },
             { data: 'sort_order' },

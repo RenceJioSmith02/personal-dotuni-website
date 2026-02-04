@@ -175,13 +175,20 @@ $(document).ready(function(){
                         $(this).remove();
                     });
                 },
-                error: function () {
+                error: function (xhr) {
+                    let message = "Failed to delete requirement.";
+
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    }
+
                     Swal.fire({
                         type: "error",
                         title: "Error",
-                        text: "Failed to delete requirement."
+                        text: message
                     });
                 }
+
             });
         });
     });

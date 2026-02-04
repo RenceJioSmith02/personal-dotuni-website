@@ -2,11 +2,12 @@
 
 namespace App\Services\Rule;
 
-use App\Models\RuleArticle;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Throwable;
+use DomainException;
+use App\Models\RuleArticle;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class RuleArticleService
 {
@@ -14,8 +15,6 @@ class RuleArticleService
     {
         return RuleArticle::orderBy('sort_order')->get();
     }
-
-
 
     public function datatable(Request $request)
     {
@@ -127,8 +126,24 @@ class RuleArticleService
 
     public function delete(RuleArticle $article): void
     {
-        DB::transaction(function () use ($article) {
-            $article->delete();
-        });
+        try {
+            DB::transaction(function () use ($article) {
+
+                $sectionsCount = $article->sections()->count();
+
+                if ($sectionsCount > 0) {
+                    throw new DomainException(
+                        "Cannot delete this article. It has {$sectionsCount} linked section(s)."
+                    );
+                }
+
+                $article->delete();
+            });
+        } catch (DomainException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to delete article.');
+        }
     }
 }

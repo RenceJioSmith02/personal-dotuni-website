@@ -29,6 +29,7 @@
         <table id="categoriesTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Name</th>
                     <th>Sort Order</th>
                     <th>Status</th>
@@ -69,6 +70,14 @@ $(function () {
             type: "GET"
         },
         columns: [
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
             { data: 'name', name: 'name' },
             { data: 'sort_order', name: 'sort_order', className: 'text-center' },
             { data: 'status', name: 'status', orderable: false, searchable: false },

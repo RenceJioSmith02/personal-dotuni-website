@@ -33,6 +33,7 @@
         <table id="rolesTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Name</th>
                     <th width="150">Actions</th>
                 </tr>
@@ -62,6 +63,14 @@ $(function () {
         serverSide: true,
         ajax: '{{ route("admin.roles.index") }}',
         columns: [
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
             { data: 'name' },
             { data: 'actions', orderable: false, searchable: false }
         ],

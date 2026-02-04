@@ -26,6 +26,7 @@
         <table id="feeTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Asset</th>
                     <th>Title</th>
                     <th>Caption</th>
@@ -60,6 +61,14 @@ $(function () {
         ajax: "{{ route('admin.fees.index') }}",
 
         columns: [
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
             { data: 'asset', orderable: false, searchable: false },
             { data: 'title' },
             { data: 'caption', orderable: false },

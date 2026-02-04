@@ -17,12 +17,12 @@ class ProgramRequirementCategory extends Model
 
     public function programRequirements()
     {
-        return $this->hasMany(ProgramRequirement::class);
+        return $this->hasMany(ProgramRequirement::class, 'requirement_category_id');
     }
 
     public function programCourses()
     {
-        return $this->hasMany(ProgramCourse::class);
+        return $this->hasMany(ProgramCourse::class, 'requirement_category_id');
     }
 
     public function programs()

@@ -26,6 +26,7 @@
         <table id="announcementsTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Thumbnail</th>
                     <th>Title</th>
                     <th>SEO Description</th>
@@ -68,6 +69,14 @@ $(function () {
             // }
         },
         columns: [
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
             { data: 'thumbnail', orderable: false, searchable: false },
             { data: 'title' },
             { data: 'seo_description' },

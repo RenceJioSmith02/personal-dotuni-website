@@ -65,13 +65,38 @@ class ProgramBuilderService
     {
         try {
             DB::transaction(function () use ($requirement) {
+
+                // Count linked ProgramCourses
+                $courseCount = $requirement->programCourses()->count();
+
+                if ($courseCount > 0) {
+                    throw new DomainException(
+                        "Cannot delete this requirement. It is used in {$courseCount} program courses."
+                    );
+                }
+
+                // Safe to delete
                 $requirement->delete();
             });
+        } catch (DomainException $e) {
+            throw $e;
         } catch (Exception $e) {
             report($e);
             throw new DomainException('Failed to delete requirement: ' . $e->getMessage());
         }
     }
+
+    // public function deleteRequirement(ProgramRequirement $requirement): void
+    // {
+    //     try {
+    //         DB::transaction(function () use ($requirement) {
+    //             $requirement->delete();
+    //         });
+    //     } catch (Exception $e) {
+    //         report($e);
+    //         throw new DomainException('Failed to delete requirement: ' . $e->getMessage());
+    //     }
+    // }
 
     /**
      * Save or restore a program course

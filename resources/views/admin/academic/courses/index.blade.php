@@ -31,6 +31,7 @@
         <table id="coursesTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Code</th>
                     <th>Title</th>
                     <th>Description</th>
@@ -73,6 +74,14 @@
             },
 
             columns: [
+                {
+                    data: null,
+                    searchable: false,
+                    orderable: false,
+                    render: function (data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                },
                 { data: "code" },
                 { data: "title" },
                 { data: "description" },

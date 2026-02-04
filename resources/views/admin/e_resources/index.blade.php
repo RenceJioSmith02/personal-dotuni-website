@@ -26,6 +26,7 @@
         <table id="eResourcesTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Name</th>
                     <th>Description</th>
                     <th>Link</th>
@@ -66,6 +67,14 @@ $(function () {
             }
         },
         columns: [
+            {       
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
             { data: 'name' },
             { data: 'description' },
             { data: 'link_url', orderable: false, searchable: false },

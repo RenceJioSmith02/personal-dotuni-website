@@ -26,6 +26,7 @@
         <table id="programsTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Image</th>
                     <th>Title</th>
                     <th>Description</th>
@@ -60,7 +61,7 @@ $(function () {
         pageLength: 10,
         lengthMenu: [10, 20, 50, 100],
         columnDefs: [
-            { orderable: false, targets: [0, 6] } // Image + Actions
+            { orderable: false, targets: [0, 1, 7] } 
         ],
         ajax: {
             url: "{{ route('admin.programs.index') }}",
@@ -71,6 +72,14 @@ $(function () {
             // }
         },
         columns: [
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
             { data: 'image', searchable: false, orderable: false },
             { data: 'title' },
             { data: 'description' },

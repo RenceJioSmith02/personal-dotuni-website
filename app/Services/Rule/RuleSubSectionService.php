@@ -3,6 +3,7 @@
 namespace App\Services\Rule;
 
 use Throwable;
+use DomainException;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\RuleSubSection;
@@ -147,8 +148,28 @@ class RuleSubSectionService
         });
     }
 
+
     public function delete(RuleSubSection $subSection): void
     {
-        DB::transaction(fn() => $subSection->delete());
+        try {
+            DB::transaction(function () use ($subSection) {
+
+                $clauseCount = $subSection->clauses()->count();
+
+                if ($clauseCount > 0) {
+                    throw new DomainException(
+                        "Cannot delete this sub-section. It has {$clauseCount} linked clause(s)."
+                    );
+                }
+
+                $subSection->delete();
+            });
+        } catch (DomainException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to delete sub-section.');
+        }
     }
+
 }

@@ -128,15 +128,60 @@ class ProgramRequirementCategoryService
     /**
      * Soft delete a category
      */
+    // public function delete(ProgramRequirementCategory $category): void
+    // {
+    //     try {
+    //         DB::transaction(function () use ($category) {
+
+    //             // Check relations
+    //             if ($category->programRequirements()->exists()) {
+    //                 throw new DomainException(
+    //                     "Cannot delete '{$category->name}'. It is used in program requirements."
+    //                 );
+    //             }
+
+    //             if ($category->programCourses()->exists()) {
+    //                 throw new DomainException(
+    //                     "Cannot delete '{$category->name}'. It is used in program courses."
+    //                 );
+    //             }
+
+    //             $category->delete();
+    //         });
+    //     } catch (DomainException $e) {
+    //         throw $e;
+    //     } catch (Exception $e) {
+    //         report($e);
+    //         throw new DomainException('Failed to delete category: ' . $e->getMessage());
+    //     }
+    // }
+
     public function delete(ProgramRequirementCategory $category): void
     {
         try {
             DB::transaction(function () use ($category) {
+
+                // Count usages
+                $reqCount = $category->programRequirements()->count();
+                $courseCount = $category->programCourses()->count();
+
+                // Block delete if used
+                if ($reqCount || $courseCount) {
+                    throw new DomainException(
+                        "Cannot delete '{$category->name}'. Used in {$reqCount} requirements and {$courseCount} program courses."
+                    );
+                }
+
+                // Safe delete
                 $category->delete();
             });
+        } catch (DomainException $e) {
+            throw $e;
         } catch (Exception $e) {
             report($e);
             throw new DomainException('Failed to delete category: ' . $e->getMessage());
         }
     }
+
+
 }

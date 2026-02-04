@@ -29,6 +29,7 @@
         <table id="categoriesTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Name</th>
                     <th>Sort Order</th>
                     <th width="150">Actions</th>
@@ -75,6 +76,14 @@ $(function () {
         },
 
         columns: [
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
             { data: "name" },
             { data: "sort_order" },
             {

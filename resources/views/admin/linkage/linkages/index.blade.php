@@ -29,6 +29,7 @@
         <table id="linkagesTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Image</th>
                     <th>Title</th>
                     <th>Category</th>
@@ -82,6 +83,14 @@ $(function () {
         },
 
         columns: [
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
             {
                 data: "image",
                 orderable: false,

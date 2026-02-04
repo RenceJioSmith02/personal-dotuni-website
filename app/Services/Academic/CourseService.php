@@ -145,15 +145,27 @@ class CourseService
     /**
      * Soft-delete a course
      */
+
     public function delete(Course $course): void
     {
         try {
             DB::transaction(function () use ($course) {
+
+                // Check if used in program_courses
+                if ($course->programCourses()->exists()) {
+                    throw new DomainException(
+                        "Cannot delete '{$course->code} - {$course->title}'. It is already assigned to a program."
+                    );
+                }
+
                 $course->delete();
             });
+        } catch (DomainException $e) {
+            throw $e;
         } catch (Exception $e) {
             report($e);
             throw new DomainException('Failed to delete course: ' . $e->getMessage());
         }
     }
+
 }

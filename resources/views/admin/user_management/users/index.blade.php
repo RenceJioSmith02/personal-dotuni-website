@@ -36,6 +36,7 @@
         <table id="usersTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Email</th>
                     <th>Name</th>
                     <th>Roles</th>
@@ -70,6 +71,14 @@ $(function () {
         serverSide: true,
         ajax: '{{ route("admin.users.index") }}',
         columns: [
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
             { data: 'email' },
             { data: 'name' },
             { data: 'roles', orderable: false, searchable: false },

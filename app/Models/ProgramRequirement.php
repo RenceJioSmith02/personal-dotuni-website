@@ -29,5 +29,13 @@ class ProgramRequirement extends Model
         return $this->belongsTo(Program::class);
     }
 
+    public function programCourses()
+    {
+        // Get courses linked to this requirement in the same program
+        return $this->hasMany(\App\Models\ProgramCourse::class, 'requirement_category_id', 'requirement_category_id')
+            ->where('program_id', $this->program_id);
+    }
+
+
 
 }

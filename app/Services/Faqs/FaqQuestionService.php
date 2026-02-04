@@ -119,8 +119,29 @@ class FaqQuestionService
 
     public function delete(FaqQuestion $question): void
     {
-        DB::transaction(function () use ($question) {
-            $question->delete();
-        });
+        try {
+            DB::transaction(function () use ($question) {
+
+                // Count linked answers
+                $answerCount = $question->answers()->count();
+
+                if ($answerCount > 0) {
+                    // User-friendly message
+                    throw new DomainException(
+                        "Cannot delete this FAQ question because it has {$answerCount} answer(s) in the FAQ Answers table. Please delete the answers first."
+                    );
+                }
+
+                // Safe to delete
+                $question->delete();
+            });
+        } catch (DomainException $e) {
+            throw $e; // Controller will handle this
+        } catch (\Exception $e) {
+            report($e);
+            throw new DomainException('Failed to delete FAQ question: ' . $e->getMessage());
+        }
     }
+
+
 }

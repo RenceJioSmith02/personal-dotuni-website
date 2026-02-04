@@ -2,12 +2,13 @@
 
 namespace App\Services\Rule;
 
-use App\Models\RuleSection;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Throwable;
-use Illuminate\Http\Request;
+use DomainException;
+use App\Models\RuleSection;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class RuleSectionService
 {
@@ -139,8 +140,28 @@ class RuleSectionService
         });
     }
 
+
     public function delete(RuleSection $section): void
     {
-        DB::transaction(fn() => $section->delete());
+        try {
+            DB::transaction(function () use ($section) {
+
+                $subSectionCount = $section->subSections()->count();
+
+                if ($subSectionCount > 0) {
+                    throw new DomainException(
+                        "Cannot delete this section. It has {$subSectionCount} linked sub-section(s)."
+                    );
+                }
+
+                $section->delete();
+            });
+        } catch (DomainException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to delete section.');
+        }
     }
+
 }

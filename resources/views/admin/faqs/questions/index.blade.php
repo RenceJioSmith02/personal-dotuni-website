@@ -26,6 +26,7 @@
         <table id="faqQuestionsTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Question</th>
                     <th>Order</th>
                     <th>Status</th>
@@ -66,6 +67,14 @@ $(function () {
             }
         },
         columns: [
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
             { data: 'question' },
             { data: 'sort_order' },
             { data: 'status', orderable: false, searchable: false },
@@ -112,65 +121,24 @@ $(document).on("submit", ".ajax-delete-faq-question", function (e) {
 
                 table.ajax.reload(null, false);
             },
-            error: function () {
+            error: function (xhr) {
+                let message = "Failed to delete FAQ question.";
+
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message; 
+                }
+
                 Swal.fire({
-                    type: "error",
+                    type: "error", 
                     title: "Error",
-                    text: "Failed to delete FAQ question."
+                    text: message
                 });
             }
+
         });
     });
 });
 
 
-
-/* DELETE FAQ QUESTION (AJAX) */
-$(document).on("submit", ".ajax-delete-faq-question", function (e) {
-    e.preventDefault();
-
-    const form = $(this);
-    const row = form.closest("tr");
-    const table = $("#faqQuestionsTable").DataTable();
-
-    Swal.fire({
-        title: "Delete this FAQ question?",
-        text: "This action cannot be undone.",
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete it",
-        confirmButtonColor: "#dc3545",
-        reverseButtons: true
-    }).then((result) => {
-        if (!result.value) return;
-
-        $.ajax({
-            url: form.attr("action"),
-            type: "POST",
-            data: {
-                _token: $('meta[name="csrf-token"]').attr("content"),
-                _method: "DELETE"
-            },
-            success: function (res) {
-                Swal.fire({
-                    type: "success",
-                    title: "Deleted",
-                    text: res.message,
-                    timer: 1200,
-                    showConfirmButton: false
-                });
-
-                table.row(row).remove().draw(false);
-            },
-            error: function () {
-                Swal.fire({
-                    type: "error",
-                    title: "Error",
-                    text: "Failed to delete FAQ question."
-                });
-            }
-        });
-    });
-});
 </script>
 @endpush

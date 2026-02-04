@@ -43,10 +43,10 @@ use App\Http\Controllers\Admin\form\FormCategoryController;
 use App\Http\Controllers\Admin\rule\RuleSubSectionController;
 
 //EResource
-use App\Http\Controllers\Admin\academic\ProgramCourseController;
 use App\Http\Controllers\Admin\academic\ProgramBuilderController;
 use App\Http\Controllers\Admin\linkage\LinkageCategoryController;
-use App\Http\Controllers\Admin\academic\ProgramRequirementController;
+// use App\Http\Controllers\Admin\academic\ProgramCourseController;
+// use App\Http\Controllers\Admin\academic\ProgramRequirementController;
 
 // DotUni News
 use App\Http\Controllers\Admin\academic\ProgramRequirementCategoryController;

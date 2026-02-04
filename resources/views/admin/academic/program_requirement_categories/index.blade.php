@@ -25,6 +25,7 @@
         <table id="categoriesTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Name</th>
                     <th>Sort Order</th>
                     <th width="150">Actions</th>
@@ -62,6 +63,14 @@ $(function () {
         },
 
         columns: [
+            {
+                data: null,
+                searchable: false,
+                orderable: false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
             { data: "name" },
             { data: "sort_order" },
             {
@@ -103,7 +112,7 @@ $(document).on("submit", ".ajax-delete-category", function (e) {
             },
             success: function (res) {
                 Swal.fire({
-                    type: "success",
+                    type: "success", 
                     title: "Deleted",
                     text: res.message,
                     timer: 1200,
@@ -111,8 +120,16 @@ $(document).on("submit", ".ajax-delete-category", function (e) {
                 });
 
                 table.row(row).remove().draw(false);
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    type: "error", 
+                    title: "Delete failed",
+                    text: xhr.responseJSON?.message || "Something went wrong"
+                });
             }
         });
+
     });
 });
 </script>

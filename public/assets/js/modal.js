@@ -303,7 +303,7 @@ $(document).on("change", ".media-input", function (e) {
             <input
                 type="file"
                 name="media[${index}][image]"
-                class="form-control-file media-input"
+                class="form-control-file media-input layout1-image"
                 data-preview="#mediaPreview_${index}"
                 accept="image/*">
         </div>
@@ -357,11 +357,16 @@ $(document).on("change", ".media-input", function (e) {
 
         // Add a new row
         addRow: function () {
-            $("#newsMediaContainer").append(this.makeRow(this.rowIndex));
+            const html = this.makeRow(this.rowIndex);
+            $("#newsMediaContainer").append(html);
+
+            $("#newsMediaContainer .layout1-image:last").prop("required", true);
+
             this.rowIndex++;
             this.refreshBadges();
             $("#newsMediaContainer").sortable("refresh");
         },
+
 
         // Remove a row
         removeRow: function (row) {
@@ -536,26 +541,54 @@ $(document).on("change", ".media-input", function (e) {
         );
     }
 
+
     function applyLayout(layoutKey) {
         const config = NEWS_LAYOUTS[layoutKey];
         if (!config) return;
 
-        // save to hidden input
         $("#newsLayout").val(layoutKey);
-
-        // label
         $("#selectedLayoutLabel").text(config.label);
 
-        // panels
         $(".layout-panel").hide();
         if (config.panel) {
             $(config.panel).show();
         }
 
-        // card highlight
         $(".layout-card").removeClass("active");
         $(`.layout-card[data-layout="${layoutKey}"]`).addClass("active");
+
+        // ----------------------------
+        // RESET REQUIRED
+        // ----------------------------
+        $("#newsStep2 :input").prop("required", false);
+
+        // ----------------------------
+        // REQUIRE IMAGES BY LAYOUT
+        // ----------------------------
+
+        if (layoutKey === "layout_1") {
+            $(".layout1-image").prop("required", true);
+        }
+
+        if (layoutKey === "layout_2") {
+            $('input[name="hero_image"]').prop("required", true);
+        }
+
+        if (layoutKey === "layout_3") {
+            $(
+                'input[name="split_left_image"], input[name="split_right_image"]',
+            ).prop("required", true);
+        }
+
+        if (layoutKey === "layout_4") {
+            $("#layout4Container input[type=file]").prop("required", true);
+        }
+
+        if (layoutKey === "layout_5") {
+            $("#layout5Container input[type=file]").prop("required", true);
+        }
     }
+
 
 
 
@@ -726,6 +759,8 @@ $(document).on("change", ".media-input", function (e) {
     });
 
     // Next / Back
+
+
     $(document).on("click", "#newsNextBtn", function () {
         // minimal validation: required fields in step 1
         const form = $("#dotuniNewsForm")[0];
@@ -734,9 +769,10 @@ $(document).on("change", ".media-input", function (e) {
         $("#newsStep1 :input[required]").each(function () {
             if (!this.value) valid = false;
         });
+
         if (!valid) {
             Swal.fire({
-                icon: "warning",
+                type: "warning",
                 title: "Missing fields",
                 text: "Please complete required fields before continuing.",
             });
@@ -776,8 +812,8 @@ $(document).on("change", ".media-input", function (e) {
     
 
     /* ===============================
-ANNOUNCEMENT MODULE SCRIPTS
-=============================== */
+    ANNOUNCEMENT MODULE SCRIPTS
+    =============================== */
 
     window.announcementMediaHelper = {
         rowIndex: 0,
@@ -814,7 +850,7 @@ ANNOUNCEMENT MODULE SCRIPTS
             <input
                 type="file"
                 name="media[${index}][image]"
-                class="form-control-file media-input"
+                class="form-control-file media-input layout1-image"
                 data-preview="#announcementMediaPreview_${index}"
                 accept="image/*">
         </div>
@@ -867,15 +903,29 @@ ANNOUNCEMENT MODULE SCRIPTS
 
         // Add a new row
         addRow: function () {
-            $("#announcementMediaContainer").append(
-                this.makeRow(this.rowIndex),
-            );
+            const html = this.makeRow(this.rowIndex);
+            $("#announcementMediaContainer").append(html);
+
+            $("#announcementMediaContainer .layout1-image:last").prop("required", true);
+
             this.rowIndex++;
             this.refreshBadges();
             if ($("#announcementMediaContainer").data("ui-sortable")) {
                 $("#announcementMediaContainer").sortable("refresh");
             }
         },
+
+        // addRow: function () {
+        //     $("#announcementMediaContainer").append(
+        //         this.makeRow(this.rowIndex),
+        //     );
+        //     this.rowIndex++;
+        //     this.refreshBadges();
+        //     if ($("#announcementMediaContainer").data("ui-sortable")) {
+        //         $("#announcementMediaContainer").sortable("refresh");
+        //     }
+        // },
+        
 
         // Remove a row
         removeRow: function (row) {
