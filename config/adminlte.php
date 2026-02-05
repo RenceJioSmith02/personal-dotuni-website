@@ -321,88 +321,62 @@ return [
             'can' => 'manage-blog',
         ],
 
+
+
         // menus
+        // [
+        //     'text' => 'pages',
+        //     'url' => 'admin/pages',
+        //     'icon' => 'far fa-fw fa-file',
+        //     'label' => 4,
+        //     'label_color' => 'success',
+        // ],
+
+
         [
-            'text' => 'pages',
-            'url' => 'admin/pages',
-            'icon' => 'far fa-fw fa-file',
-            'label' => 4,
-            'label_color' => 'success',
+            'text' => 'User Management',
+            'icon' => 'fas fa-users',
+            'can' => 'manage-users',
+            'submenu' => [
+                [
+                    'text' => 'Roles',
+                    'url' => 'admin/roles',
+                    'icon' => 'fas fa-user-shield',
+                    'can' => 'manage-users',
+                ],
+                [
+                    'text' => 'Users',
+                    'url' => 'admin/users',
+                    'icon' => 'fas fa-user',
+                    'can' => 'manage-users',
+                ],
+            ],
+        ],
+        [
+            'text' => 'Gallery',
+            'route' => 'admin.gallery.index',
+            'icon' => 'far fa-fw fa-images',
+            'can' => 'manage-content',
+        ],
+        [
+            'text' => 'Fees',
+            'route' => 'admin.fees.index',
+            'icon' => 'fas fa-fw fa-file-invoice-dollar',
+            'can' => 'manage-content',
         ],
         [
             'text' => 'E-Resources',
             'url' => 'admin/e_resources',
             'icon' => 'fas fa-book', 
             // 'label' => \App\Models\EResource::count(), 
-            'label_color' => 'info', 
-        ],
-        [
-            'text' => 'Gallery',
-            'route' => 'admin.gallery.index',
-            'icon' => 'far fa-fw fa-images',
-        ],
-        [
-            'text' => 'Fees',
-            'route' => 'admin.fees.index',
-            'icon' => 'fas fa-fw fa-file-invoice-dollar',
+            'label_color' => 'info',
+            'can' => 'manage-content',
         ],
         [
             'text' => 'DotUni News',
             'route' => 'admin.dotuni_news.index',
             'icon' => 'far fa-fw fa-newspaper',
-        ],
-        [
-            'text' => 'User Management',
-            'icon' => 'fas fa-users',
-            'submenu' => [
-                [
-                    'text' => 'Users',
-                    'url' => 'admin/users',
-                    'icon' => 'fas fa-user',
-                ],
-                [
-                    'text' => 'Roles',
-                    'url' => 'admin/roles',
-                    'icon' => 'fas fa-user-shield',
-                ],
-            ],
-        ],
-        [
-            'text' => 'Academic Setup',
-            'icon' => 'fas fa-graduation-cap',
-            'submenu' => [
-                [
-                    'text' => 'Programs',
-                    'url' => 'admin/programs',
-                    'icon' => 'fas fa-layer-group',
-                ],
-                [
-                    'text' => 'Requirement Categories',
-                    'url' => 'admin/program_requirement_categories',
-                    'icon' => 'fas fa-list',
-                ],
-                [
-                    'text' => 'Courses',
-                    'url' => 'admin/courses',
-                    'icon' => 'fas fa-book',
-                ],
-            ],
-        ],
-        [
-            'text' => 'Linkages',
-            'icon' => 'fas fa-handshake',
-            'submenu' => [
-                [
-                    'text' => 'Linkage Categories',
-                    'url' => 'admin/linkage_categories',
-                    'icon' => 'fas fa-tags',
-                ],
-                [
-                    'text' => 'Linkages',
-                    'url' => 'admin/linkages',
-                    'icon' => 'fas fa-link',
-                ],
-            ],
+            'can' => 'manage-publishing',
         ],
         [
             'text' => 'CLSU',
@@ -412,90 +386,148 @@ return [
                     'text' => 'News',
                     'url' => 'admin/clsu_news',
                     'icon' => 'fas fa-newspaper',
+                    'can' => 'manage-content',
                 ],
                 [
                     'text' => 'Announcements',
                     'url' => 'admin/announcements',
                     'icon' => 'fas fa-bullhorn',
+                    'can' => 'manage-publishing',
                 ],
             ],
         ],
         [
-            'text' => 'FAQs',
-            'icon' => 'fas fa-question-circle',
+            'text' => 'Linkages',
+            'icon' => 'fas fa-handshake',
+            'can' => 'manage-content',
             'submenu' => [
                 [
-                    'text' => 'Questions',
-                    'url' => 'admin/faqs_questions',
-                    'icon' => 'fas fa-question',
+                    'text' => 'Linkage Categories',
+                    'url' => 'admin/linkage_categories',
+                    'icon' => 'fas fa-tags',
+                    'can' => 'manage-content',
                 ],
                 [
-                    'text' => 'Answers',
-                    'url' => 'admin/faqs_answers',
-                    'icon' => 'fas fa-comment-dots',
+                    'text' => 'Linkages',
+                    'url' => 'admin/linkages',
+                    'icon' => 'fas fa-link',
+                    'can' => 'manage-content',
+                ],
+            ],
+        ],
+        [
+            'text' => 'Academic Setup',
+            'icon' => 'fas fa-graduation-cap',
+            'can' => 'manage-content',
+            'submenu' => [
+                [
+                    'text' => 'Requirement Categories',
+                    'url' => 'admin/program_requirement_categories',
+                    'icon' => 'fas fa-list',
+                    'can' => 'manage-content',
+                ],
+                [
+                    'text' => 'Courses',
+                    'url' => 'admin/courses',
+                    'icon' => 'fas fa-book',
+                    'can' => 'manage-content',
+                ],
+                [
+                    'text' => 'Programs',
+                    'url' => 'admin/programs',
+                    'icon' => 'fas fa-layer-group',
+                    'can' => 'manage-content',
                 ],
             ],
         ],
         [
             'text' => 'Prospective Students',
             'icon' => 'fas fa-user-graduate',
+            'can' => 'manage-content',
             'submenu' => [
                 [
                     'text' => 'Categories',
                     'url' => 'admin/prospective_student_categories',
                     'icon' => 'fas fa-folder-open',
+                    'can' => 'manage-content',
                 ],
                 [
                     'text' => 'Items',
                     'url' => 'admin/prospective_student_items',
                     'icon' => 'fas fa-list-alt',
+                    'can' => 'manage-content',
                 ],
             ],
         ],
         [
             'text' => 'Rules and Regulations',
             'icon' => 'fas fa-gavel',
+            'can' => 'manage-content',
             'submenu' => [
                 [
                     'text' => 'Articles',
                     'url' => 'admin/rule_articles',
                     'icon' => 'fas fa-book',
+                    'can' => 'manage-content',
                 ],
                 [
                     'text' => 'Sections',
                     'url' => 'admin/rule_sections',
                     'icon' => 'fas fa-list-alt',
+                    'can' => 'manage-content',
                 ],
                 [
                     'text' => 'Sub-Sections',
                     'url' => 'admin/rule_sub_sections',
                     'icon' => 'fas fa-list',
+                    'can' => 'manage-content',
                 ],
                 [
                     'text' => 'Clauses',
                     'url' => 'admin/rule_clauses',
                     'icon' => 'fas fa-paragraph',
+                    'can' => 'manage-content',
                 ],
             ],
         ],
         [
             'text' => 'Form Management',
             'icon' => 'fas fa-file-alt',
+            'can' => 'manage-content',
             'submenu' => [
                 [
                     'text' => 'Categories',
                     'url' => 'admin/form_categories',
                     'icon' => 'fas fa-folder',
+                    'can' => 'manage-content',
                 ],
                 [
                     'text' => 'Forms',
                     'url' => 'admin/forms',
                     'icon' => 'fas fa-wpforms',
+                    'can' => 'manage-content',
                 ],
             ],
         ],
-
-
+        [
+            'text' => 'FAQs',
+            'icon' => 'fas fa-question-circle',
+            'can' => 'manage-content',
+            'submenu' => [
+                [
+                    'text' => 'Questions',
+                    'url' => 'admin/faqs_questions',
+                    'icon' => 'fas fa-question',
+                    'can' => 'manage-content',
+                ],
+                [
+                    'text' => 'Answers',
+                    'url' => 'admin/faqs_answers',
+                    'icon' => 'fas fa-comment-dots',
+                    'can' => 'manage-content',
+                ],
+            ],
+        ],
 
 
 

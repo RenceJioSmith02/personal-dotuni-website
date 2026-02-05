@@ -48,4 +48,34 @@ class User extends Authenticatable
             'role_id'
         );
     }
+
+    // public function hasRole($role): bool
+    // {
+    //     return $this->roles->contains('name', $role);
+    // }
+
+    // public function hasAnyRole(array $roles): bool
+    // {
+    //     return in_array($this->role, $roles);
+    // }
+
+
+    public function hasRole($role): bool
+    {
+        return $this->roles()->where('name', $role)->exists();
+    }
+
+    
+    public function hasAnyRole(array $roles): bool
+    {
+        return $this->roles->pluck('name')->intersect($roles)->isNotEmpty();
+    }
+
+
+    public function getRoleNameAttribute()
+    {
+        return $this->roles->pluck('name')->join(', ');
+    }
+
+
 }

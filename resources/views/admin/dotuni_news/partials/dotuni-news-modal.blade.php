@@ -50,10 +50,10 @@
                                 <input type="text" name="seo_description" class="form-control" maxlength="300" required>
                             </div>
 
+                        @if(auth()->user()->hasRole('admin'))
                             <div class="form-group col-md-4">
                                 <label>Status</label>
                                 <select name="status" class="form-control" required>
-                                    <option value="draft">Draft</option>
                                     <option value="submitted">Submitted</option>
                                     <option value="published">Published</option>
                                     <option value="archived">Archived</option>
@@ -68,6 +68,7 @@
                                     <option value="unlisted">Unlisted</option>
                                 </select>
                             </div>
+                        @endif
 
                             <div class="form-group col-md-4">
                                 <label>Published At (Optional)</label>

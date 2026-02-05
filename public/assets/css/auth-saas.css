@@ -1,6 +1,4 @@
-/* ===============================
-   SAAS AUTH LAYOUT
-================================ */
+/* 
 
 .auth-saas {
     display: flex;
@@ -45,7 +43,6 @@
     animation: fadeUp .5s ease;
 }
 
-/* Floating labels */
 .form-floating > label {
     color: #6b7280;
 }
@@ -60,14 +57,12 @@
     border-color: #2563eb;
 }
 
-/* Buttons */
 .btn-primary {
     border-radius: 10px;
     padding: 12px;
     font-weight: 600;
 }
 
-/* Animations */
 @keyframes fadeUp {
     from {
         opacity: 0;
@@ -79,7 +74,6 @@
     }
 }
 
-/* Password toggle */
 .password-toggle {
     position: absolute;
     right: 14px;
@@ -87,4 +81,4 @@
     transform: translateY(-50%);
     cursor: pointer;
     color: #6b7280;
-}
+} */

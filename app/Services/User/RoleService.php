@@ -6,6 +6,8 @@ use Throwable;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
 
 class RoleService
 {
@@ -64,11 +66,19 @@ class RoleService
     }
 
 
+
+
     public function create(array $data): Role
     {
         return DB::transaction(function () use ($data) {
             try {
+
+                if (isset($data['name'])) {
+                    $data['name'] = Str::lower(trim($data['name']));
+                }
+
                 return Role::create($data);
+
             } catch (Throwable $e) {
                 report($e);
                 throw $e;
@@ -80,8 +90,15 @@ class RoleService
     {
         return DB::transaction(function () use ($role, $data) {
             try {
+
+                if (isset($data['name'])) {
+                    $data['name'] = Str::lower(trim($data['name']));
+                }
+
                 $role->update($data);
+
                 return $role;
+
             } catch (Throwable $e) {
                 report($e);
                 throw $e;

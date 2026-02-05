@@ -64,76 +64,153 @@ Auth::routes();
 
 Route::get('/dashboard', [App\Http\Controllers\AdminController::class, 'dashboard'])->name('dashboard');
 
-// Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['auth'])
+    ->group(function () {
 
-Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+        // ============================
+        // ADMIN ONLY
+        // ============================
+        Route::middleware(['role:admin'])->group(function () {
+            Route::resource('users', UserController::class);
+            Route::resource('roles', RoleController::class)->except(['show']);
+        });
 
-    Route::resource('users', UserController::class);
-    Route::resource('roles', RoleController::class)->except(['show']);
+        // ============================
+        // ADMIN + EDITOR + PUBLISHER 
+        // ============================
+        Route::middleware(['role:admin,editor,publisher'])->group(function () {
+            Route::resource('dotuni_news', DotuniNewsController::class);
+            Route::resource('announcements', AnnouncementController::class);
+        });
 
-
-    Route::resource('courses', CourseController::class);
-    Route::resource('programs', ProgramController::class);
-    Route::resource('program_requirement_categories', ProgramRequirementCategoryController::class);
-
-
-    Route::get('programs/{program}/builder', [ProgramBuilderController::class, 'show'])
-        ->name('academic.programs.builder');
-
-    // AJAX endpoints
-    Route::post('programs/{program}/requirements/ajax', [ProgramBuilderController::class, 'storeRequirement'])
-        ->name('programs.requirements.store.ajax');
-    Route::delete('programs/{program}/requirements/{requirement}/ajax', [ProgramBuilderController::class, 'destroyRequirement'])
-        ->name('programs.requirements.destroy.ajax');
-
-    Route::post('programs/{program}/courses/ajax', [ProgramBuilderController::class, 'storeCourse'])
-        ->name('programs.courses.store.ajax');
-    Route::delete('programs/{program}/courses/{programCourse}/ajax', [ProgramBuilderController::class, 'destroyCourse'])
-        ->name('programs.courses.destroy.ajax');
-
-
-
-    // LINKAGE ROUTES
-    Route::resource('linkage_categories', LinkageCategoryController::class);
-    Route::resource('linkages', LinkageController::class);
+        // ============================
+        // ADMIN + PUBLISHER 
+        // ============================
+        Route::middleware(['role:admin,publisher'])->group(function () {
+            Route::patch('dotuni_news/{dotuniNews}/publish', [DotuniNewsController::class, 'publish'])
+                ->name('dotuni_news.publish');
+        });
 
 
-    // CLSU NEWS ROUTES
-    Route::resource('clsu_news', ClsuNewsController::class);
+        // ============================
+        // ADMIN + EDITOR
+        // ============================
+        Route::middleware(['role:admin,editor'])->group(function () {
 
-    // FAQS ROUTES
-    Route::resource('faqs_questions', FaqQuestionController::class);
-    Route::resource('faqs_answers', FaqAnswerController::class);
+            Route::resource('courses', CourseController::class);
+            Route::resource('programs', ProgramController::class);
+            Route::resource('program_requirement_categories', ProgramRequirementCategoryController::class);
 
-    // Information Prospective Students Routes
-    Route::resource('prospective_student_categories', ProspectiveStudentCategoryController::class);
-    Route::resource('prospective_student_items', ProspectiveStudentItemController::class);
+            Route::get('programs/{program}/builder', [ProgramBuilderController::class, 'show'])
+                ->name('academic.programs.builder');
+
+            Route::post('programs/{program}/requirements/ajax', [ProgramBuilderController::class, 'storeRequirement'])
+                ->name('programs.requirements.store.ajax');
+
+            Route::delete('programs/{program}/requirements/{requirement}/ajax', [ProgramBuilderController::class, 'destroyRequirement'])
+                ->name('programs.requirements.destroy.ajax');
+
+            Route::post('programs/{program}/courses/ajax', [ProgramBuilderController::class, 'storeCourse'])
+                ->name('programs.courses.store.ajax');
+
+            Route::delete('programs/{program}/courses/{programCourse}/ajax', [ProgramBuilderController::class, 'destroyCourse'])
+                ->name('programs.courses.destroy.ajax');
+
+            Route::resource('linkage_categories', LinkageCategoryController::class);
+            Route::resource('linkages', LinkageController::class);
+            Route::resource('clsu_news', ClsuNewsController::class);
+            Route::resource('faqs_questions', FaqQuestionController::class);
+            Route::resource('faqs_answers', FaqAnswerController::class);
+            Route::resource('prospective_student_categories', ProspectiveStudentCategoryController::class);
+            Route::resource('prospective_student_items', ProspectiveStudentItemController::class);
+            Route::resource('rule_articles', RuleArticleController::class);
+            Route::resource('rule_sections', RuleSectionController::class);
+            Route::resource('rule_sub_sections', RuleSubSectionController::class);
+            Route::resource('rule_clauses', RuleClauseController::class);
+            Route::resource('form_categories', FormCategoryController::class);
+            Route::resource('forms', FormController::class);
+            Route::resource('e_resources', EResourceController::class);
+            Route::resource('gallery', GalleryController::class);
+            Route::resource('fees', FeeController::class);
+        });
+
+    });
 
 
-    // Rules and Regulations Routes
-    Route::resource('rule_articles', RuleArticleController::class);
-    Route::resource('rule_sections', RuleSectionController::class);
-    Route::resource('rule_sub_sections', RuleSubSectionController::class);
-    Route::resource('rule_clauses', RuleClauseController::class);
+// Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
 
-    // Forms Routes
-    Route::resource('form_categories', FormCategoryController::class);
-    Route::resource('forms', FormController::class);
+//     Route::resource('users', UserController::class);
+//     Route::resource('roles', RoleController::class)->except(['show']);
 
-    // E-Resources Routes
-    Route::resource('e_resources', EResourceController::class);
 
-    // Gallery Routes
-    Route::resource('gallery', GalleryController::class);
+//     Route::resource('courses', CourseController::class);
+//     Route::resource('programs', ProgramController::class);
+//     Route::resource('program_requirement_categories', ProgramRequirementCategoryController::class);
 
-    // DotUni News Routes
-    Route::resource('dotuni_news', DotuniNewsController::class);
 
-    // Announcements Routes
-    Route::resource('announcements', AnnouncementController::class);
+//     Route::get('programs/{program}/builder', [ProgramBuilderController::class, 'show'])
+//         ->name('academic.programs.builder');
 
-    // Fee Routes
-    Route::resource('fees', FeeController::class);
+//     // AJAX endpoints
+//     Route::post('programs/{program}/requirements/ajax', [ProgramBuilderController::class, 'storeRequirement'])
+//         ->name('programs.requirements.store.ajax');
+//     Route::delete('programs/{program}/requirements/{requirement}/ajax', [ProgramBuilderController::class, 'destroyRequirement'])
+//         ->name('programs.requirements.destroy.ajax');
 
-});
+//     Route::post('programs/{program}/courses/ajax', [ProgramBuilderController::class, 'storeCourse'])
+//         ->name('programs.courses.store.ajax');
+//     Route::delete('programs/{program}/courses/{programCourse}/ajax', [ProgramBuilderController::class, 'destroyCourse'])
+//         ->name('programs.courses.destroy.ajax');
 
+
+
+//     // LINKAGE ROUTES
+//     Route::resource('linkage_categories', LinkageCategoryController::class);
+//     Route::resource('linkages', LinkageController::class);
+
+
+//     // CLSU NEWS ROUTES
+//     Route::resource('clsu_news', ClsuNewsController::class);
+
+//     // FAQS ROUTES
+//     Route::resource('faqs_questions', FaqQuestionController::class);
+//     Route::resource('faqs_answers', FaqAnswerController::class);
+
+//     // Information Prospective Students Routes
+//     Route::resource('prospective_student_categories', ProspectiveStudentCategoryController::class);
+//     Route::resource('prospective_student_items', ProspectiveStudentItemController::class);
+
+
+//     // Rules and Regulations Routes
+//     Route::resource('rule_articles', RuleArticleController::class);
+//     Route::resource('rule_sections', RuleSectionController::class);
+//     Route::resource('rule_sub_sections', RuleSubSectionController::class);
+//     Route::resource('rule_clauses', RuleClauseController::class);
+
+//     // Forms Routes
+//     Route::resource('form_categories', FormCategoryController::class);
+//     Route::resource('forms', FormController::class);
+
+//     // E-Resources Routes
+//     Route::resource('e_resources', EResourceController::class);
+
+//     // Gallery Routes
+//     Route::resource('gallery', GalleryController::class);
+
+//     // DotUni News Routes
+//     Route::resource('dotuni_news', DotuniNewsController::class);
+
+//     // Announcements Routes
+//     Route::resource('announcements', AnnouncementController::class);
+
+//     // Fee Routes
+//     Route::resource('fees', FeeController::class);
+
+// });
+
+
+// Route::fallback('/error404', function () {
+//     return view('error_404');
+// });

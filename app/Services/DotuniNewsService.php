@@ -113,8 +113,8 @@ class DotuniNewsService
                     'slug' => $this->makeUniqueSlug($validated['title']),
                     'seo_title' => $validated['seo_title'],
                     'seo_description' => $validated['seo_description'],
-                    'status' => $validated['status'],
-                    'visibility' => $validated['visibility'],
+                    'status' => $validated['status'] ?? 'submitted',
+                    'visibility' => $validated['visibility'] ?? 'public',
                     'article_body' => $validated['article_body'] ?? null,
                     'layout' => $validated['layout'],
                     'author_id' => Auth::id(),
@@ -150,8 +150,8 @@ class DotuniNewsService
                     'headline' => $validated['headline'] ?? null,
                     'seo_title' => $validated['seo_title'],
                     'seo_description' => $validated['seo_description'],
-                    'status' => $validated['status'],
-                    'visibility' => $validated['visibility'],
+                    'status' => $validated['status'] ?? $news->status,
+                    'visibility' => $validated['visibility'] ?? $news->visibility,
                     'layout' => $validated['layout'],
                     'article_body' => $validated['article_body'] ?? null,
                     'published_at' => $this->resolvePublishedAt($validated, $news),
@@ -367,10 +367,15 @@ class DotuniNewsService
 
     private function resolvePublishedAt(array $validated, ?DotuniNews $news = null)
     {
-        if ($validated['status'] !== 'published')
-            return $validated['published_at'] ?? null;
+        $status = $validated['status'] ?? $news?->status ?? 'submitted';
+
+        if ($status !== 'published') {
+            return $validated['published_at'] ?? $news?->published_at;
+        }
+
         return $validated['published_at'] ?? $news?->published_at ?? now();
     }
+
 
     private function makeUniqueSlug(string $title, ?int $ignoreId = null): string
     {
@@ -413,11 +418,32 @@ class DotuniNewsService
             'headline' => 'nullable|string|max:250',
             'seo_title' => 'required|string|max:250',
             'seo_description' => 'required|string|max:300',
-            'status' => 'required|in:draft,submitted,published,archived',
-            'visibility' => 'required|in:public,private,unlisted',
+            'status' => 'nullable|in:submitted,published,archived',
+            'visibility' => 'nullable|in:public,private,unlisted,',
             'layout' => 'required|string|max:50',
             'published_at' => 'nullable|date',
             'article_body' => 'nullable|string',
         ]);
     }
+
+
+    public function publish(DotuniNews $news): DotuniNews
+    {
+        return DB::transaction(function () use ($news) {
+
+            if ($news->status !== 'submitted') {
+                return $news;
+            }
+
+            $news->update([
+                'status' => 'published',
+                'published_at' => $news->published_at ?? now(),
+                'updated_by' => Auth::id(),
+            ]);
+
+            return $news;
+        });
+    }
+
+
 }

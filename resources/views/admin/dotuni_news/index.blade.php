@@ -137,5 +137,53 @@ $(document).on("submit", ".ajax-delete-dotuni-news", function (e) {
         });
     });
 });
+
+
+/* PUBLISH DOTUNI NEWS */
+$(document).on("submit", ".ajax-publish-dotuni-news", function (e) {
+    e.preventDefault();
+
+    const form = $(this);
+    const row = form.closest("tr");
+    const table = $("#dotuniNewsTable").DataTable();
+
+    Swal.fire({
+        title: "Publish this news?",
+        text: "It will become visible to the public.",
+        type: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, publish",
+        confirmButtonColor: "#28a745",
+        reverseButtons: true
+    }).then((result) => {
+        if (!result.value) return;
+
+        $.ajax({
+            url: form.attr("action"),
+            type: "POST",
+            data: form.serialize(),
+            success: function (res) {
+                Swal.fire({
+                    type: "success",
+                    title: "Published",
+                    text: res.message,
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                table.ajax.reload(null, false);
+            },
+            error: function () {
+                Swal.fire({
+                    type: "error",
+                    title: "Error",
+                    text: "Failed to publish news."
+                });
+            }
+        });
+    });
+});
+
+
 </script>
 @endpush
