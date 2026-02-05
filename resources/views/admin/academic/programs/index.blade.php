@@ -129,29 +129,16 @@ $(document).on("submit", ".ajax-delete-program", function (e) {
 
                 table.row(row).remove().draw(false);
             },
-            error: function () {
+            error: function (xhr) {
                 Swal.fire({
                     type: "error",
                     title: "Error",
-                    text: "Failed to delete program."
+                    text: xhr.responseJSON?.message || "Failed to delete program."
                 });
             }
         });
     });
 });
-
-
-// $(document).on("change", "#programImageInput", function (e) {
-//     const file = e.target.files[0];
-
-//     if (!file) return;
-
-//     const reader = new FileReader();
-//     reader.onload = function (e) {
-//         $("#programImagePreview").attr("src", e.target.result);
-//     };
-//     reader.readAsDataURL(file);
-// });
 
 
 </script>

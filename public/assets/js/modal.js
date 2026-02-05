@@ -1,4 +1,16 @@
 $(document).ready(function () {
+
+    $(document).on("click", "#newsNextBtn, #newsBackBtn", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    $(document).on("click", "#announcementNextBtn, #announcementBackBtn", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+
     /* ===============================
        MODAL OPEN (ADD / EDIT)
     =============================== */
@@ -120,6 +132,11 @@ $(document).ready(function () {
         const form = $(this);
         const modal = form.closest(".modal");
 
+        // force textarea sync
+        form.find("textarea").each(function () {
+            $(this).val($(this).val());
+        });
+
         // Use FormData to handle files
         const formData = new FormData(form[0]);
 
@@ -183,45 +200,16 @@ $(document).ready(function () {
     /* ===============================
     MODAL CLOSE WITH ANIMATION
     =============================== */
+
     $(document).on(
         "click",
         "[data-dismiss='modal'], .modal-close",
         function (e) {
             e.preventDefault();
-
-            const modal = $(this).closest(".modal");
-
-            closeAnimatedModal(modal);
+            $(this).closest(".modal").modal("hide");
         },
     );
 
-    /* Bootstrap hide event override */
-    $(".modal").on("hide.bs.modal", function (e) {
-        if (!$(this).hasClass("animated-modal")) return;
-        if ($(this).hasClass("force-close")) return;
-
-        e.preventDefault();
-        closeAnimatedModal($(this));
-    });
-
-    /* Reusable close function */
-    function closeAnimatedModal(modal) {
-        if (modal.hasClass("is-closing")) return;
-
-        modal.addClass("is-closing");
-
-        $(".modal-backdrop").addClass("fade-out");
-
-        setTimeout(() => {
-            modal
-                .removeClass("is-closing")
-                .addClass("force-close")
-                .modal("hide");
-
-            modal.removeClass("force-close");
-            $(".modal-backdrop").removeClass("fade-out");
-        }, 300);
-    }
 
     function resetImagePreviews(form) {
         form.find(".preview-img").each(function () {
@@ -242,16 +230,33 @@ $(document).ready(function () {
 
 
 
+// $(document).on("change", ".media-input", function (e) {
+//     const input = $(this);
+//     const preview = $(input.data("preview"));
+
+//     const file = e.target.files[0];
+//     if (!file) return;
+
+//     const reader = new FileReader();
+//     reader.onload = (e) => preview.attr("src", e.target.result);
+//     reader.readAsDataURL(file);
+// });
+
 $(document).on("change", ".media-input", function (e) {
     const input = $(this);
     const preview = $(input.data("preview"));
+    const row = input.closest(".media-row");
 
     const file = e.target.files[0];
     if (!file) return;
 
+    // preview
     const reader = new FileReader();
     reader.onload = (e) => preview.attr("src", e.target.result);
     reader.readAsDataURL(file);
+
+    // IMPORTANT: mark row as replaced
+    row.attr("data-replaced", "1");
 });
 
 
@@ -285,8 +290,9 @@ $(document).on("change", ".media-input", function (e) {
 
             // Include hidden input for existing media ID if it exists
             const existingIdInput = mediaData?.id
-                ? `<input type="hidden" name="existing_media_ids[]" value="${mediaData.id}">`
+                ? `<input type="hidden" name="media[${index}][id]" value="${mediaData.id}">`
                 : "";
+
 
             const imageCol = `
         <div>
@@ -305,7 +311,9 @@ $(document).on("change", ".media-input", function (e) {
                 name="media[${index}][image]"
                 class="form-control-file media-input layout1-image"
                 data-preview="#mediaPreview_${index}"
+                data-index="${index}"
                 accept="image/*">
+
         </div>
     `;
 
@@ -499,6 +507,16 @@ $(document).on("change", ".media-input", function (e) {
             });
 
             window.newsMediaHelper.refreshBadges();
+
+            // EDIT MODE: do not require existing images
+            $("#newsMediaContainer .media-row").each(function () {
+                const row = $(this);
+                const hasExisting = row.find('input[name^="media"][name$="[id]"]').length;
+
+                if (hasExisting) {
+                    row.find('input[type="file"]').prop("required", false);
+                }
+            });
         }
 
         // Layout 2 preview
@@ -567,26 +585,58 @@ $(document).on("change", ".media-input", function (e) {
         // ----------------------------
 
         if (layoutKey === "layout_1") {
-            $(".layout1-image").prop("required", true);
+            $(".layout1-image").each(function () {
+                const row = $(this).closest(".media-row");
+
+                const hasExisting = row.find('input[name^="media"][name$="[id]"]').length;
+
+                if (hasExisting) {
+                    $(this).prop("required", false);
+                } else {
+                    $(this).prop("required", true);
+                }
+            });
         }
 
         if (layoutKey === "layout_2") {
-            $('input[name="hero_image"]').prop("required", true);
+            const heroInput = $('input[name="hero_image"]');
+            const heroPreview = $("#heroPreview");
+
+            const hasHero =
+                heroPreview.attr("src") &&
+                !heroPreview.attr("src").includes("placeholder");
+
+            heroInput.prop("required", !hasHero);
+            $('textarea[name="hero_caption"]').prop("required", true);
         }
 
         if (layoutKey === "layout_3") {
-            $(
-                'input[name="split_left_image"], input[name="split_right_image"]',
-            ).prop("required", true);
+            const leftInput = $('input[name="split_left_image"]');
+            const rightInput = $('input[name="split_right_image"]');
+
+            const leftPreview = $("#splitLeftPreview");
+            const rightPreview = $("#splitRightPreview");
+
+            const hasLeft =
+                leftPreview.attr("src") &&
+                !leftPreview.attr("src").includes("placeholder");
+
+            const hasRight =
+                rightPreview.attr("src") &&
+                !rightPreview.attr("src").includes("placeholder");
+
+            leftInput.prop("required", !hasLeft);
+            rightInput.prop("required", !hasRight);
         }
+
 
         if (layoutKey === "layout_4") {
             $("#layout4Container input[type=file]").prop("required", true);
         }
 
-        if (layoutKey === "layout_5") {
-            $("#layout5Container input[type=file]").prop("required", true);
-        }
+        // if (layoutKey === "layout_5") {
+        //     $("#layout5Container input[type=file]").prop("required", true);
+        // }
     }
 
 
@@ -810,6 +860,7 @@ $(document).on("change", ".media-input", function (e) {
 
 
     
+    
 
     /* ===============================
     ANNOUNCEMENT MODULE SCRIPTS
@@ -832,7 +883,7 @@ $(document).on("change", ".media-input", function (e) {
             const caption = mediaData?.caption || "";
 
             const existingIdInput = mediaData?.id
-                ? `<input type="hidden" name="existing_media_ids[]" value="${mediaData.id}">`
+                ? `<input type="hidden" name="media[${index}][id]" value="${mediaData.id}">`
                 : "";
 
             const imageCol = `
@@ -852,7 +903,9 @@ $(document).on("change", ".media-input", function (e) {
                 name="media[${index}][image]"
                 class="form-control-file media-input layout1-image"
                 data-preview="#announcementMediaPreview_${index}"
+                data-index="${index}"
                 accept="image/*">
+
         </div>
     `;
 
@@ -907,6 +960,12 @@ $(document).on("change", ".media-input", function (e) {
             $("#announcementMediaContainer").append(html);
 
             $("#announcementMediaContainer .layout1-image:last").prop("required", true);
+
+            // if (!$('input[name^="media"][value]').length) {
+            // $("#announcementMediaContainer .layout1-image:last").prop(
+            //     "required",
+            //     true,
+            // );
 
             this.rowIndex++;
             this.refreshBadges();
@@ -1051,6 +1110,15 @@ FORM AUTO-POPULATE (GENERIC)
             });
 
             window.announcementMediaHelper.refreshBadges();
+
+            // EDIT MODE: do not require existing images
+            $("#announcementMediaContainer .media-row").each(function () {
+                const row = $(this);
+                const hasExisting = row.find('input[name^="media"][name$="[id]"]').length;
+                if (hasExisting) {
+                    row.find('input[type="file"]').prop("required", false);
+                }
+            });
         }
 
         // Layout previews
@@ -1111,6 +1179,45 @@ function applyAnnouncementLayout(layoutKey) {
     $(
         `#announcementModal .announcement-layout-card[data-layout="${layoutKey}"]`,
     ).addClass("active");
+
+
+    $("#announcementStep2 :input").prop("required", false);
+
+    if (layoutKey === "layout_1") {
+        $(".layout1-image").each(function () {
+            const row = $(this).closest(".media-row");
+            const hasExisting = row.find(
+                'input[name^="media"][name$="[id]"]',
+            ).length;
+            $(this).prop("required", !hasExisting);
+        });
+    }
+
+    // new code
+    if (layoutKey === "layout_2") {
+        const heroInput = $('input[name="hero_image"]');
+        const hasHero =
+            $("#announcementHeroPreview").attr("src") &&
+            !$("#announcementHeroPreview").attr("src").includes("placeholder");
+
+        heroInput.prop("required", !hasHero);
+        $('textarea[name="hero_caption"]').prop("required", true);
+    }
+
+    if (layoutKey === "layout_3") {
+        const left = $('input[name="split_left_image"]');
+        const right = $('input[name="split_right_image"]');
+
+        const hasLeft =
+            $("#announcementSplitLeftPreview").attr("src") &&
+            !$("#announcementSplitLeftPreview")
+                .attr("src")
+                .includes("placeholder");
+
+        left.prop("required", !hasLeft);
+        right.prop("required", false);
+    }
+
 }
 
 
@@ -1143,10 +1250,13 @@ function applyAnnouncementLayout(layoutKey) {
         form.find('input[name^="media["]').remove();
 
         window.announcementLayout5Media.forEach((m, index) => {
-            if (m.type === "existing")
-                form.append(
-                    `<input type="hidden" name="existing_media_ids[]" value="${m.id}">`,
-                );
+
+            if (m.type === "existing") {
+                form.append(`
+                    <input type="hidden" name="media[${index}][id]" value="${m.id}">
+                `);
+            }
+
             if (m.type === "new") {
                 const input = $(
                     `<input type="file" name="media[${index}][image]" hidden>`,
@@ -1156,10 +1266,10 @@ function applyAnnouncementLayout(layoutKey) {
             }
 
             form.append(`
-            <input type="hidden" name="media[${index}][caption]" value="${m.caption ?? ""}">
-            <input type="hidden" name="media[${index}][sort_order]" value="${index}">
-            <input type="hidden" name="media[${index}][is_thumbnail]" value="${index === 0 ? 1 : 0}">
-        `);
+                <input type="hidden" name="media[${index}][caption]" value="${m.caption ?? ""}">
+                <input type="hidden" name="media[${index}][sort_order]" value="${index}">
+                <input type="hidden" name="media[${index}][is_thumbnail]" value="${index === 0 ? 1 : 0}">
+            `);
         });
     }
 

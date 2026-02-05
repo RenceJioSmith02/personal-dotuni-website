@@ -58,6 +58,13 @@ class Announcement extends Model
                     ->orderBy('announcement_assets.sort_order');
     }
 
+    public function attachmentRows()
+    {
+        return $this->hasMany(AnnouncementAsset::class)
+            ->orderBy('sort_order');
+    }
+
+
     public function thumbnail()
     {
         return $this->assets()

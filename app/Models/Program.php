@@ -76,6 +76,11 @@ class Program extends Model
         return $this->hasMany(ProgramCourse::class);
     }
 
+    public function programRequirements()
+    {
+        return $this->hasMany(\App\Models\ProgramRequirement::class, 'program_id');
+    }
+
     // Many-to-many shortcut
     public function courses()
     {

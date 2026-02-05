@@ -192,6 +192,10 @@ class AnnouncementService
                 if ($request->hasFile('hero_image')) {
                     $this->replaceCoverAssets($announcement);
                     $this->handleHeroLayout($request, $announcement);
+                } else {
+                    AnnouncementAsset::where('announcement_id', $announcement->id)
+                        ->where('is_cover', true)
+                        ->update(['caption' => $request->hero_caption]);
                 }
                 break;
 
@@ -199,8 +203,13 @@ class AnnouncementService
                 if ($request->hasFile('split_left_image')) {
                     $this->replaceCoverAssets($announcement);
                     $this->handleSplitLayout($request, $announcement);
+                } else {
+                    AnnouncementAsset::where('announcement_id', $announcement->id)
+                        ->where('is_cover', true)
+                        ->update(['caption' => $request->split_right_caption]);
                 }
                 break;
+
 
             case 'layout_4':
                 // article-only layout, no media
@@ -293,26 +302,98 @@ class AnnouncementService
         }
     }
 
+    // private function syncMediaRows(Request $request, Announcement $announcement): void
+    // {
+    //     $existingIds = $request->input('existing_media_ids', []);
+
+    //     if ($existingIds) {
+    //         $announcement->assets()
+    //             ->whereNotIn('announcement_assets.id', $existingIds)
+    //             ->get()
+    //             ->each(fn($a) => $this->deleteAssetPivot($a->pivot));
+    //     }
+
+    //     foreach ($existingIds as $index => $id) {
+    //         $data = $request->input("media.$index", []);
+    //         AnnouncementAsset::where('id', $id)->update([
+    //             'caption' => $data['caption'] ?? null,
+    //             'sort_order' => $data['sort_order'] ?? $index,
+    //             'is_thumbnail' => $index === 0,
+    //         ]);
+    //     }
+    // }
+
+
+
+    
+    // close enough
     private function syncMediaRows(Request $request, Announcement $announcement): void
     {
-        $existingIds = $request->input('existing_media_ids', []);
+        $existingIdsFromInput = $request->input('existing_media_ids', []);
+        $media = $request->input('media', []);
 
-        if ($existingIds) {
-            $announcement->assets()
-                ->whereNotIn('announcement_assets.id', $existingIds)
-                ->get()
-                ->each(fn($a) => $this->deleteAssetPivot($a->pivot));
-        }
+        // Combine IDs from media rows and existing_media_ids input
+        $keptIds = collect($media)
+            ->pluck('id')
+            ->filter() // remove null / undefined
+            ->merge($existingIdsFromInput) // ensure existing attachments are kept
+            ->unique()
+            ->values()
+            ->toArray();
 
-        foreach ($existingIds as $index => $id) {
-            $data = $request->input("media.$index", []);
-            AnnouncementAsset::where('id', $id)->update([
-                'caption' => $data['caption'] ?? null,
-                'sort_order' => $data['sort_order'] ?? $index,
-                'is_thumbnail' => $index === 0,
+        // Delete only attachments that are truly removed
+        $announcement->assets()
+            ->whereNotIn('announcement_assets.id', $keptIds)
+            ->get()
+            ->each(fn($a) => $this->deleteAssetPivot($a->pivot));
+
+        // Determine thumbnail by sort_order (existing media included)
+        $thumbnailId = collect($media)
+            ->filter(fn($row) => !empty($row['id']))
+            ->sortBy('sort_order')
+            ->first()['id'] ?? null;
+
+        // Update existing media from media rows
+        foreach ($media as $row) {
+            if (!isset($row['id']))
+                continue;
+
+            $attachment = AnnouncementAsset::find($row['id']);
+            if (!$attachment)
+                continue;
+
+            $attachment->update([
+                'caption' => $row['caption'] ?? null,
+                'sort_order' => $row['sort_order'] ?? 0,
+                'is_thumbnail' => $row['id'] == $thumbnailId,
             ]);
         }
     }
+
+
+    // private function syncMediaRows(Request $request, Announcement $announcement): void
+    // {
+    //     $existingIds = $request->input('existing_media_ids', []);
+    //     $media = $request->input('media', []);
+
+    //     $announcement->assets()
+    //         ->whereNotIn('announcement_assets.id', $existingIds)
+    //         ->get()
+    //         ->each(fn($a) => $this->deleteAssetPivot($a->pivot));
+
+    //     $thumbnailId = collect($media)
+    //         ->sortBy('sort_order')
+    //         ->first()['id'] ?? null;
+
+    //     foreach ($media as $row) {
+    //         AnnouncementAsset::where('id', $row['id'])->update([
+    //             'caption' => $row['caption'] ?? null,
+    //             'sort_order' => $row['sort_order'],
+    //             'is_thumbnail' => $row['id'] == $thumbnailId,
+    //         ]);
+    //     }
+    // }
+
 
     private function replaceCoverAssets(Announcement $announcement): void
     {

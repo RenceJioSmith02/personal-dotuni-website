@@ -64,8 +64,17 @@ class ProgramController extends Controller
 
     public function destroy(Program $program)
     {
-        $this->service->delete($program);
+        try {
+            $this->service->delete($program);
 
-        return response()->json(['message' => 'Program deleted successfully']);
+            return response()->json([
+                'message' => 'Program deleted successfully'
+            ]);
+        } catch (\DomainException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 422);
+        }
     }
+
 }

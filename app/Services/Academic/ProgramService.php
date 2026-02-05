@@ -113,21 +113,36 @@ class ProgramService
         });
     }
 
+
     public function delete(Program $program): void
     {
-        DB::transaction(function () use ($program) {
-            try {
+        try {
+            DB::transaction(function () use ($program) {
+
+                $courseCount = $program->programCourses()->count();
+                $reqCount = $program->programRequirements()->count();
+
+                if ($courseCount || $reqCount) {
+                    throw new DomainException(
+                        "Cannot delete '{$program->title}'. It is used in {$courseCount} course(s) and {$reqCount} requirement(s)."
+                    );
+                }
+
                 if ($program->asset) {
                     Storage::disk('public')->delete($program->asset->storage_path);
                     $program->asset->delete();
                 }
 
                 $program->delete();
-            } catch (\Throwable $e) {
-                throw $e;
-            }
-        });
+            });
+        } catch (DomainException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to delete program.');
+        }
     }
+
 
     protected function storeImage(UploadedFile $file): int
     {
