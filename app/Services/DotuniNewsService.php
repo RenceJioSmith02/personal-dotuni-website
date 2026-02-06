@@ -255,17 +255,16 @@ class DotuniNewsService
     /* ================================
        MEDIA HANDLING (layout_1 / layout_5)
     ================================= */
-
     private function syncMediaRows(Request $request, DotuniNews $news): void
     {
         $existingIdsFromInput = $request->input('existing_media_ids', []);
         $media = $request->input('media', []);
 
-        // Combine existing IDs from media rows + existing_media_ids
+        // Collect IDs that should remain (pivot row IDs)
         $keptIds = collect($media)
             ->pluck('id')
             ->filter()
-            ->merge($existingIdsFromInput)
+            ->merge($existingIdsFromInput) 
             ->unique()
             ->values()
             ->toArray();
@@ -276,75 +275,33 @@ class DotuniNewsService
             ->get()
             ->each(fn($a) => $this->deleteAttachment($a));
 
-        // Determine thumbnail: first media by sort_order (just like Announcement)
+        // Trust ordered media[] instead of merging fallback IDs
         $thumbnailId = collect($media)
             ->filter(fn($row) => !empty($row['id']))
             ->sortBy('sort_order')
-            ->first()['id'] ?? null;
+            ->pluck('id')
+            ->first();
 
-        // Update existing media
+        // Update existing pivot rows
         foreach ($media as $row) {
-            if (!isset($row['id']))
+
+            if (!isset($row['id'])) {
                 continue;
+            }
 
             $attachment = DotuniNewsAsset::find($row['id']);
-            if (!$attachment)
+            if (!$attachment) {
                 continue;
+            }
 
             $attachment->update([
                 'caption' => $row['caption'] ?? null,
                 'sort_order' => $row['sort_order'] ?? 0,
-                'is_thumbnail' => $row['id'] == $thumbnailId,
+                'is_thumbnail' => $row['id'] === $thumbnailId,
             ]);
         }
     }
 
-
-    // private function syncMediaRows(Request $request, DotuniNews $news): void
-    // {
-    //     $existingIdsFromInput = $request->input('existing_media_ids', []);
-    //     $media = $request->input('media', []);
-
-    //     // Combine existing IDs from both media rows AND existing_media_ids input
-    //     $keptIds = collect($media)
-    //         ->pluck('id')
-    //         ->filter() // removes null / undefined
-    //         ->merge($existingIdsFromInput) // <- important for layout 5
-    //         ->unique()
-    //         ->values()
-    //         ->toArray();
-
-    //     // delete only DB records that are truly removed
-    //     $news->attachments()
-    //         ->whereNotIn('id', $keptIds)
-    //         ->get()
-    //         ->each(fn($a) => $this->deleteAttachment($a));
-
-    //     // determine thumbnail by sort_order (existing media first)
-    //     $thumbnailId = collect($media)
-    //         ->merge(
-    //             collect($existingIdsFromInput)
-    //                 ->map(fn($id) => ['id' => $id, 'sort_order' => 0]) // fallback sort_order for existing only IDs
-    //         )
-    //         ->sortBy('sort_order')
-    //         ->first()['id'] ?? null;
-
-    //     // Update existing media from media rows
-    //     foreach ($media as $row) {
-    //         if (!isset($row['id']))
-    //             continue;
-
-    //         $attachment = DotuniNewsAsset::find($row['id']);
-    //         if (!$attachment)
-    //             continue;
-
-    //         $attachment->update([
-    //             'caption' => $row['caption'] ?? null,
-    //             'sort_order' => $row['sort_order'] ?? 0,
-    //             'is_thumbnail' => $row['id'] === $thumbnailId,
-    //         ]);
-    //     }
-    // }
 
 
     private function handleMediaUploads(Request $request, DotuniNews $news): void

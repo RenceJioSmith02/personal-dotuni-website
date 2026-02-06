@@ -533,14 +533,14 @@
 
         .thumbnail-badge {
             position: absolute;
-            top: 6px;
-            left: 6px;
-            background: #007bff;
-            color: #fff;
-            font-size: 11px;
-            padding: 3px 8px;
-            border-radius: 12px;
-            z-index: 5;
+            top: 8px;
+            left: 8px;
+            background-color: rgba(0, 123, 255, 0.8); /* blue with transparency */
+            color: white;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            z-index: 10;
         }
 
         .sortable-placeholder {
@@ -568,3 +568,4 @@
         .image-card:active {
             cursor: grabbing;
         }
+

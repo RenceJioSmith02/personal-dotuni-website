@@ -12,8 +12,9 @@ $(document).ready(function () {
         const img = firstRow.find(".media-preview");
         img.addClass("thumbnail-active");
 
-        firstRow.css("position", "relative");
-        firstRow.append(`<span class="thumbnail-badge">Thumbnail</span>`);
+        const imgWrapper = firstRow.find(".media-preview").parent(); // wrapper
+        imgWrapper.css("position", "relative"); // ensure relative
+        imgWrapper.append(`<span class="thumbnail-badge">Thumbnail</span>`);
     }
 
     function refreshNewsLayout1Order() {
@@ -45,13 +46,14 @@ $(document).ready(function () {
         container.find(".media-preview").removeClass("thumbnail-active");
 
         const firstRow = container.find(".media-row:first");
-        if (!firstRow.length) return;
+        if (!firstRow.length) return; 
 
         const img = firstRow.find(".media-preview");
         img.addClass("thumbnail-active");
 
-        firstRow.css("position", "relative");
-        firstRow.append(`<span class="thumbnail-badge">Thumbnail</span>`);
+        const imgWrapper = firstRow.find(".media-preview").parent(); // wrapper
+        imgWrapper.css("position", "relative"); // ensure relative
+        imgWrapper.append(`<span class="thumbnail-badge">Thumbnail</span>`);
     }
 
     function refreshAnnouncementLayout1Order() {
@@ -309,17 +311,6 @@ $(document).ready(function () {
 
 
 
-// $(document).on("change", ".media-input", function (e) {
-//     const input = $(this);
-//     const preview = $(input.data("preview"));
-
-//     const file = e.target.files[0];
-//     if (!file) return;
-
-//     const reader = new FileReader();
-//     reader.onload = (e) => preview.attr("src", e.target.result);
-//     reader.readAsDataURL(file);
-// });
 
 $(document).on("change", ".media-input", function (e) {
     const input = $(this);
@@ -760,22 +751,31 @@ $(document).on("change", ".media-input", function (e) {
 
     window.layout5Media = [];
 
+    function normalizeLayout5Thumbnail() {
+        window.layout5Media.forEach((m, i) => {
+            m.is_thumbnail = i === 0 ? 1 : 0;
+        });
+    }
+
     function renderLayout5() {
         const grid = $("#mediaGrid");
         grid.find(".image-card").remove();
 
+        normalizeLayout5Thumbnail(); 
+
         window.layout5Media.forEach((m, i) => {
-            const active = i === 0 ? "thumbnail-active" : "";
-            const badge =
-                i === 0 ? `<span class="thumbnail-badge">Thumbnail</span>` : "";
+            const active = m.is_thumbnail ? "thumbnail-active" : "";
+            const badge = m.is_thumbnail
+                ? `<span class="thumbnail-badge">Thumbnail</span>`
+                : "";
 
             const card = $(`
-            <div class="media-card image-card ${active}" data-key="${i}">
-                ${badge}
-                <span class="remove-btn">&times;</span>
-                <img src="${m.url}">
-            </div>
-        `);
+                <div class="media-card image-card ${active}" data-key="${i}">
+                    ${badge}
+                    <span class="remove-btn">&times;</span>
+                    <img src="${m.url}">
+                </div>
+            `);
 
             $("#addMediaCard").before(card);
         });
@@ -785,23 +785,36 @@ $(document).on("change", ".media-input", function (e) {
         if ($("#mediaGrid").data("ui-sortable")) {
             $("#mediaGrid").sortable("refresh");
         }
-
     }
 
+
+
     function updateLayout5Inputs() {
+
+        if (!window.layout5Media.length) return;
+
         const form = $("#dotuniNewsForm");
 
         // Clear only layout 5 inputs
         form.find('input[name="existing_media_ids[]"]').remove();
         form.find('input[name^="media["]').remove();
 
-        window.layout5Media.forEach((m, index) => {
+        // Update sort_order according to current DOM order
+        $("#mediaGrid .image-card").each(function (index) {
+            const key = $(this).data("key");
+            const m = window.layout5Media[key];
+
+            // Update sort_order in memory
+            m.sort_order = index;
+
+            // Existing media IDs
             if (m.type === "existing") {
-                form.append(`
-                <input type="hidden" name="existing_media_ids[]" value="${m.id}">
-            `);
+                form.append(
+                    `<input type="hidden" name="existing_media_ids[]" value="${m.id}">`,
+                );
             }
 
+            // File input for new
             if (m.type === "new") {
                 const input = $(
                     `<input type="file" name="media[${index}][image]" hidden>`,
@@ -810,10 +823,12 @@ $(document).on("change", ".media-input", function (e) {
                 form.append(input);
             }
 
+            // Hidden inputs for all
             form.append(`
             <input type="hidden" name="media[${index}][caption]" value="${m.caption ?? ""}">
             <input type="hidden" name="media[${index}][sort_order]" value="${index}">
             <input type="hidden" name="media[${index}][is_thumbnail]" value="${index === 0 ? 1 : 0}">
+            ${m.id ? `<input type="hidden" name="media[${index}][id]" value="${m.id}">` : ""}
         `);
         });
     }
@@ -832,12 +847,6 @@ $(document).on("change", ".media-input", function (e) {
         this.value = "";
     });
 
-    $(document).on("click", ".remove-btn", function () {
-        const key = $(this).closest(".image-card").data("key");
-        window.layout5Media.splice(key, 1);
-        renderLayout5();
-    });
-
     $("#mediaGrid").sortable({
         items: ".image-card",
         cancel: "#addMediaCard",
@@ -852,10 +861,26 @@ $(document).on("change", ".media-input", function (e) {
                 reordered.push(window.layout5Media[key]);
             });
 
+            // Update array first
             window.layout5Media = reordered;
+
+            // Then re-render and update inputs
             renderLayout5();
+            updateLayout5Inputs();
         },
     });
+
+    // Remove button
+    $(document).on("click", ".remove-btn", function () {
+        const key = $(this).closest(".image-card").data("key");
+
+        window.layout5Media.splice(key, 1);
+
+        normalizeLayout5Thumbnail(); // 🔥 reassign thumbnail
+        renderLayout5();
+    });
+
+
 
 
     function loadExistingLayout5(media) {
