@@ -1,5 +1,84 @@
 $(document).ready(function () {
 
+    function refreshNewsLayout1Thumbnail() {
+        const container = $("#newsMediaContainer");
+
+        container.find(".thumbnail-badge").remove();
+        container.find(".media-preview").removeClass("thumbnail-active");
+
+        const firstRow = container.find(".media-row:first");
+        if (!firstRow.length) return;
+
+        const img = firstRow.find(".media-preview");
+        img.addClass("thumbnail-active");
+
+        firstRow.css("position", "relative");
+        firstRow.append(`<span class="thumbnail-badge">Thumbnail</span>`);
+    }
+
+    function refreshNewsLayout1Order() {
+        $("#newsMediaContainer .media-row").each(function (i) {
+            const row = $(this);
+
+            row.find(".badge").text(`Row ${i + 1}`);
+
+            let input = row.find('input[name$="[sort_order]"]');
+
+            if (!input.length) {
+                const index = row.data("index");
+                row.append(
+                    `<input type="hidden" name="media[${index}][sort_order]" value="${i}">`,
+                );
+            } else {
+                input.val(i);
+            }
+        });
+
+        refreshNewsLayout1Thumbnail();
+    }
+
+
+    function refreshAnnouncementLayout1Thumbnail() {
+        const container = $("#announcementMediaContainer");
+
+        container.find(".thumbnail-badge").remove();
+        container.find(".media-preview").removeClass("thumbnail-active");
+
+        const firstRow = container.find(".media-row:first");
+        if (!firstRow.length) return;
+
+        const img = firstRow.find(".media-preview");
+        img.addClass("thumbnail-active");
+
+        firstRow.css("position", "relative");
+        firstRow.append(`<span class="thumbnail-badge">Thumbnail</span>`);
+    }
+
+    function refreshAnnouncementLayout1Order() {
+        $("#announcementMediaContainer .media-row").each(function (i) {
+            const row = $(this);
+
+            // update badge
+            row.find(".badge").text(`Row ${i + 1}`);
+
+            // inject / update sort_order
+            let input = row.find('input[name$="[sort_order]"]');
+
+            if (!input.length) {
+                const index = row.data("index");
+                row.append(
+                    `<input type="hidden" name="media[${index}][sort_order]" value="${i}">`,
+                );
+            } else {
+                input.val(i);
+            }
+        });
+
+        refreshAnnouncementLayout1Thumbnail();
+    }
+
+
+
     $(document).on("click", "#newsNextBtn, #newsBackBtn", function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -268,6 +347,11 @@ $(document).on("change", ".media-input", function (e) {
 
 
 
+
+
+
+
+
     /* ===============================
     NEWS MODULE SCRIPTS
     =============================== */
@@ -372,7 +456,11 @@ $(document).on("change", ".media-input", function (e) {
 
             this.rowIndex++;
             this.refreshBadges();
-            $("#newsMediaContainer").sortable("refresh");
+            refreshNewsLayout1Order();
+
+            if ($("#newsMediaContainer").data("ui-sortable")) {
+                $("#newsMediaContainer").sortable("refresh");
+            }
         },
 
 
@@ -382,8 +470,29 @@ $(document).on("change", ".media-input", function (e) {
 
             row.remove();
             this.refreshBadges();
+            refreshNewsLayout1Order();
+
+            if ($("#newsMediaContainer").data("ui-sortable")) {
+                $("#newsMediaContainer").sortable("refresh");
+            }
         },
     };
+
+
+    // ===============================
+    // NEWS LAYOUT 1 SORTABLE
+    // ===============================
+    $("#newsMediaContainer").sortable({
+        items: ".media-row",
+        handle: ".media-actions, .media-preview",
+        tolerance: "pointer",
+        distance: 3,
+
+        update() {
+            refreshNewsLayout1Order();
+        },
+    });
+
 
     // ==========================
     // Event listeners
@@ -539,6 +648,9 @@ $(document).on("change", ".media-input", function (e) {
                 data.split_right_caption,
             );
         }
+
+        refreshNewsLayout1Thumbnail();
+
     }
 
     function setStep(step) {
@@ -653,8 +765,13 @@ $(document).on("change", ".media-input", function (e) {
         grid.find(".image-card").remove();
 
         window.layout5Media.forEach((m, i) => {
+            const active = i === 0 ? "thumbnail-active" : "";
+            const badge =
+                i === 0 ? `<span class="thumbnail-badge">Thumbnail</span>` : "";
+
             const card = $(`
-            <div class="media-card image-card" data-key="${i}">
+            <div class="media-card image-card ${active}" data-key="${i}">
+                ${badge}
                 <span class="remove-btn">&times;</span>
                 <img src="${m.url}">
             </div>
@@ -664,6 +781,11 @@ $(document).on("change", ".media-input", function (e) {
         });
 
         updateLayout5Inputs();
+
+        if ($("#mediaGrid").data("ui-sortable")) {
+            $("#mediaGrid").sortable("refresh");
+        }
+
     }
 
     function updateLayout5Inputs() {
@@ -720,6 +842,7 @@ $(document).on("change", ".media-input", function (e) {
         items: ".image-card",
         cancel: "#addMediaCard",
         tolerance: "pointer",
+        distance: 3,
 
         update() {
             const reordered = [];
@@ -730,9 +853,10 @@ $(document).on("change", ".media-input", function (e) {
             });
 
             window.layout5Media = reordered;
-            renderLayout5(); // re-render to reset keys
+            renderLayout5();
         },
     });
+
 
     function loadExistingLayout5(media) {
         window.layout5Media = media
@@ -745,6 +869,11 @@ $(document).on("change", ".media-input", function (e) {
             }));
 
         renderLayout5();
+
+        if ($("#mediaGrid").data("ui-sortable")) {
+            $("#mediaGrid").sortable("refresh");
+        }
+
     }
 
     // Add selected images
@@ -840,7 +969,16 @@ $(document).on("change", ".media-input", function (e) {
     $("#dotuniNewsModal").on("shown.bs.modal", function () {
         setStep(1);
         applyLayout($("#newsLayout").val() || "layout_1");
+
+        if ($("#newsMediaContainer").data("ui-sortable")) {
+            $("#newsMediaContainer").sortable("refresh");
+        }
+
+        if ($("#mediaGrid").data("ui-sortable")) {
+            $("#mediaGrid").sortable("refresh");
+        }
     });
+
 
     /* ===============================
     NEWS MODULE END SCRIPT
@@ -922,6 +1060,8 @@ $(document).on("change", ".media-input", function (e) {
             <input type="hidden" name="media[${index}][is_thumbnail]" value="${hiddenThumbnail}">
             <input type="hidden" name="media[${index}][is_cover]" value="0">
             ${existingIdInput}
+            <input type="hidden" name="media[${index}][sort_order]" value="${index}">
+
         </div>
     `;
 
@@ -961,37 +1101,42 @@ $(document).on("change", ".media-input", function (e) {
 
             $("#announcementMediaContainer .layout1-image:last").prop("required", true);
 
-            // if (!$('input[name^="media"][value]').length) {
-            // $("#announcementMediaContainer .layout1-image:last").prop(
-            //     "required",
-            //     true,
-            // );
-
             this.rowIndex++;
             this.refreshBadges();
+            refreshAnnouncementLayout1Order();
+
+
             if ($("#announcementMediaContainer").data("ui-sortable")) {
                 $("#announcementMediaContainer").sortable("refresh");
             }
         },
 
-        // addRow: function () {
-        //     $("#announcementMediaContainer").append(
-        //         this.makeRow(this.rowIndex),
-        //     );
-        //     this.rowIndex++;
-        //     this.refreshBadges();
-        //     if ($("#announcementMediaContainer").data("ui-sortable")) {
-        //         $("#announcementMediaContainer").sortable("refresh");
-        //     }
-        // },
-        
 
         // Remove a row
         removeRow: function (row) {
             row.remove();
             this.refreshBadges();
+            refreshAnnouncementLayout1Order();
+
+            if ($("#announcementMediaContainer").data("ui-sortable")) {
+                $("#announcementMediaContainer").sortable("refresh");
+            }
         },
     };
+
+    // ===============================
+    // ANNOUNCEMENT LAYOUT 1 SORTABLE
+    // ===============================
+    $("#announcementMediaContainer").sortable({
+        items: ".media-row",
+        handle: ".media-actions",
+        tolerance: "pointer",
+
+        update() {
+            refreshAnnouncementLayout1Order();
+        },
+    });
+
 
     // ==========================
     // Event listeners
@@ -1077,21 +1222,6 @@ FORM AUTO-POPULATE (GENERIC)
             }
         }
 
-        // IMAGE PREVIEW (EDIT)
-        // form.find(".preview-img").each(function () {
-        //     const img = $(this);
-        //     const jsonKey = img.data("json-key");
-        //     if (data[jsonKey] && data[jsonKey].storage_path) {
-        //         img.attr("src", `/storage/${data[jsonKey].storage_path}`);
-        //     } else {
-        //         img.attr(
-        //             "src",
-        //             img.attr("data-placeholder") ||
-        //                 "https://via.placeholder.com/300x200?text=No+Image",
-        //         );
-        //     }
-        // });
-
         
 
         // Populate media rows if any
@@ -1110,6 +1240,7 @@ FORM AUTO-POPULATE (GENERIC)
             });
 
             window.announcementMediaHelper.refreshBadges();
+            refreshAnnouncementLayout1Order();
 
             // EDIT MODE: do not require existing images
             $("#announcementMediaContainer .media-row").each(function () {
@@ -1227,17 +1358,24 @@ function applyAnnouncementLayout(layoutKey) {
 
     window.announcementLayout5Media = [];
 
+
     function renderAnnouncementLayout5() {
         const grid = $("#announcementMediaGrid");
         grid.find(".image-card").remove();
 
         window.announcementLayout5Media.forEach((m, i) => {
+            const active = i === 0 ? "thumbnail-active" : "";
+            const badge =
+                i === 0 ? `<span class="thumbnail-badge">Thumbnail</span>` : "";
+
             const card = $(`
-            <div class="media-card image-card" data-key="${i}">
+            <div class="media-card image-card ${active}" data-key="${i}">
+                ${badge}
                 <span class="remove-btn">&times;</span>
                 <img src="${m.url}">
             </div>
         `);
+
             $("#announcementAddMediaCard").before(card);
         });
 

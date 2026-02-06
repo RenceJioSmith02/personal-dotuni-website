@@ -110,7 +110,7 @@ return [
     */
 
     'preloader' => [
-        'enabled' => true,
+        'enabled' => false,
         'mode' => 'fullscreen',
         'img' => [
             'path' => 'vendor/adminlte/dist/img/clsudotuni_logo.png',
@@ -257,7 +257,7 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'home',
+    'dashboard_url' => 'dashboard',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
@@ -367,7 +367,7 @@ return [
         [
             'text' => 'E-Resources',
             'url' => 'admin/e_resources',
-            'icon' => 'fas fa-book', 
+            'icon' => 'fas fa-book',
             // 'label' => \App\Models\EResource::count(), 
             'label_color' => 'info',
             'can' => 'manage-content',

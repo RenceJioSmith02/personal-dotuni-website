@@ -520,3 +520,51 @@
                 grid-template-columns: 1fr;
             }
         }
+
+
+
+        /* THUMBNAIL HIGHLIGHT */
+        .media-preview.thumbnail-active,
+        .image-card.thumbnail-active {
+            border: 3px solid #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,.25);
+            position: relative;
+        }
+
+        .thumbnail-badge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            background: #007bff;
+            color: #fff;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            z-index: 5;
+        }
+
+        .sortable-placeholder {
+            background: rgba(0, 0, 0, 0.04);
+            border: 2px dashed #bbb;
+            border-radius: 8px;
+            height: 120px;
+            margin-bottom: 10px;
+        }
+
+
+
+        .media-row {
+            cursor: grab;
+        }
+
+        .media-row:active {
+            cursor: grabbing;
+        }
+
+        .image-card {
+            cursor: grab;
+        }
+
+        .image-card:active {
+            cursor: grabbing;
+        }

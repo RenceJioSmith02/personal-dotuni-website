@@ -302,31 +302,7 @@ class AnnouncementService
         }
     }
 
-    // private function syncMediaRows(Request $request, Announcement $announcement): void
-    // {
-    //     $existingIds = $request->input('existing_media_ids', []);
 
-    //     if ($existingIds) {
-    //         $announcement->assets()
-    //             ->whereNotIn('announcement_assets.id', $existingIds)
-    //             ->get()
-    //             ->each(fn($a) => $this->deleteAssetPivot($a->pivot));
-    //     }
-
-    //     foreach ($existingIds as $index => $id) {
-    //         $data = $request->input("media.$index", []);
-    //         AnnouncementAsset::where('id', $id)->update([
-    //             'caption' => $data['caption'] ?? null,
-    //             'sort_order' => $data['sort_order'] ?? $index,
-    //             'is_thumbnail' => $index === 0,
-    //         ]);
-    //     }
-    // }
-
-
-
-    
-    // close enough
     private function syncMediaRows(Request $request, Announcement $announcement): void
     {
         $existingIdsFromInput = $request->input('existing_media_ids', []);
@@ -370,29 +346,6 @@ class AnnouncementService
         }
     }
 
-
-    // private function syncMediaRows(Request $request, Announcement $announcement): void
-    // {
-    //     $existingIds = $request->input('existing_media_ids', []);
-    //     $media = $request->input('media', []);
-
-    //     $announcement->assets()
-    //         ->whereNotIn('announcement_assets.id', $existingIds)
-    //         ->get()
-    //         ->each(fn($a) => $this->deleteAssetPivot($a->pivot));
-
-    //     $thumbnailId = collect($media)
-    //         ->sortBy('sort_order')
-    //         ->first()['id'] ?? null;
-
-    //     foreach ($media as $row) {
-    //         AnnouncementAsset::where('id', $row['id'])->update([
-    //             'caption' => $row['caption'] ?? null,
-    //             'sort_order' => $row['sort_order'],
-    //             'is_thumbnail' => $row['id'] == $thumbnailId,
-    //         ]);
-    //     }
-    // }
 
 
     private function replaceCoverAssets(Announcement $announcement): void
