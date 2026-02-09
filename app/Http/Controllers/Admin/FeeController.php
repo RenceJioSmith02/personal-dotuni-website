@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Fee;
 use Illuminate\Http\Request;
 use App\Services\FeeService;
+use Illuminate\Validation\Rule;
+
 
 class FeeController extends Controller
 {
@@ -29,11 +31,19 @@ class FeeController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:250',
+            'title' => [
+                'required',
+                'string',
+                'max:250',
+                Rule::unique('fees', 'title')
+                    ->whereNull('deleted_at'),
+            ],
             'caption' => 'nullable|string|max:500',
             'sort_order' => 'nullable|integer',
             'image' => 'nullable|image|max:2048',
         ]);
+
+
 
         $fee = $this->service->create($validated, $request->file('image'));
 
@@ -48,11 +58,19 @@ class FeeController extends Controller
     public function update(Request $request, Fee $fee)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:250',
+            'title' => [
+                'required',
+                'string',
+                'max:250',
+                Rule::unique('fees', 'title')
+                    ->ignore($fee->id)
+                    ->whereNull('deleted_at'),
+            ],
             'caption' => 'nullable|string|max:500',
             'sort_order' => 'nullable|integer',
             'image' => 'nullable|image|max:2048',
         ]);
+
 
         $fee = $this->service->update($fee, $validated, $request->file('image'));
 

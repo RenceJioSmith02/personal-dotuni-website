@@ -33,10 +33,11 @@ class UserController extends Controller
         $validated = $request->validate([
             'email' => ['required', 'email'],
             'password' => 'required|min:6',
-            'name' => 'nullable|string',
-            'roles' => 'array',
+            'name' => 'required|string',
+            'roles' => ['required', 'array', 'min:1'], 
             'is_active' => 'sometimes|boolean',
         ]);
+
 
         $user = $this->service->storeOrRestore($validated, $request->roles ?? []);
 
@@ -62,11 +63,12 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'email' => ['required', 'email'],
-            'name' => 'nullable|string',
-            'roles' => 'array',
+            'name' => 'required|string',
+            'roles' => ['required', 'array', 'min:1'], 
             'is_active' => 'required|boolean',
             'password' => 'nullable|min:6',
         ]);
+
 
         try {
             $user = $this->service->updateOrRestore($user, $validated, $request->roles ?? []);

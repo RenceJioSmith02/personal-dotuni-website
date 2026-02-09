@@ -37,13 +37,13 @@ class ClsuNewsService
         $filtered = $query->count();
 
         // Ordering
-        $columns = ['thumbnail', 'title', 'description', 'url', 'sort_order', 'status'];
+        $columns = ['title', 'description', 'url', 'sort_order', 'status'];
         $orderColumnIndex = $request->input('order.0.column', 1);
         $orderColumn = $columns[$orderColumnIndex] ?? 'sort_order';
         $orderDir = $request->input('order.0.dir', 'asc');
 
         // Only order by DB columns
-        if (!in_array($orderColumn, ['thumbnail', 'status', 'url'])) {
+        if (!in_array($orderColumn, ['status', 'url'])) {
             $query->orderBy($orderColumn, $orderDir);
         }
 
@@ -60,9 +60,6 @@ class ClsuNewsService
             'recordsFiltered' => $filtered,
             'data' => $data->map(function ($item) {
                 return [
-                    'thumbnail' => $item->thumbnail
-                        ? '<img src="' . asset('storage/' . $item->thumbnail->storage_path) . '" class="img-thumbnail" style="max-width:50px;" alt="' . $item->title . '">'
-                        : '<span class="text-muted">No Image</span>',
                     'title' => $item->title,
                     'description' => \Str::limit($item->description, 80),
                     'url' => $item->url ? '<a href="' . $item->url . '" target="_blank">View</a>' : '<span class="text-muted">—</span>',
@@ -143,11 +140,21 @@ class ClsuNewsService
 
     protected function storeImage(UploadedFile $file): int
     {
-        $path = $file->store('news', 'public');
+
+        $extension = $file->getClientOriginalExtension();
+
+        $filename = sprintf(
+            'clsu_news-%s-%s.%s',
+            now()->format('Y-m-d'),
+            substr(bin2hex(random_bytes(4)), 0, 8),
+            $extension
+        );
+
+        $path = $file->storeAs('clsu-news', $filename, 'public');
 
         return Asset::create([
             'kind' => 'image',
-            'file_name' => $file->getClientOriginalName(),
+            'file_name' => $filename,
             'storage_path' => $path,
             'mime_type' => $file->getMimeType(),
             'file_size_kb' => round($file->getSize() / 1024),

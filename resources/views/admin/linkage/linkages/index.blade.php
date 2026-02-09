@@ -30,7 +30,6 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Image</th>
                     <th>Title</th>
                     <th>Category</th>
                     <th>URL</th>
@@ -90,11 +89,6 @@ $(function () {
                 render: function (data, type, row, meta) {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
-            },
-            {
-                data: "image",
-                orderable: false,
-                searchable: false
             },
             { data: "title" },
             { data: "category" },

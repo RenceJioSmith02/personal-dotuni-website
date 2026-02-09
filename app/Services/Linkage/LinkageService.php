@@ -69,9 +69,6 @@ class LinkageService
             'recordsTotal' => $total,
             'recordsFiltered' => $filtered,
             'data' => $data->map(fn($l) => [
-                'image' => $l->image_url
-                    ? "<img src='{$l->image_url}' style='max-height:50px'>"
-                    : '-',
                 'title' => $l->title,
                 'category' => $l->category->name ?? '-',
                 'url' => $l->url,
@@ -136,11 +133,21 @@ class LinkageService
 
     protected function storeLogo(UploadedFile $file): int
     {
-        $path = $file->store('linkages', 'public');
+
+        $extension = $file->getClientOriginalExtension();
+
+        $filename = sprintf(
+            'linkages-%s-%s.%s',
+            now()->format('Y-m-d'),
+            substr(bin2hex(random_bytes(4)), 0, 8),
+            $extension
+        );
+
+        $path = $file->storeAs('linkages', $filename, 'public');
 
         return Asset::create([
             'kind' => 'image',
-            'file_name' => $file->getClientOriginalName(),
+            'file_name' => $filename,
             'storage_path' => $path,
             'mime_type' => $file->getMimeType(),
             'file_size_kb' => round($file->getSize() / 1024),

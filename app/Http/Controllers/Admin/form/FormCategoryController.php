@@ -27,9 +27,14 @@ class FormCategoryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string'],
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('form_categories', 'name')->whereNull('deleted_at'),
+            ],
             'sort_order' => 'nullable|integer',
         ]);
+
 
         try {
             $category = $this->service->create($validated);
@@ -53,12 +58,14 @@ class FormCategoryController extends Controller
         $validated = $request->validate([
             'name' => [
                 'required',
-                Rule::unique('form_categories')
+                'string',
+                Rule::unique('form_categories', 'name')
                     ->ignore($formCategory->id)
                     ->whereNull('deleted_at'),
             ],
             'sort_order' => 'nullable|integer',
         ]);
+
 
         $this->service->update($formCategory, $validated);
 

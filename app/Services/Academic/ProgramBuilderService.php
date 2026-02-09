@@ -39,8 +39,8 @@ class ProgramBuilderService
                     $requirement->restore();
                     $requirement->update([
                         'required_units' => $data['required_units'],
-                        'ms' => $data['ms'] ?? null,
-                        'mps' => $data['mps'] ?? null,
+                        'ms' => $data['ms'] ?? 0,
+                        'mps' => $data['mps'] ?? 0,
                         'updated_by' => auth()->id(),
                     ]);
                 } else {
@@ -86,17 +86,6 @@ class ProgramBuilderService
         }
     }
 
-    // public function deleteRequirement(ProgramRequirement $requirement): void
-    // {
-    //     try {
-    //         DB::transaction(function () use ($requirement) {
-    //             $requirement->delete();
-    //         });
-    //     } catch (Exception $e) {
-    //         report($e);
-    //         throw new DomainException('Failed to delete requirement: ' . $e->getMessage());
-    //     }
-    // }
 
     /**
      * Save or restore a program course

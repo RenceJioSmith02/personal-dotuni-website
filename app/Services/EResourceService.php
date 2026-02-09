@@ -2,11 +2,12 @@
 
 namespace App\Services;
 
+use Throwable;
 use App\Models\EResource;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Throwable;
 
 class EResourceService
 {
@@ -82,7 +83,7 @@ class EResourceService
     {
         return DB::transaction(function () use ($request) {
             try {
-                $validated = $this->validate($request);
+                $validated = $this->validate(request: $request);
 
                 return EResource::create([
                     'name' => $validated['name'],
@@ -106,7 +107,7 @@ class EResourceService
     {
         return DB::transaction(function () use ($request, $resource) {
             try {
-                $validated = $this->validate($request);
+                $validated = $this->validate($request, $resource);
 
                 $resource->update([
                     'name' => $validated['name'],
@@ -138,14 +139,32 @@ class EResourceService
     /**
      * Validate request
      */
-    private function validate(Request $request): array
+    private function validate(Request $request, ?EResource $resource = null): array
     {
         return $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('e_resources', 'name')
+                    ->ignore($resource?->id)
+                    ->whereNull('deleted_at'),
+            ],
+
             'description' => 'nullable|string|max:500',
-            'link_url' => 'nullable|string|max:1000',
+
+            'link_url' => [
+                'nullable',
+                'string',
+                'max:1000',
+                Rule::unique('e_resources', 'link_url')
+                    ->ignore($resource?->id)
+                    ->whereNull('deleted_at'),
+            ],
+
             'sort_order' => 'nullable|integer',
             'is_active' => 'required|boolean',
         ]);
     }
+
 }

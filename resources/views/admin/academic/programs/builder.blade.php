@@ -23,6 +23,7 @@
 {{-- Program Details --}}
 <div class="card mb-3">
     <div class="card-header">
+        <img src="{{ $program->image_url }}" class="program_image" style="max-width:200px;" alt="{{ $program->title }}">
         <h3>{{ $program->title }}</h3>
         <br>
         <p>{{ $program->description }}</p>

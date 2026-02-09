@@ -27,7 +27,6 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Thumbnail</th>
                     <th>Title</th>
                     <th>Description</th>
                     <th>URL</th>
@@ -77,7 +76,6 @@ $(function () {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
             },
-            { data: 'thumbnail', orderable: false, searchable: false },
             { data: 'title' },
             { data: 'description' },
             { data: 'url', orderable: false, searchable: false },

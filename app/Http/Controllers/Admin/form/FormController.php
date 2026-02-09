@@ -7,6 +7,8 @@ use App\Models\Form;
 use App\Models\FormCategory;
 use App\Services\Form\FormService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
 
 class FormController extends Controller
 {
@@ -32,12 +34,18 @@ class FormController extends Controller
     {
         $validated = $request->validate([
             'form_category_id' => 'required|exists:form_categories,id',
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('forms', 'name')->whereNull('deleted_at'),
+            ],
             'description' => 'nullable|string|max:500',
             'sort_order' => 'nullable|integer',
             'is_active' => 'required|boolean',
             'file' => 'required|file|max:10240',
         ]);
+
 
         $this->service->create($validated, $request->file('file'));
 
@@ -53,12 +61,20 @@ class FormController extends Controller
     {
         $validated = $request->validate([
             'form_category_id' => 'required|exists:form_categories,id',
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('forms', 'name')
+                    ->ignore($form->id)
+                    ->whereNull('deleted_at'),
+            ],
             'description' => 'nullable|string|max:500',
             'sort_order' => 'nullable|integer',
             'is_active' => 'required|boolean',
             'file' => 'nullable|file|max:10240',
         ]);
+
 
         $this->service->update($form, $validated, $request->file('file'));
 

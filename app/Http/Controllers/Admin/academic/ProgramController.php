@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Program;
 use App\Services\Academic\ProgramService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
 
 class ProgramController extends Controller
 {
@@ -28,13 +30,20 @@ class ProgramController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:250',
+            'title' => [
+                'required',
+                'string',
+                'max:250',
+                Rule::unique('programs', 'title')
+                    ->whereNull('deleted_at'),
+            ],
             'description' => 'required|string',
             'type' => 'required|string|max:50',
             'total_units' => 'required|numeric',
             'is_active' => 'required|boolean',
             'image' => 'nullable|image|max:2048',
         ]);
+
 
         $this->service->create($validated, $request->file('image'));
 
@@ -49,7 +58,14 @@ class ProgramController extends Controller
     public function update(Request $request, Program $program)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:250',
+            'title' => [
+                'required',
+                'string',
+                'max:250',
+                Rule::unique('programs', 'title')
+                    ->ignore($program->id)
+                    ->whereNull('deleted_at'),
+            ],
             'description' => 'required|string',
             'type' => 'required|string|max:50',
             'total_units' => 'required|numeric',

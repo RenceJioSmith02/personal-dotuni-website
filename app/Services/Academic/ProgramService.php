@@ -62,9 +62,6 @@ class ProgramService
             'recordsTotal' => $total,
             'recordsFiltered' => $filtered,
             'data' => $data->map(fn($p) => [
-                'image' => $p->image_url
-                    ? '<img src="' . $p->image_url . '" class="img-thumbnail" style="max-width:50px;" alt="' . $p->title . '">'
-                    : '<span class="text-muted">No Image</span>',
                 'title' => $p->title,
                 'description' => $p->description,
                 'type' => $p->type,
@@ -146,11 +143,20 @@ class ProgramService
 
     protected function storeImage(UploadedFile $file): int
     {
-        $path = $file->store('programs', 'public');
+        $extension = $file->getClientOriginalExtension();
+
+        $filename = sprintf(
+            'programs-%s-%s.%s',
+            now()->format('Y-m-d'),
+            substr(bin2hex(random_bytes(4)), 0, 8),
+            $extension
+        );
+
+        $path = $file->storeAs('programs', $filename, 'public');
 
         return Asset::create([
             'kind' => 'image',
-            'file_name' => $file->getClientOriginalName(),
+            'file_name' => $filename,
             'storage_path' => $path,
             'mime_type' => $file->getMimeType(),
             'file_size_kb' => round($file->getSize() / 1024),

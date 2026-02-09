@@ -37,6 +37,7 @@
                     <th>Description</th>
                     <th>Units</th>
                     <th>Prerequisite</th>
+                    <th>Created At</th>
                     <th>Status</th>
                     <th width="150">Actions</th>
                 </tr>
@@ -87,6 +88,7 @@
                 { data: "description" },
                 { data: "units" },
                 { data: "prerequisite" },
+                { data: "created_at" },
                 {
                     data: "status",
                     render: (data) =>

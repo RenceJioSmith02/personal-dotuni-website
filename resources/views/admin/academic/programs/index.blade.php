@@ -27,7 +27,6 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Image</th>
                     <th>Title</th>
                     <th>Description</th>
                     <th>Type</th>
@@ -61,7 +60,7 @@ $(function () {
         pageLength: 10,
         lengthMenu: [10, 20, 50, 100],
         columnDefs: [
-            { orderable: false, targets: [0, 1, 7] } 
+            { orderable: false, targets: [0, 6] }
         ],
         ajax: {
             url: "{{ route('admin.programs.index') }}",
@@ -80,7 +79,6 @@ $(function () {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
             },
-            { data: 'image', searchable: false, orderable: false },
             { data: 'title' },
             { data: 'description' },
             { data: 'type' },

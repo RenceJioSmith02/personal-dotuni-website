@@ -43,7 +43,7 @@ class AnnouncementService
         $filtered = $query->count();
 
         // ORDERING
-        $columns = ['title', 'seo_description', 'status', 'visibility', 'publish_start'];
+        $columns = ['title', 'seo_description', 'layout', 'status', 'visibility', 'publish_start'];
         $orderColumn = $columns[$request->input('order.0.column', 0)] ?? 'publish_start';
         $orderDir = $request->input('order.0.dir', 'desc');
 
@@ -60,7 +60,6 @@ class AnnouncementService
             'recordsTotal' => $total,
             'recordsFiltered' => $filtered,
             'data' => $data->map(function ($item) {
-                $thumbnail = $item->assets->firstWhere('pivot.is_thumbnail', true);
 
                 $statusClass = match ($item->status) {
                     'published' => 'badge-success',
@@ -76,11 +75,9 @@ class AnnouncementService
                 };
 
                 return [
-                    'thumbnail' => $thumbnail && $thumbnail->kind === 'image'
-                        ? '<img src="' . asset('storage/' . $thumbnail->storage_path) . '" class="img-thumbnail" style="max-width:50px;" alt="' . ($thumbnail->alt_text ?? $item->title) . '">'
-                        : '<span class="text-muted">No Image</span>',
                     'title' => $item->title,
                     'seo_description' => Str::limit($item->seo_description, 80),
+                    'layout' => ucfirst(str_replace('_', ' ', $item->layout)),
                     'status' => '<span class="badge ' . $statusClass . '">' . ucfirst($item->status) . '</span>',
                     'visibility' => '<span class="badge ' . $visClass . '">' . ucfirst($item->visibility) . '</span>',
                     'publish_window' => $item->publish_start
@@ -407,11 +404,20 @@ class AnnouncementService
 
     private function storeFileAsAsset($file): Asset
     {
-        $path = $file->store('announcements', 'public');
+        $extension = $file->getClientOriginalExtension();
+
+        $filename = sprintf(
+            'announcements-%s-%s.%s',
+            now()->format('Y-m-d'),
+            substr(bin2hex(random_bytes(4)), 0, 8),
+            $extension
+        );
+
+        $path = $file->storeAs('announcements', $filename, 'public');
 
         return Asset::create([
             'kind' => str_starts_with($file->getMimeType(), 'image') ? 'image' : 'document',
-            'file_name' => $file->getClientOriginalName(),
+            'file_name' => $filename,
             'storage_path' => $path,
             'mime_type' => $file->getMimeType(),
             'file_size_kb' => round($file->getSize() / 1024),

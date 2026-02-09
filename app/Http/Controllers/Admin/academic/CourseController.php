@@ -29,13 +29,22 @@ class CourseController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => ['required','string',Rule::unique('courses')->whereNull('deleted_at')],
-            'code' => ['required','string',Rule::unique('courses')->whereNull('deleted_at')],
+            'title' => [
+                'required',
+                'string',
+                Rule::unique('courses', 'title')->whereNull('deleted_at'),
+            ],
+            'code' => [
+                'required',
+                'string',
+                Rule::unique('courses', 'code')->whereNull('deleted_at'),
+            ],
             'description' => 'required|string',
             'units' => 'required|integer|min:0',
             'prerequisite' => 'nullable|string',
             'is_active' => 'required|boolean',
         ]);
+
 
         $course = $this->service->create($validated);
 
@@ -53,8 +62,20 @@ class CourseController extends Controller
     public function update(Request $request, Course $course)
     {
         $validated = $request->validate([
-            'title' => ['required','string',Rule::unique('courses')->ignore($course)->whereNull('deleted_at')],
-            'code' => ['required','string',Rule::unique('courses')->ignore($course)->whereNull('deleted_at')],
+            'title' => [
+                'required',
+                'string',
+                Rule::unique('courses', 'title')
+                    ->ignore($course->id)
+                    ->whereNull('deleted_at'),
+            ],
+            'code' => [
+                'required',
+                'string',
+                Rule::unique('courses', 'code')
+                    ->ignore($course->id)
+                    ->whereNull('deleted_at'),
+            ],
             'description' => 'required|string',
             'units' => 'required|integer|min:0',
             'prerequisite' => 'nullable|string',

@@ -27,7 +27,6 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Asset</th>
                     <th>Title</th>
                     <th>Caption</th>
                     <th>Order</th>
@@ -69,7 +68,6 @@ $(function () {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
             },
-            { data: 'asset', orderable: false, searchable: false },
             { data: 'title' },
             { data: 'caption', orderable: false },
             { data: 'sort_order' },

@@ -41,7 +41,6 @@ class FeeService
            ORDERING
         =============================== */
         $columns = [
-            'asset',
             'title',
             'caption',
             'sort_order',
@@ -79,11 +78,6 @@ class FeeService
             'data' => $data->map(function ($item) {
 
                 return [
-                    'asset' => view(
-                        'admin.fees.partials.asset',
-                        compact('item')
-                    )->render(),
-
                     'title' => e($item->title),
 
                     'caption' => Str::limit($item->caption, 80),
@@ -147,11 +141,20 @@ class FeeService
 
     protected function storeImage(UploadedFile $file): int
     {
-        $path = $file->store('fees', 'public');
+        $extension = $file->getClientOriginalExtension();
+
+        $filename = sprintf(
+            'fee-%s-%s.%s',
+            now()->format('Y-m-d'),
+            substr(bin2hex(random_bytes(4)), 0, 8),
+            $extension
+        );
+
+        $path = $file->storeAs('fees', $filename, 'public');
 
         return Asset::create([
             'kind' => 'image',
-            'file_name' => $file->getClientOriginalName(),
+            'file_name' => $filename,
             'storage_path' => $path,
             'mime_type' => $file->getMimeType(),
             'file_size_kb' => round($file->getSize() / 1024),

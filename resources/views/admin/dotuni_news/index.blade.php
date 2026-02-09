@@ -27,9 +27,9 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Thumbnail</th>
                     <th>Title</th>
                     <th>SEO Description</th>
+                    <th>Layout</th>
                     <th>Status</th>
                     <th>Visibility</th>
                     <th>Published</th>
@@ -77,9 +77,9 @@ $(function () {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
             },
-            { data: 'thumbnail', name: 'thumbnail', orderable: false, searchable: false },
             { data: 'title', name: 'title' },
             { data: 'seo_description', name: 'seo_description' },
+            { data: 'layout', name: 'layout' },
             { data: 'status', name: 'status' },
             { data: 'visibility', name: 'visibility' },
             { data: 'published_at', name: 'published_at' },

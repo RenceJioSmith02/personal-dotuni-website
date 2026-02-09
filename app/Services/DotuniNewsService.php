@@ -44,7 +44,7 @@ class DotuniNewsService
         $filtered = $query->count();
 
         // Ordering
-        $columns = ['thumbnail', 'title', 'seo_description', 'status', 'visibility', 'published_at', 'actions'];
+        $columns = ['title', 'seo_description', 'layout', 'status', 'visibility', 'published_at', 'actions'];
         $orderColumnIndex = $request->input('order.0.column', 1);
         $orderColumn = $columns[$orderColumnIndex] ?? 'published_at';
         $orderDir = $request->input('order.0.dir', 'desc');
@@ -54,7 +54,7 @@ class DotuniNewsService
 
         $orderDir = $orderDir === 'asc' ? 'asc' : 'desc';
 
-        if (!in_array($orderColumn, ['thumbnail', 'actions'])) {
+        if (!in_array($orderColumn, ['actions'])) {
             $query->orderBy($orderColumn, $orderDir);
         }
 
@@ -65,7 +65,6 @@ class DotuniNewsService
             'recordsTotal' => $total,
             'recordsFiltered' => $filtered,
             'data' => $data->map(function ($item) {
-                $thumbnail = $item->attachments->firstWhere('is_thumbnail', true)?->asset;
 
                 // Status badge
                 $statusClass = match ($item->status) {
@@ -83,11 +82,9 @@ class DotuniNewsService
                 };
 
                 return [
-                    'thumbnail' => $thumbnail
-                        ? '<img src="' . asset('storage/' . $thumbnail->storage_path) . '" class="img-thumbnail" style="max-width:50px;" alt="' . ($thumbnail->alt_text ?? $item->title) . '">'
-                        : '<span class="text-muted">No Image</span>',
                     'title' => $item->title,
                     'seo_description' => \Str::limit($item->seo_description, 80),
+                    'layout' => ucfirst(str_replace('_', ' ', $item->layout)),
                     'status' => '<span class="badge ' . $statusClass . '">' . ucfirst($item->status) . '</span>',
                     'visibility' => '<span class="badge ' . $visClass . '">' . ucfirst($item->visibility) . '</span>',
                     'published_at' => $item->published_at ? $item->published_at->format('Y-m-d H:i') : '<span class="text-muted">—</span>',
@@ -335,11 +332,11 @@ class DotuniNewsService
                 'is_cover' => false,
             ]);
 
-            Gallery::create([
-                'asset_id' => $asset->id,
-                'sort_order' => $media['sort_order'],
-                'updated_by' => Auth::id(),
-            ]);
+            // Gallery::create([
+            //     'asset_id' => $asset->id,
+            //     'sort_order' => $media['sort_order'],
+            //     'updated_by' => Auth::id(),
+            // ]);
         }
     }
 
@@ -431,11 +428,20 @@ class DotuniNewsService
 
     private function storeImageAsAsset($file, string $folder): Asset
     {
-        $path = $file->store($folder, 'public');
+        $extension = $file->getClientOriginalExtension();
+
+        $filename = sprintf(
+            'dotuni_news-%s-%s.%s',
+            now()->format('Y-m-d'),
+            substr(bin2hex(random_bytes(4)), 0, 8),
+            $extension
+        );
+
+        $path = $file->storeAs('dotuni_news', $filename, 'public');
 
         return Asset::create([
             'kind' => 'image',
-            'file_name' => $file->getClientOriginalName(),
+            'file_name' => $filename,
             'storage_path' => $path,
             'mime_type' => $file->getMimeType(),
             'file_size_kb' => round($file->getSize() / 1024),

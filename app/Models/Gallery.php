@@ -13,9 +13,11 @@ class Gallery extends Model
 
     protected $fillable = [
         'asset_id',
+        'thumbnail_path',
         'sort_order',
         'updated_by',
     ];
+
 
     protected $appends = [
         'image_url',

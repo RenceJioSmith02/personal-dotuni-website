@@ -67,11 +67,14 @@ class GalleryService
             'data' => $items->map(function ($item) {
 
                 return [
-                    'image' => $item->asset
-                        ? '<img src="' . asset('storage/' . $item->asset->storage_path) . '"
-                             class="img-thumbnail"
-                             style="max-width:50px;"
-                             alt="' . e($item->asset->alt_text ?? 'Gallery image') . '">'
+                    'image' => $item->thumbnail_path
+                        ? '<a href="' . asset('storage/' . $item->asset->storage_path) . '" target="_blank">
+                                <img src="' . asset('storage/' . $item->thumbnail_path) . '"
+                                        class="img-thumbnail"
+                                        style="max-width:50px; height:auto;"
+                                        loading="lazy"
+                                >
+                            </a>'
                         : '<span class="text-muted">No Image</span>',
 
                     'file_name' => $item->asset->file_name ?? '—',
@@ -82,6 +85,16 @@ class GalleryService
                         'admin.gallery.partials.actions',
                         compact('item')
                     )->render(),
+
+                    // 'actions' => (
+                    //     $item->asset &&
+                    //     str_contains($item->asset->file_name, 'gallery')
+                    // )
+                    //     ? view(
+                    //         'admin.gallery.partials.actions',
+                    //         compact('item')
+                    //     )->render()
+                    //     : '<span class="text-muted">—</span>',
                 ];
             }),
         ];
@@ -101,12 +114,15 @@ class GalleryService
 
                 // Store asset
                 $asset = $this->storeImageAsset($request->file('image'));
+                $thumbnailPath = $this->createThumbnail($request->file('image'));
 
                 return Gallery::create([
                     'asset_id' => $asset->id,
+                    'thumbnail_path' => $thumbnailPath,
                     'sort_order' => $validated['sort_order'] ?? 0,
                     'updated_by' => Auth::id(),
                 ]);
+
             } catch (Throwable $e) {
                 report($e);
                 throw $e;
@@ -127,21 +143,35 @@ class GalleryService
                 ]);
 
                 if ($request->hasFile('image')) {
+
+                    // 1️⃣ Delete old thumbnail
+                    if ($gallery->thumbnail_path) {
+                        Storage::disk('public')->delete($gallery->thumbnail_path);
+                    }
+
+                    // 2️⃣ Replace original asset
                     $this->replaceAsset($gallery, $request->file('image'));
+
+                    // 3️⃣ Create new thumbnail
+                    $gallery->thumbnail_path = $this->createThumbnail(
+                        $request->file('image')
+                    );
                 }
 
                 $gallery->update([
-                    'sort_order' => $validated['sort_order'] ?? 0,
+                    'sort_order' => $validated['sort_order'] ?? $gallery->sort_order,
                     'updated_by' => Auth::id(),
                 ]);
 
                 return $gallery;
+
             } catch (Throwable $e) {
                 report($e);
                 throw $e;
             }
         });
     }
+
 
     /**
      * Delete a gallery item
@@ -168,11 +198,20 @@ class GalleryService
      */
     private function storeImageAsset($file): Asset
     {
-        $path = $file->store('gallery', 'public');
+        $extension = $file->getClientOriginalExtension();
+
+        $filename = sprintf(
+            'gallery-%s-%s.%s',
+            now()->format('Y-m-d'),
+            substr(bin2hex(random_bytes(4)), 0, 8),
+            $extension
+        );
+
+        $path = $file->storeAs('gallery', $filename, 'public');
 
         return Asset::create([
             'kind' => 'image',
-            'file_name' => $file->getClientOriginalName(),
+            'file_name' => $filename,
             'storage_path' => $path,
             'mime_type' => $file->getMimeType(),
             'file_size_kb' => round($file->getSize() / 1024),
@@ -181,6 +220,7 @@ class GalleryService
             'updated_by' => Auth::id(),
         ]);
     }
+
 
     /**
      * Replace asset for update
@@ -193,7 +233,51 @@ class GalleryService
         }
 
         $asset = $this->storeImageAsset($file);
-        $gallery->asset_id = $asset->id;
+
+        $gallery->update([
+            'asset_id' => $asset->id,
+        ]);
+
         return $asset;
     }
+
+
+    private function createThumbnail($file): string
+    {
+        $image = imagecreatefromstring(file_get_contents($file));
+        $width = imagesx($image);
+        $height = imagesy($image);
+
+        $thumbWidth = 150;
+        $thumbHeight = intval(($height / $width) * $thumbWidth);
+
+        $thumbnail = imagecreatetruecolor($thumbWidth, $thumbHeight);
+        imagecopyresampled(
+            $thumbnail,
+            $image,
+            0,
+            0,
+            0,
+            0,
+            $thumbWidth,
+            $thumbHeight,
+            $width,
+            $height
+        );
+
+        $filename = 'thumb-' . uniqid() . '.jpg';
+        $path = storage_path('app/public/gallery/thumbnails/' . $filename);
+
+        if (!file_exists(dirname($path))) {
+            mkdir(dirname($path), 0755, true);
+        }
+
+        imagejpeg($thumbnail, $path, 80);
+
+        imagedestroy($image);
+        imagedestroy($thumbnail);
+
+        return 'gallery/thumbnails/' . $filename;
+    }
+
 }

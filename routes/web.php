@@ -134,6 +134,7 @@ Route::prefix('admin')
             Route::resource('e_resources', EResourceController::class);
             Route::resource('gallery', GalleryController::class);
             Route::resource('fees', FeeController::class);
+            
         });
 
     });

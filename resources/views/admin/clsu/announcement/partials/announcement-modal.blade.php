@@ -36,24 +36,14 @@
                                 <input type="text" name="title" class="form-control" required>
                             </div>
 
-                            <div class="form-group col-md-6">
+                            <div class="form-group col-md-4">
                                 <label>SEO Title</label>
                                 <input type="text" name="seo_title" class="form-control" required>
                             </div>
 
-                            <div class="form-group col-md-6">
+                            <div class="form-group col-md-4">
                                 <label>SEO Description</label>
                                 <input type="text" name="seo_description" class="form-control" required>
-                            </div>
-
-                            <div class="form-group col-md-4">
-                                <label>Status</label>
-                                <select name="status" class="form-control" required>
-                                    <option value="draft">Draft</option>
-                                    <option value="submitted">Submitted</option>
-                                    <option value="published">Published</option>
-                                    <option value="archived">Archived</option>
-                                </select>
                             </div>
 
                             <div class="form-group col-md-4">
@@ -65,9 +55,13 @@
                                 </select>
                             </div>
 
-                            <div class="form-group col-md-4">
-                                <label>Publish Window</label>
+                            <div class="form-group col-md-6">
+                                <label>Publish Start</label>
                                 <input type="datetime-local" name="publish_start" class="form-control mb-2">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label>Publish End</label>
                                 <input type="datetime-local" name="publish_end" class="form-control">
                             </div>
                         </div>
