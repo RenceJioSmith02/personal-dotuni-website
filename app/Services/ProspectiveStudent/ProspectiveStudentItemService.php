@@ -39,7 +39,7 @@ class ProspectiveStudentItemService
         $filtered = $query->count();
 
         /* ORDER */
-        $columns = ['category', 'content', 'sort_order'];
+        $columns = ['category', 'content', 'sort_order', 'status', 'created_at', 'updated_at'];
         $orderCol = $columns[$request->input('order.0.column')] ?? 'sort_order';
         $orderDir = $request->input('order.0.dir', 'asc');
 
@@ -75,6 +75,8 @@ class ProspectiveStudentItemService
                     'status' => $item->is_active
                         ? '<span class="badge badge-success">Active</span>'
                         : '<span class="badge badge-danger">Inactive</span>',
+                    'created_at' => $item->created_at->toDateTimeString(),
+                    'updated_at' => $item->updated_at->toDateTimeString(),
                     'actions' => view(
                         'admin.prospective_student.items.partials.actions',
                         compact('item')

@@ -33,7 +33,7 @@ class RuleArticleService
         $filtered = $query->count();
 
         /* ORDER */
-        $columns = ['number', 'title', 'sort_order'];
+        $columns = ['number', 'title', 'sort_order', 'created_at', 'updated_at'];
         $orderCol = $columns[$request->input('order.0.column')] ?? 'sort_order';
         $orderDir = $request->input('order.0.dir', 'asc');
 
@@ -54,6 +54,8 @@ class RuleArticleService
                     'number' => e($article->number),
                     'title' => e($article->title),
                     'sort_order' => $article->sort_order,
+                    'created_at' => $article->created_at->toDateTimeString(),
+                    'updated_at' => $article->updated_at->toDateTimeString(),
                     'actions' => view(
                         'admin.rules_and_regulations.articles.partials.actions',
                         compact('article')

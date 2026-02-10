@@ -33,7 +33,7 @@
         <table id="rolesTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th width="10">#</th>
                     <th>Name</th>
                     <th width="150">Actions</th>
                 </tr>
@@ -67,6 +67,7 @@ $(function () {
                 data: null,
                 searchable: false,
                 orderable: false,
+                textAlign: 'center',
                 render: function (data, type, row, meta) {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }

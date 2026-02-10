@@ -26,12 +26,14 @@
         <table id="clsuNewsTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th width="10">#</th>
                     <th>Title</th>
                     <th>Description</th>
                     <th>URL</th>
                     <th>Order</th>
                     <th>Status</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
                     <th width="180">Actions</th>
                 </tr>
             </thead>
@@ -72,6 +74,7 @@ $(function () {
                 data: null,
                 searchable: false,
                 orderable: false,
+                textAlign: 'center',
                 render: function (data, type, row, meta) {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
@@ -81,6 +84,16 @@ $(function () {
             { data: 'url', orderable: false, searchable: false },
             { data: 'sort_order' },
             { data: 'status' },
+            {
+                data: "created_at",
+                render: (data) =>
+                    new Date(data).toLocaleString()
+            },
+            {
+                data: "updated_at",
+                render: (data) =>
+                    new Date(data).toLocaleString()
+            },
             { data: 'actions', orderable: false, searchable: false }
         ]
     });

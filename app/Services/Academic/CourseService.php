@@ -49,6 +49,7 @@ class CourseService
             'units',
             'prerequisite',
             'created_at',
+            'updated_at',
             'is_active'
         ];
 
@@ -78,7 +79,8 @@ class CourseService
                 'description' => $c->description,
                 'units' => $c->units,
                 'prerequisite' => $c->prerequisite,
-                'created_at' => $c->created_at->format('Y-m-d'),
+                'created_at' => $c->created_at->toDateTimeString(),
+                'updated_at' => $c->updated_at->toDateTimeString(),
                 'status' => $c->is_active,
                 'actions' => view(
                     'admin.academic.courses.partials.actions',

@@ -33,7 +33,7 @@ class LinkageCategoryService
         /* ======================
          * ORDERING
          * ====================== */
-        $columns = ['name', 'sort_order'];
+        $columns = ['name', 'sort_order', 'created_at', 'updated_at'];
         $orderColumn = $columns[$request->input('order.0.column', 0)] ?? 'sort_order';
         $orderDir = $request->input('order.0.dir', 'asc');
 
@@ -57,6 +57,8 @@ class LinkageCategoryService
             'data' => $data->map(fn($c) => [
                 'name' => $c->name,
                 'sort_order' => $c->sort_order,
+                'created_at' => $c->created_at->toDateTimeString(),
+                'updated_at' => $c->updated_at->toDateTimeString(),
                 'actions' => view(
                     'admin.linkage.categories.partials.actions',
                     compact('c')

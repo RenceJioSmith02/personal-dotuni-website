@@ -28,7 +28,7 @@
         <table id="sectionsTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th width="10">#</th>
                     <th>Article</th>
                     <th>Number</th>
                     <th>Body</th>

@@ -1,10 +1,10 @@
 @extends('layouts.admin')
 
 @section('plugins.Datatables', true)
-@section('title', 'Programs')
+@section('title', 'FAQ Questions')
 
 @section('content_header')
-<h1>Programs</h1>
+<h1>FAQ Questions</h1>
 @stop
 
 @section('content')
@@ -14,27 +14,25 @@
         <button
             class="open-modal btn btn-primary"
             data-action="add"
-            data-modal="#programModal"
-            data-form="#programForm"
-            data-title="Add Program"
-            data-url="{{ route('admin.programs.store') }}">
-            <i class="fas fa-plus"></i> Add Program
+            data-modal="#faqQuestionModal"
+            data-form="#faqQuestionForm"
+            data-title="Add FAQ Question"
+            data-url="{{ route('admin.faqs_questions.store') }}">
+            <i class="fas fa-plus"></i> Add Question
         </button>
     </div>
 
     <div class="card-body">
-        <table id="programsTable" class="table table-bordered table-hover">
+        <table id="faqQuestionsTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th width="10">#</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Type</th>
-                    <th>Total Units</th>
+                    <th>Question</th>
+                    <th>Order</th>
                     <th>Status</th>
                     <th>Created At</th>
                     <th>Updated At</th>
-                    <th width="180">Actions</th>
+                    <th width="160">Actions</th>
                 </tr>
             </thead>
 
@@ -42,35 +40,33 @@
     </div>
 </div>
 
-@include('admin.academic.programs.partials.program-modal')
+@include('admin.faqs.questions.partials.question-modal')
 
 @stop
 
 
-
 @push('js')
 <script>
+
 $(function () {
-    if ($.fn.DataTable.isDataTable('#programsTable')) {
-        $('#programsTable').DataTable().destroy();
+
+    if ($.fn.DataTable.isDataTable('#faqQuestionsTable')) {
+        $('#faqQuestionsTable').DataTable().destroy();
     }
 
-    const table = $('#programsTable').DataTable({
+    const table = $('#faqQuestionsTable').DataTable({
         processing: true,
         serverSide: true,
         responsive: true,
+        autoWidth: false,
         pageLength: 10,
-        lengthMenu: [10, 20, 50, 100],
-        columnDefs: [
-            { orderable: false, targets: [0, 6] }
-        ],
         ajax: {
-            url: "{{ route('admin.programs.index') }}",
+            ulr: "{{ route('admin.faqs_questions.index') }}",
             type: "GET",
-            // dataSrc: function (json) {
-            //     console.log('Programs returned:', json.data.length);
-            //     return json.data;
-            // }
+            dataSrc: function(json) {
+                console.log('Questions returned:', json.data.length);
+                return json.data;
+            }
         },
         columns: [
             {
@@ -82,11 +78,9 @@ $(function () {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
             },
-            { data: 'title' },
-            { data: 'description' },
-            { data: 'type' },
-            { data: 'total_units' },
-            { data: 'status', searchable: false },
+            { data: 'question' },
+            { data: 'sort_order' },
+            { data: 'status', orderable: false, searchable: false },
             {
                 data: "created_at",
                 render: (data) =>
@@ -97,22 +91,22 @@ $(function () {
                 render: (data) =>
                     new Date(data).toLocaleString()
             },
-            { data: 'actions', searchable: false, orderable: false }
+            { data: 'actions', orderable: false, searchable: false },
         ]
     });
+
 });
 
-
-/* DELETE PROGRAM (AJAX) */
-$(document).on("submit", ".ajax-delete-program", function (e) {
+/* DELETE FAQ QUESTION (AJAX) */
+$(document).on("submit", ".ajax-delete-faq-question", function (e) {
     e.preventDefault();
 
     const form = $(this);
     const row = form.closest("tr");
-    const table = $("#programsTable").DataTable();
+    const table = $("#faqQuestionsTable").DataTable();
 
     Swal.fire({
-        title: "Delete this program?",
+        title: "Delete this FAQ question?",
         text: "This action cannot be undone.",
         type: "warning",
         showCancelButton: true,
@@ -138,15 +132,22 @@ $(document).on("submit", ".ajax-delete-program", function (e) {
                     showConfirmButton: false
                 });
 
-                table.row(row).remove().draw(false);
+                table.ajax.reload(null, false);
             },
             error: function (xhr) {
+                let message = "Failed to delete FAQ question.";
+
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message; 
+                }
+
                 Swal.fire({
-                    type: "error",
+                    type: "error", 
                     title: "Error",
-                    text: xhr.responseJSON?.message || "Failed to delete program."
+                    text: message
                 });
             }
+
         });
     });
 });

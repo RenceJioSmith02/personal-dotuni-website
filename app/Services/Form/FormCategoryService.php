@@ -16,7 +16,6 @@ class FormCategoryService
     }
 
 
-
     public function datatable(Request $request)
     {
         $query = FormCategory::query();
@@ -35,7 +34,7 @@ class FormCategoryService
         /* ======================
          * ORDERING
          * ====================== */
-        $columns = ['name', 'sort_order', 'status', 'actions'];
+        $columns = ['name', 'sort_order', 'status', 'created_at', 'updated_at', 'actions'];
         $orderColumnIndex = $request->input('order.0.column', 0);
         $orderColumn = $columns[$orderColumnIndex] ?? 'sort_order';
         $orderDir = $request->input('order.0.dir', 'asc');
@@ -68,6 +67,8 @@ class FormCategoryService
                     'status' => $category->is_active
                         ? '<span class="badge badge-success">Active</span>'
                         : '<span class="badge badge-danger">Inactive</span>',
+                    'created_at' => $category->created_at->toDateTimeString(),
+                    'updated_at' => $category->updated_at->toDateTimeString(),
                     'actions' => view(
                         'admin.form.categories.partials.actions',
                         compact('category')

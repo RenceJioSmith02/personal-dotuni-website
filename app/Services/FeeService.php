@@ -44,6 +44,8 @@ class FeeService
             'title',
             'caption',
             'sort_order',
+            'created_at',
+            'updated_at',
             'actions'
         ];
 
@@ -79,11 +81,10 @@ class FeeService
 
                 return [
                     'title' => e($item->title),
-
                     'caption' => Str::limit($item->caption, 80),
-
                     'sort_order' => $item->sort_order,
-
+                    'created_at' => $item->created_at->toDateTimeString(),
+                    'updated_at' => $item->updated_at->toDateTimeString(),
                     'actions' => view(
                         'admin.fees.partials.actions',
                         compact('item')

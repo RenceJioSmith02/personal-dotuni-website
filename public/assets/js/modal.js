@@ -243,11 +243,12 @@ $(document).ready(function () {
                     type: "success",
                     title: "Success",
                     text: res.message || "Saved successfully",
-                    timer: 1800,
+                    timer: 1000,
                     showConfirmButton: false,
                 });
 
-                setTimeout(() => location.reload(), 1800);
+                setTimeout(() => location.reload(), 200);
+                
             },
             error: function (xhr) {
                 modal.addClass("modal-error");

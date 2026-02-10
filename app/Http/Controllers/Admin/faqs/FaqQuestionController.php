@@ -20,7 +20,9 @@ class FaqQuestionController extends Controller
             return $this->service->datatable($request);
         }
 
-        return view('admin.faqs.questions.index');
+        $questions = FaqQuestion::orderBy('sort_order')->get();
+
+        return view('admin.faqs.questions.index', compact('questions'));
     }
 
     public function store(Request $request)

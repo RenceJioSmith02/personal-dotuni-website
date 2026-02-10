@@ -29,10 +29,12 @@
         <table id="categoriesTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th width="10">#</th>
                     <th>Name</th>
                     <th>Sort Order</th>
                     <th>Status</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
                     <th width="160">Actions</th>
                 </tr>
             </thead>
@@ -74,6 +76,7 @@ $(function () {
                 data: null,
                 searchable: false,
                 orderable: false,
+                textAlign: "center",
                 render: function (data, type, row, meta) {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
@@ -81,6 +84,16 @@ $(function () {
             { data: 'name', name: 'name' },
             { data: 'sort_order', name: 'sort_order', className: 'text-center' },
             { data: 'status', name: 'status', orderable: false, searchable: false },
+            {
+                data: "created_at",
+                render: (data) =>
+                    new Date(data).toLocaleString()
+            },
+            {
+                data: "updated_at",
+                render: (data) =>
+                    new Date(data).toLocaleString()
+            },
             { data: 'actions', orderable: false, searchable: false }
         ]
     });

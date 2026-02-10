@@ -402,13 +402,13 @@ return [
             'can' => 'manage-content',
             'submenu' => [
                 [
-                    'text' => 'Linkage Categories',
+                    'text' => 'Categories',
                     'url' => 'admin/linkage_categories',
                     'icon' => 'fas fa-tags',
                     'can' => 'manage-content',
                 ],
                 [
-                    'text' => 'Linkages',
+                    'text' => 'items',
                     'url' => 'admin/linkages',
                     'icon' => 'fas fa-link',
                     'can' => 'manage-content',

@@ -36,7 +36,7 @@ class ProgramRequirementCategoryService
         /* ======================
          * ORDERING
          * ====================== */
-        $columns = ['name', 'sort_order'];
+        $columns = ['name', 'sort_order', 'status', 'created_at', 'updated_at', 'actions'];
         $orderColumn = $columns[$request->input('order.0.column', 0)] ?? 'sort_order';
         $orderDir = $request->input('order.0.dir', 'asc');
 
@@ -60,6 +60,8 @@ class ProgramRequirementCategoryService
             'data' => $data->map(fn($c) => [
                 'name' => $c->name,
                 'sort_order' => $c->sort_order,
+            'created_at' => $c->created_at->toDateTimeString(),
+            'updated_at' => $c->updated_at->toDateTimeString(),
                 'actions' => view(
                     'admin.academic.program_requirement_categories.partials.actions',
                     compact('c')

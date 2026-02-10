@@ -26,7 +26,7 @@
         <table id="subSectionsTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th width="10">#</th>
                     <th>Article</th>
                     <th>Section</th>
                     <th>Number</th>

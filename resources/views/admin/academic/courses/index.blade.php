@@ -31,13 +31,14 @@
         <table id="coursesTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th width="10">#</th>
                     <th>Code</th>
                     <th>Title</th>
                     <th>Description</th>
                     <th>Units</th>
                     <th>Prerequisite</th>
                     <th>Created At</th>
+                    <th>Updated At</th>    
                     <th>Status</th>
                     <th width="150">Actions</th>
                 </tr>
@@ -88,7 +89,16 @@
                 { data: "description" },
                 { data: "units" },
                 { data: "prerequisite" },
-                { data: "created_at" },
+                {
+                    data: "created_at",
+                    render: (data) =>
+                        new Date(data).toLocaleString()
+                },
+                {
+                    data: "updated_at",
+                    render: (data) =>
+                        new Date(data).toLocaleString()
+                },
                 {
                     data: "status",
                     render: (data) =>

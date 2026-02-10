@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Admin\user;
 
-use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Services\User\UserService;
+use App\Http\Controllers\Controller;
 
 class UserController extends Controller
 {
@@ -31,21 +32,29 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'email' => ['required', 'email'],
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->whereNull('deleted_at'),
+            ],
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('users')->whereNull('deleted_at'),
+            ],
             'password' => 'required|min:6',
-            'name' => 'required|string',
-            'roles' => ['required', 'array', 'min:1'], 
+            'roles' => ['required', 'array', 'min:1'],
             'is_active' => 'sometimes|boolean',
         ]);
 
-
-        $user = $this->service->storeOrRestore($validated, $request->roles ?? []);
+        $user = $this->service->storeOrRestore($validated, $request->roles);
 
         return response()->json([
             'message' => 'User created/restored successfully',
             'user' => $user
         ], 201);
     }
+
 
     public function edit(User $user)
     {
@@ -62,21 +71,33 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'email' => ['required', 'email'],
-            'name' => 'required|string',
-            'roles' => ['required', 'array', 'min:1'], 
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')
+                    ->whereNull('deleted_at')
+                    ->ignore($user->id),
+            ],
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('users')
+                    ->whereNull('deleted_at')
+                    ->ignore($user->id),
+            ],
+            'roles' => ['required', 'array', 'min:1'],
             'is_active' => 'required|boolean',
             'password' => 'nullable|min:6',
         ]);
 
+        $user = $this->service->updateOrRestore($user, $validated, $request->roles);
 
-        try {
-            $user = $this->service->updateOrRestore($user, $validated, $request->roles ?? []);
-            return response()->json(['message' => 'User updated successfully', 'user' => $user]);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
-        }
+        return response()->json([
+            'message' => 'User updated successfully',
+            'user' => $user
+        ]);
     }
+
 
     public function destroy(User $user)
     {

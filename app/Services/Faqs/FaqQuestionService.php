@@ -19,53 +19,61 @@ class FaqQuestionService
 
     public function datatable(Request $request)
     {
-        $query = FaqQuestion::query();
+        $query = FaqQuestion::with('answers');
 
+        // Total records BEFORE filtering
         $total = $query->count();
 
         // Search
         if ($search = $request->input('search.value')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('question', 'like', "%{$search}%");
-            });
+            $query->where('question', 'like', "%{$search}%");
         }
 
+        // Total records AFTER filtering
         $filtered = $query->count();
 
         // Ordering
-        $columns = ['question', 'sort_order', 'status', 'actions'];
-        $orderColumnIndex = $request->input('order.0.column', 0);
+        $columns = ['question', 'sort_order', 'status', 'created_at', 'updated_at'];
+        $orderColumnIndex = (int) $request->input('order.0.column', 0);
         $orderColumn = $columns[$orderColumnIndex] ?? 'sort_order';
-        $orderDir = $request->input('order.0.dir', 'asc');
-
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
-
-        $orderDir = $orderDir === 'asc' ? 'asc' : 'desc';
-
+        $orderDir = $request->input('order.0.dir') === 'desc' ? 'desc' : 'asc';
         if (!in_array($orderColumn, ['actions'])) {
             $query->orderBy($orderColumn, $orderDir);
         }
 
-        $data = $query->offset($start)->limit($length)->get();
+        // Pagination
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
 
-        return [
-            'draw' => intval($request->draw),
+        $items = $query->skip($start)->take($length)->get();
+
+        $data = $items->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'question' => $item->question,
+                'status' => $item->is_active
+                    ? '<span class="badge badge-success">Active</span>'
+                    : '<span class="badge badge-danger">Inactive</span>',
+                'created_at' => $item->created_at->toDateTimeString(),
+                'actions' => view('admin.faqs.questions.partials.actions', compact('item'))->render(),
+                'answers' => $item->answers->map(function ($answer) {
+                    return [
+                        'id' => $answer->id,
+                        'answer' => $answer->answer,
+                        'status' => $answer->is_active,
+                    ];
+                }),
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
             'recordsTotal' => $total,
             'recordsFiltered' => $filtered,
-            'data' => $data->map(function ($item) {
-
-                return [
-                    'question' => $item->question,
-                    'sort_order' => $item->sort_order,
-                    'status' => $item->is_active
-                        ? '<span class="badge badge-success">Active</span>'
-                        : '<span class="badge badge-danger">Inactive</span>',
-                    'actions' => view('admin.faqs.questions.partials.actions', compact('item'))->render(),
-                ];
-            }),
-        ];
+            'data' => $data,
+        ]);
     }
+
 
 
     public function create(array $data): FaqQuestion

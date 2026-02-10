@@ -26,10 +26,12 @@
         <table id="faqAnswersTable" class="table table-bordered table-hover">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th width="10">#</th>
                     <th>Question</th>
                     <th>Answer</th>
                     <th>Status</th>
+                    <th>Created At</th>
+                    <th>Updated At</th>
                     <th width="160">Actions</th>
                 </tr>
             </thead>
@@ -70,6 +72,7 @@ $(function () {
                 data: null,
                 searchable: false,
                 orderable: false,
+                textAlign: "center",
                 render: function (data, type, row, meta) {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
@@ -77,6 +80,16 @@ $(function () {
             { data: 'question' },
             { data: 'answer' },
             { data: 'status', orderable: false, searchable: false },
+            {
+                data: "created_at",
+                render: (data) =>
+                    new Date(data).toLocaleString()
+            },
+            {
+                data: "updated_at",
+                render: (data) =>
+                    new Date(data).toLocaleString()
+            },
             { data: 'actions', orderable: false, searchable: false },
         ]
     });

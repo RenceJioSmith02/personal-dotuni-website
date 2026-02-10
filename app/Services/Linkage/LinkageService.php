@@ -47,7 +47,7 @@ class LinkageService
         /* ======================
          * ORDERING
          * ====================== */
-        $columns = ['id', 'title', 'category_id', 'url', 'is_active'];
+        $columns = ['id', 'title', 'category_id', 'url', 'is_active', 'created_at', 'updated_at'];
         $orderColumn = $columns[$request->input('order.0.column', 0)] ?? 'id';
         $orderDir = $request->input('order.0.dir', 'asc');
 
@@ -73,6 +73,8 @@ class LinkageService
                 'category' => $l->category->name ?? '-',
                 'url' => $l->url,
                 'status' => $l->is_active,
+                'created_at' => $l->created_at->toDateTimeString(),
+                'updated_at' => $l->updated_at->toDateTimeString(),
                 'actions' => view(
                     'admin.linkage.linkages.partials.actions',
                     compact('l')

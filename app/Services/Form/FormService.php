@@ -47,7 +47,7 @@ class FormService
         /* ======================
          * ORDERING
          * ====================== */
-        $columns = ['file', 'name', 'category', 'type', 'status', 'actions'];
+        $columns = ['file', 'name', 'category', 'type', 'status', 'created_at', 'updated_at', 'actions'];
         $orderColumnIndex = $request->input('order.0.column', 1);
         $orderColumn = $columns[$orderColumnIndex] ?? 'name';
         $orderDir = $request->input('order.0.dir', 'asc');
@@ -91,6 +91,8 @@ class FormService
                     'status' => $form->is_active
                         ? '<span class="badge badge-success">Active</span>'
                         : '<span class="badge badge-danger">Inactive</span>',
+                    'created_at' => $form->created_at->toDateTimeString(),
+                    'updated_at' => $form->updated_at->toDateTimeString(),
 
                     'actions' => view(
                         'admin.form.forms.partials.actions',

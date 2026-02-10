@@ -37,7 +37,7 @@ class ClsuNewsService
         $filtered = $query->count();
 
         // Ordering
-        $columns = ['title', 'description', 'url', 'sort_order', 'status'];
+        $columns = ['title', 'description', 'url', 'sort_order', 'status', 'created_at', 'updated_at', 'actions'];
         $orderColumnIndex = $request->input('order.0.column', 1);
         $orderColumn = $columns[$orderColumnIndex] ?? 'sort_order';
         $orderDir = $request->input('order.0.dir', 'asc');
@@ -67,6 +67,8 @@ class ClsuNewsService
                     'status' => $item->is_active
                         ? '<span class="badge badge-success">Active</span>'
                         : '<span class="badge badge-danger">Inactive</span>',
+                    'created_at' => $item->created_at->toDateTimeString(),
+                    'updated_at' => $item->updated_at->toDateTimeString(),
                     'actions' => view('admin.clsu.news.partials.actions', compact('item'))->render()
                 ];
             })

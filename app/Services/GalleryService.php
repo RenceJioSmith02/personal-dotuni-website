@@ -41,7 +41,7 @@ class GalleryService
         /* ======================
          * ORDERING
          * ====================== */
-        $columns = ['image', 'file_name', 'sort_order', 'actions'];
+        $columns = ['image', 'file_name', 'sort_order', 'created_at', 'updated_at', 'actions'];
         $orderIndex = $request->input('order.0.column', 2);
         $orderDir = $request->input('order.0.dir', 'asc');
 
@@ -76,11 +76,10 @@ class GalleryService
                                 >
                             </a>'
                         : '<span class="text-muted">No Image</span>',
-
                     'file_name' => $item->asset->file_name ?? '—',
-
                     'sort_order' => $item->sort_order,
-
+                    'created_at' => $item->created_at->toDateTimeString(),
+                    'updated_at' => $item->updated_at->toDateTimeString(),
                     'actions' => view(
                         'admin.gallery.partials.actions',
                         compact('item')

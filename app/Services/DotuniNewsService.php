@@ -44,7 +44,7 @@ class DotuniNewsService
         $filtered = $query->count();
 
         // Ordering
-        $columns = ['title', 'seo_description', 'layout', 'status', 'visibility', 'published_at', 'actions'];
+        $columns = ['title', 'seo_description', 'layout', 'status', 'visibility', 'published_at', 'updated_at', 'actions'];
         $orderColumnIndex = $request->input('order.0.column', 1);
         $orderColumn = $columns[$orderColumnIndex] ?? 'published_at';
         $orderDir = $request->input('order.0.dir', 'desc');
@@ -87,7 +87,8 @@ class DotuniNewsService
                     'layout' => ucfirst(str_replace('_', ' ', $item->layout)),
                     'status' => '<span class="badge ' . $statusClass . '">' . ucfirst($item->status) . '</span>',
                     'visibility' => '<span class="badge ' . $visClass . '">' . ucfirst($item->visibility) . '</span>',
-                    'published_at' => $item->published_at ? $item->published_at->format('Y-m-d H:i') : '<span class="text-muted">—</span>',
+                    'published_at' => $item->published_at ? $item->published_at->toDateTimeString() : '<span class="text-muted">—</span>',
+                    'updated_at' => $item->updated_at ? $item->updated_at->toDateTimeString() : '<span class="text-muted">—</span>',
                     'actions' => view('admin.dotuni_news.partials.actions', compact('item'))->render()
                 ];
             }),

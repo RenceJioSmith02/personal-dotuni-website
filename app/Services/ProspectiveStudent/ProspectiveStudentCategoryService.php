@@ -29,7 +29,7 @@ class ProspectiveStudentCategoryService
         $filtered = $query->count();
 
         /* ORDER */
-        $columns = ['name', 'sort_order'];
+        $columns = ['name', 'sort_order', 'created_at', 'updated_at'];
         $orderCol = $columns[$request->input('order.0.column')] ?? 'sort_order';
         $orderDir = $request->input('order.0.dir', 'asc');
 
@@ -52,6 +52,8 @@ class ProspectiveStudentCategoryService
                     'status' => $category->is_active
                         ? '<span class="badge badge-success">Active</span>'
                         : '<span class="badge badge-danger">Inactive</span>',
+                    'created_at' => $category->created_at->toDateTimeString(),
+                    'updated_at' => $category->updated_at->toDateTimeString(),
                     'actions' => view(
                         'admin.prospective_student.categories.partials.actions',
                         compact('category')

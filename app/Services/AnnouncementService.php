@@ -20,7 +20,6 @@ class AnnouncementService
     public function list()
     {
         return Announcement::with(['author:id,name', 'assets'])
-            ->orderByRaw("CASE status WHEN 'published' THEN 0 ELSE 1 END")
             ->orderByDesc('publish_start')
             ->orderByDesc('id')
             ->get();
@@ -43,7 +42,7 @@ class AnnouncementService
         $filtered = $query->count();
 
         // ORDERING
-        $columns = ['title', 'seo_description', 'layout', 'status', 'visibility', 'publish_start'];
+        $columns = ['title', 'seo_description', 'layout', 'visibility', 'publish_start', 'created_at', 'updated_at'];
         $orderColumn = $columns[$request->input('order.0.column', 0)] ?? 'publish_start';
         $orderDir = $request->input('order.0.dir', 'desc');
 
@@ -61,13 +60,6 @@ class AnnouncementService
             'recordsFiltered' => $filtered,
             'data' => $data->map(function ($item) {
 
-                $statusClass = match ($item->status) {
-                    'published' => 'badge-success',
-                    'submitted' => 'badge-warning',
-                    'archived' => 'badge-secondary',
-                    default => 'badge-info',
-                };
-
                 $visClass = match ($item->visibility) {
                     'public' => 'badge-success',
                     'unlisted' => 'badge-warning',
@@ -78,12 +70,13 @@ class AnnouncementService
                     'title' => $item->title,
                     'seo_description' => Str::limit($item->seo_description, 80),
                     'layout' => ucfirst(str_replace('_', ' ', $item->layout)),
-                    'status' => '<span class="badge ' . $statusClass . '">' . ucfirst($item->status) . '</span>',
                     'visibility' => '<span class="badge ' . $visClass . '">' . ucfirst($item->visibility) . '</span>',
                     'publish_window' => $item->publish_start
                         ? $item->publish_start->format('Y-m-d') .
                         ($item->publish_end ? '<br><small class="text-muted">to ' . $item->publish_end->format('Y-m-d') . '</small>' : '')
                         : '<span class="text-muted">—</span>',
+                    'created_at' => $item->created_at->toDateTimeString(),
+                    'updated_at' => $item->updated_at->toDateTimeString(),
                     'actions' => view('admin.clsu.announcement.partials.actions', compact('item'))->render(),
                 ];
             }),
@@ -105,7 +98,6 @@ class AnnouncementService
                     'slug' => $this->makeUniqueSlug($validated['title']),
                     'seo_title' => $validated['seo_title'],
                     'seo_description' => $validated['seo_description'],
-                    'status' => $validated['status'],
                     'visibility' => $validated['visibility'],
                     'layout' => $validated['layout'],
                     'article_body' => $validated['article_body'] ?? null,
@@ -142,7 +134,6 @@ class AnnouncementService
                     'title' => $validated['title'],
                     'seo_title' => $validated['seo_title'],
                     'seo_description' => $validated['seo_description'],
-                    'status' => $validated['status'],
                     'visibility' => $validated['visibility'],
                     'layout' => $validated['layout'],
                     'article_body' => $validated['article_body'] ?? null,
@@ -451,7 +442,6 @@ class AnnouncementService
             'title' => 'required|string|max:250',
             'seo_title' => 'required|string|max:250',
             'seo_description' => 'required|string|max:300',
-            'status' => 'required|in:draft,submitted,published,archived',
             'visibility' => 'required|in:public,private,unlisted',
             'layout' => 'required|string|max:50',
             'publish_start' => 'nullable|date',

@@ -40,7 +40,7 @@ class UserService
         /* ===============================
            ORDER
         =============================== */
-        $columns = ['email', 'name', 'roles', 'is_active'];
+        $columns = ['email', 'name', 'roles', 'is_active', 'created_at', 'updated_at'];
         $orderColIndex = $request->input('order.0.column', 0);
         $orderDir = $request->input('order.0.dir', 'asc');
         $orderCol = $columns[$orderColIndex] ?? 'email';
@@ -77,6 +77,8 @@ class UserService
                     'status' => $user->is_active
                         ? '<span class="badge badge-success">Active</span>'
                         : '<span class="badge badge-danger">Inactive</span>',
+                    'created_at' => $user->created_at->toDateTimeString(),
+                    'updated_at' => $user->updated_at->toDateTimeString(),
                     'actions' => view('admin.user_management.users.partials.actions', compact('user'))->render(),
                 ];
             }),

@@ -34,7 +34,7 @@ class FaqAnswerService
         $filtered = $query->count();
 
         // Ordering
-        $columns = ['question', 'answer', 'status', 'actions'];
+        $columns = ['question', 'answer', 'status', 'created_at', 'updated_at', 'actions'];
         $orderColumnIndex = $request->input('order.0.column', 0);
         $orderColumn = $columns[$orderColumnIndex] ?? 'answer';
         $orderDir = $request->input('order.0.dir', 'asc');
@@ -66,6 +66,8 @@ class FaqAnswerService
                     'status' => $item->is_active
                         ? '<span class="badge badge-success">Active</span>'
                         : '<span class="badge badge-danger">Inactive</span>',
+                    'created_at' => $item->created_at->toDateTimeString(),
+                    'updated_at' => $item->updated_at->toDateTimeString(),
                     'actions' => view('admin.faqs.answers.partials.actions', ['item' => $item])->render(),
                 ];
             }),
