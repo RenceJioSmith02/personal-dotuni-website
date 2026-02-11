@@ -139,6 +139,20 @@ $(document).ready(function () {
                 |-------------------------------- */
                 if (typeof populateForm === "function") {
                     populateForm(form, data);
+
+                    if (form.attr("id") === "feeForm") {
+                        const preview = $("#feeAssetPreview");
+                        const placeholder = preview.data("placeholder");
+
+                        if (data.asset && data.asset.storage_path) {
+                            preview.attr(
+                                "src",
+                                `/storage/${data.asset.storage_path}`,
+                            );
+                        } else {
+                            preview.attr("src", placeholder);
+                        }
+                    }
                 }
 
                 /* --------------------------------

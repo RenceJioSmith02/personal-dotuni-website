@@ -28,11 +28,12 @@
                             <div class="mb-2">
                                 <img
                                     id="feeAssetPreview"
-                                    class="img-thumbnail preview-img"
+                                    class="img-thumbnail preview-img universal-preview"
                                     data-input-target="#feeAssetInput"
                                     data-json-key="thumbnail"
                                     data-placeholder="https://via.placeholder.com/300x200?text=No+Asset"
-                                    src="https://via.placeholder.com/300x200?text=No+Asset">
+                                    src="https://via.placeholder.com/300x200?text=No+Asset"
+                                    >
                             </div>
 
                             <input
