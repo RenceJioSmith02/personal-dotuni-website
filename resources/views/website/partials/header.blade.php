@@ -118,22 +118,22 @@
           <div class="offcanvas-body">
             <ul class="navbar-nav m-auto">
               <li class="nav-item">
-                <a class="nav-link active" href="#">Home</a>
+                <a class="nav-link active" href="{{ route('website.pages.home') }}">Home</a>
               </li>
 
               <!-- About -->
               <li class="nav-item">
-                <a class="nav-link" href="#">About Us</a>
+                <a class="nav-link" href="{{ route('website.pages.about') }}">About Us</a>
               </li>
 
               <!-- Course -->
               <li class="nav-item">
-                <a class="nav-link" href="#">Course</a>
+                <a class="nav-link" href="{{ route('website.pages.courses') }}">Course</a>
               </li>
 
               <!-- Gallery -->
               <li class="nav-item">
-                <a class="nav-link" href="#">Gallery</a>
+                <a class="nav-link" href="{{ route('website.pages.gallery') }}">Gallery</a>
               </li>
 
               <!-- News and Announcement -->

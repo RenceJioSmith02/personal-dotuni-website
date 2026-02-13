@@ -20,7 +20,6 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/website/main.css') }}" />
-    <link rel="stylesheet" href="{{ asset('assets/css/website/homepage.css') }}" />
 
     @stack('css')
 </head>

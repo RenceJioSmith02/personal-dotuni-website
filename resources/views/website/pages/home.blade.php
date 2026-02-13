@@ -1,6 +1,10 @@
 @extends('layouts.website')
 
-@section('Homepage', 'Home | CLSU DOT-Uni')
+@section('title', 'Home | CLSU DOT-Uni')
+
+@push('css')
+    <link rel="stylesheet" href="{{ asset('assets/css/website/homepage.css') }}" />
+@endpush
 
 @section('content')
 

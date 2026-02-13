@@ -452,6 +452,26 @@ span .a-link:hover a {
 
 
 
+/* Title */
+.section-title {
+  color: #0f7c2e;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 50px;
+  letter-spacing: 1px;
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 40px;
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 22px;
+  }
+}
+
+
+
 
 
 

@@ -56,13 +56,31 @@ use App\Http\Controllers\Admin\AdminController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-
+// Public Website Routes
 Route::get('/', function () {
     return view('website.pages.home');
-});
+})->name('website.pages.home');
 
+Route::get('/about', function () {
+    return view('website.pages.about');
+})->name('website.pages.about');
+
+Route::get('/gallery', function () {
+    return view('website.pages.gallery');
+})->name('website.pages.gallery');
+
+Route::get('/courses', function () {
+    return view('website.pages.courses');
+})->name('website.pages.courses');
+
+
+
+
+
+// Authentication Routes
 Auth::routes();
 
+// Admin Routes
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
 Route::prefix('admin')
