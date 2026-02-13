@@ -1,0 +1,665 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500,600,700,800");
+
+@import url("https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800,900");
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap");
+
+/*-----------------------------------*/
+/*             DEFAULT               */
+/*-----------------------------------*/
+
+/* 00. COLOR PALETTE */
+:root {
+  --primary: #038303;
+  --secondary: #003a10;
+  --tertiary: #e8d203;
+  --yellow-green: #92d12c;
+  --primary2: #4eab18;
+
+  --gray: #757575;
+  --d-gray: #494949;
+  --dark-gray: #212121;
+  --bg: #f9f9f9;
+
+  --border-gray: #dee2e6;
+
+  --primary-gradient: linear-gradient(
+    to right,
+    rgb(0, 129, 2),
+    rgb(149, 210, 45)
+  );
+  --gray-gradient: linear-gradient(to top, rgba(3, 3, 3, 0.7), transparent);
+  --tall-opacity: rgba(78, 171, 24, 0.7);
+
+  --primary-opacity: rgba(78, 171, 24, 0.9);
+  --secondary-opacity: rgba(0, 58, 16, 0.9);
+  --secondary-hero: rgba(0, 58, 16, 0.7);
+  --gray-opacity: rgba(21, 21, 21, 0.777);
+  --light-gray: rgb(228, 228, 228);
+  --footer-opacity: rgba(33, 33, 33, 0.828);
+
+  --black: #2f2f2f;
+  --white: #ffffff;
+  --p-black: #36363d;
+
+
+  --red: #e2231a;
+  --red-100: #c01e16;
+  --blue-50: #dde5eb;
+  --blue: #008dea;
+  --orange: #f9c150;
+  --white: #ffffff;
+  --white-50: #f1f2f3;
+  --gray: #dad8d8;
+  --gray-100: #979797;
+  --black-20: #525252;
+  --black-25: #3a3a3a;
+  --black-50: #313131;
+  --yellow: #cdfb13;
+  --green: #92d12c;
+  --green-50: #4eab18;
+  --green-100: #038303;
+  --green-150: #003a10;
+  --green-grad: linear-gradient(
+    90deg,
+    rgba(0, 129, 2, 1) 0%,
+    rgba(149, 210, 45, 1) 100%
+  );
+  /* SDG Colors */
+  --sdg-1: #e5243b;
+  --sdg-2: #dda83a;
+  --sdg-3: #4c9f38;
+  --sdg-4: #c5192d;
+  --sdg-5: #ff3a21;
+  --sdg-6: #26bde2;
+  --sdg-7: #fcc30b;
+  --sdg-8: #a21942;
+  --sdg-9: #fd6925;
+  --sdg-10: #dd1367;
+  --sdg-11: #fd9d24;
+  --sdg-12: #bf8b2e;
+  --sdg-13: #3f7e44;
+  --sdg-14: #0a97d9;
+  --sdg-15: #56c02b;
+  --sdg-16: #00689d;
+  --sdg-17: #19486a;
+}
+
+/* 01. GENERAL */
+html,
+body {
+  font-size: 15px;
+  color: var(--black);
+  background-color: var(--bg);
+  font-family: "Roboto Condensed", sans-serif;
+  vertical-align: baseline;
+  line-height: 26px;
+  font-weight: 400;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Roboto", sans-serif;
+}
+h1 {
+  display: inline-block;
+  width: 80%;
+  font-size: 50px;
+  font-weight: 700;
+}
+.btn-primary {
+  background-color: var(--secondary);
+  color: var(--white);
+  border-color: var(--primary);
+  padding: 9px 20px;
+  width: auto;
+  font-family: "Roboto", sans-serif;
+}
+.btn-primary:hover,
+.btn-primary:active {
+  background-color: var(--yellow-green);
+  border: none;
+}
+
+.btn-success {
+  background-color: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+  padding: 9px 20px;
+  width: auto;
+  font-family: "Roboto", sans-serif;
+}
+.btn-success:hover,
+.btn-success:active {
+  background-color: var(--yellow-green);
+  border: none;
+  transform: scaleX(1.03);
+  transition: transform 0.3s ease-in-out;
+}
+
+.card-btn {
+  background-color: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+}
+.card-btn:hover {
+  background-color: var(--yellow-green);
+  border-color: var(--yellow-green);
+}
+a {
+  text-decoration: none !important;
+}
+.card-body2 a {
+  text-decoration: none !important;
+  color: white;
+}
+p {
+  font-size: 16px;
+  line-height: 1.5;
+}
+span {
+  font-size: 14px;
+  line-height: 1;
+}
+.rounded {
+  border: 1.3px solid var(--light-gray);
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.063);
+}
+.rounded-shadow {
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 4px 7px rgba(0, 0, 0, 0.214);
+}
+
+.divider {
+  width: 80px;
+  height: 4px;
+  background: #E8D203; 
+  margin: 0 auto 15px auto;
+  border-radius: 3px;
+}
+
+.shorter-line {
+  border-top: 3px solid var(--tertiary);
+  width: 8%;
+  margin: 0 auto;
+  margin-top: 50px;
+  margin-bottom: 20px;
+  border-radius: 3px;
+}
+
+.add-spacing {
+  padding-bottom: 40px;
+}
+.pop {
+  color: inherit; /* Set the color to inherit from its parent */
+  text-decoration: none;
+}
+
+li::marker {
+  color: var(--tertiary); /* Change bullet color */
+}
+.a-link:hover,
+span .a-link:hover a {
+  color: var(--tertiary);
+}
+
+
+
+
+/* 02. HEADER (navigation bar) */
+
+/* Navbar Header */
+.page-header {
+  background-color: var(--secondary) !important;
+  padding: 2px 15px;
+  font-family: "Roboto", sans-serif;
+}
+.page-header a {
+  font-size: 11px;
+  color: var(--white);
+}
+.navbar-header {
+  padding: 15px;
+}
+.navbar-header-logo-container {
+  background-color: var(--bg);
+  border-radius: 50%;
+  padding: 10px;
+  position: absolute;
+  top: 60px;
+  left: 50px;
+  z-index: 4;
+}
+@media (max-width: 1100px) {
+  .navbar-header-logo-container {
+    z-index: 3;
+  }
+}
+
+.nav-header-left {
+  margin-left: 160px;
+}
+.nav-header-right a {
+  font-weight: bold;
+  color: var(--black);
+  font-family: "Roboto", sans-serif;
+  margin-left: -45px;
+  font-size: 18px;
+}
+.nav-header-college h2 {
+  font-weight: bold;
+  background-image: var(--primary-gradient);
+  -webkit-background-clip: text; /* For Safari */
+  background-clip: text;
+  color: transparent; /* Hide the original text color */
+}
+.nav-header-address h6 {
+  font-size: clamp(10px, 2.6vw, 17px);
+}
+.nav-header-address {
+  background-image: var(--primary-gradient);
+  -webkit-background-clip: text; /* For Safari */
+  background-clip: text;
+  color: transparent;
+}
+
+/* Sticky navigation */
+.navbar {
+  z-index: 3;
+  font-family: "Roboto", sans-serif;
+}
+
+/* Actual Navbar s*/
+.navbar {
+  background: var(--primary-gradient) !important;
+  font-size: 16px;
+  font-weight: 400;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0;
+}
+.navbar .nav-link.active {
+  color: var(--tertiary);
+  width: 100%;
+  font-weight: 450;
+}
+.navbar .nav-link:hover {
+  background-color: var(--yellow-green);
+}
+.navbar .nav-link {
+  color: var(--white);
+}
+.navbar .nav-link.active {
+  color: var(--tertiary);
+}
+.nav-item {
+  padding: 0 7px;
+}
+
+/* Toggler and Offcanvas */
+.navbar-toggler {
+  border: none;
+  background-color: transparent;
+  outline: none;
+  cursor: pointer;
+}
+.custom-toggler {
+  border: none;
+  background-color: transparent;
+  outline: none;
+  cursor: pointer;
+}
+.custom-toggler-icon {
+  color: var(--white);
+}
+.offcanvas {
+  background-color: var(--primary);
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 800;
+}
+.custom-close {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--yellow-green); /* Dark background color */
+  color: white; /* White text color */
+  border: none;
+  outline: none;
+  transition: transform 1s ease-in-out;
+}
+
+/* Dropdown */
+.navbar .dropdown-menu {
+  background-color: var(--primary);
+  border: none;
+}
+.navbar .dropdown-item {
+  color: var(--white);
+}
+.navbar .dropdown-item:hover,
+.navbar .dropdown-item.active {
+  background-color: var(--tertiary);
+}
+
+/* Dropdown submenu */
+.dropdown-menu li {
+  position: relative;
+}
+.dropdown-menu > li:hover > .dropdown-submenu {
+  display: block;
+}
+.dropdown-menu .dropdown-item {
+  padding-right: 30px;
+}
+.drop-down {
+  padding: 100px;
+}
+.dropdown-submenu {
+  width: 100%;
+}
+
+
+
+
+
+/* ============================= */
+/* MODERN SIMPLE OFFCANVAS ONLY */
+/* ============================= */
+
+/* Sidebar Container */
+.offcanvas.show {
+  background: linear-gradient(180deg, #003a10, #038303);
+  padding: 25px 20px;
+  border-left: 3px solid var(--tertiary);
+}
+
+/* Space nav items */
+.offcanvas.show .navbar-nav {
+  gap: 8px;
+}
+
+/* Sidebar Links */
+.offcanvas.show .nav-link {
+  color: var(--white);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+/* Hover Effect */
+.offcanvas.show .nav-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateX(5px);
+}
+
+/* Active Page */
+.offcanvas.show .nav-link.active {
+  background: var(--tertiary);
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+/* Dropdown Menu Inside Sidebar */
+.offcanvas.show .dropdown-menu {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 8px;
+  padding: 6px;
+  margin-top: 6px;
+}
+
+/* Dropdown Items */
+.offcanvas.show .dropdown-item {
+  color: var(--white);
+  border-radius: 6px;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+}
+
+/* Dropdown Hover */
+.offcanvas.show .dropdown-item:hover {
+  background: var(--tertiary);
+  color: var(--secondary);
+  transform: translateX(4px);
+}
+
+/* Close Button */
+.offcanvas.show .custom-close {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--tertiary);
+  color: var(--secondary);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.offcanvas.show .custom-close:hover {
+  transform: rotate(90deg);
+  background: var(--white);
+}
+
+
+
+
+
+
+
+
+/* ============================= */
+/* 10. FOOTER */
+/* ============================= */
+
+.home-footer {
+  position: relative;
+  background: url("footer.png") center/cover no-repeat;
+  color: var(--white);
+  padding-top: 70px;
+}
+
+.footer-overlay {
+
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 58, 16, 1.4),
+    rgba(0, 129, 2, 0.4)
+  );
+  z-index: 1;
+}
+
+.footer-container {
+  position: relative;
+  z-index: 2;
+  max-width: 1300px;
+  margin: auto;
+  display: flex;
+  gap: 60px;
+  padding: 0 5% 60px;
+}
+
+/* COLUMNS */
+.footer-col {
+  flex: 1;
+}
+
+.footer-about h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 5px;
+}
+
+.footer-logo img {
+  height: 60px;
+  margin-right: 10px;
+}
+
+.footer-links {
+  padding: 0;
+  list-style: none;
+}
+
+.footer-links li {
+  margin-bottom: 8px;
+}
+
+.footer-links a {
+  color: var(--white);
+  opacity: .9;
+}
+
+.footer-links a:hover {
+  color: var(--yellow-green);
+}
+
+.footer-map {
+  position: relative;
+  width: 100%;
+  max-width: 260px; /* desktop size like your design */
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+/* RESPONSIVE RATIO (no distortion) */
+.footer-map iframe {
+  width: 100%;
+  height: 180px;
+  border: 0;
+  display: block;
+}
+
+
+
+/* BOTTOM BAR */
+.footer-bottom {
+  position: relative;
+  z-index: 2;
+  background: var(--primary);
+  text-align: center;
+  padding: 10px;
+  font-size: 12px;
+}
+
+
+.footer-social a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  margin-right:8px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+  font-size:14px;
+  transition:.3s;
+  text-decoration:none;
+}
+
+.footer-social a:hover{
+  background:#2ecc71; /* CLSU green feel */
+  transform:translateY(-2px);
+}
+
+.footer-contact p{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin:6px 0;
+  font-size:14px;
+}
+
+.footer-contact i{
+  margin-top:3px;
+  min-width:16px;
+}
+
+
+
+@media (max-width: 1000px) {
+
+  .footer-container {
+    flex-direction: column;
+    gap: 40px;
+    text-align: center;
+  }
+
+  .footer-map {
+    max-width: 100%;
+    margin: auto;
+  }
+
+  .footer-map iframe {
+    height: 240px;
+  }
+
+}
+
+
+/* ============================= */
+/* FLOATING BUTTONS */
+/* ============================= */
+
+
+.scroll-top-btn {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  position: fixed;
+  left: 20px;
+  bottom: 25px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 999;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.ai-chat-btn {
+  position: fixed;
+  right: 20px;
+  bottom: 25px;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  cursor: pointer;
+  z-index: 999;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.ai-chat-btn img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+
+@media (max-width: 1100px) {
+  .scroll-top-btn,
+  .ai-chat-btn {
+    z-index: 2;
+  }
+}

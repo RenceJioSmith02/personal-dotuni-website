@@ -1,0 +1,940 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <!-- favicon -->
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="assets/images/cvsm-logo.png"
+    />
+
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+
+    <!-- Font Awesome -->
+     <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="main.css" />
+    <link rel="stylesheet" href="homepage.css" />
+  </head>
+  <body>
+
+    <!-- PAGE HEADER BAR -->
+    <div class="container-fluid page-header">
+      <div class="d-flex justify-content-between">
+        <div class="header-contacts">
+          <a href="mailto: dotuni@clsu.edu.ph " class="me-3 text-white"
+            ><i class="bi bi-envelope-fill"></i>  dotuni@clsu.edu.ph </a
+          >
+          <a href="#" class="me-3 text-white"
+            ><i class="bi bi-telephone-fill"></i>  +63 912 345 6789 </a
+          >
+        </div>
+        <div class="header-socials social-media">
+          <a
+            href="#"
+            class="me-3 text-white"
+            target="_blank"
+            ><i class="bi bi-facebook"></i
+          ></a>
+          <a href="#" class="me-3 text-white"><i class="bi bi-twitter"></i></a>
+          <a
+            href="#"
+            class="me-3 text-white"
+            target="_blank"
+            ><i class="bi bi-youtube"></i
+          ></a>
+          <a href="#" class="text-white"><i class="bi bi-instagram"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAVIGATION HEADER BAR -->
+    <div class="container-fluid navbar-header justify-content-center">
+      <div class="row justify-content-between">
+        <div class="col-md-10 nav-header-college align-items-start">
+          <div
+            class="navbar-header-logo-container"
+            id="navbar-header-logo-container"
+          >
+            <a href="index.html">
+              <img
+                src="dotuni.png"
+                alt="CVSM Logo"
+                class="img-fluid navbar-header-logo"
+                style="width: 80px"
+              />
+            </a>
+          </div>
+          <div class="nav-header-left align-items-center">
+            <div class="row nav-header-college">
+              <h2> DISTANCE, OPEN, AND TRANSNATIONAL UNIVERSITY</h2>
+            </div>
+            <div class="row nav-header-address">
+              <h6>
+                Central Luzon State University, Science City of Muñoz, Nueva
+                Ecija, 3120
+              </h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAVIGATION BAR -->
+    <nav
+      class="navbar navbar-expand-lg navbar-dark position-relative sticky-top"
+    >
+      <div class="container">
+        <div></div>
+        <!-- Hamburger Menu -->
+        <button
+          id="navbar-toggler"
+          class="navbar-toggler custom-toggler"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="custom-toggler-icon"
+            ><i class="bi bi-list fs-2"></i
+          ></span>
+        </button>
+
+        <!-- Offcanvas Sidebar -->
+        <div
+          class="offcanvas offcanvas-end"
+          tabindex="-1"
+          id="navbarNav"
+          aria-labelledby="navbarNavLabel"
+          data-bs-backdrop="false"
+        >
+          <div class="offcanvas-header">
+            <div class="row w-100">
+              <div class="col-auto">
+                <button
+                  id="offcanvas-close"
+                  type="button"
+                  class="custom-close"
+                  data-bs-dismiss="offcanvas"
+                  aria-label="Close"
+                  style="margin: 20px"
+                >
+                  ✖
+                </button>
+              </div>
+              <div class="col justify-self-center" style="margin-left: 20px">
+                <img
+                  src="dotuni.png"
+                  alt="CLSU Logo"
+                  style="height: 120px"
+                />
+              </div>
+              <div class="col"></div>
+            </div>
+          </div>
+
+          <div class="offcanvas-body">
+            <ul class="navbar-nav m-auto">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">Home</a>
+              </li>
+
+              <!-- About -->
+              <li class="nav-item">
+                <a class="nav-link" href="#">About Us</a>
+              </li>
+
+              <!-- Course -->
+              <li class="nav-item">
+                <a class="nav-link" href="#">Course</a>
+              </li>
+
+              <!-- Gallery -->
+              <li class="nav-item">
+                <a class="nav-link" href="#">Gallery</a>
+              </li>
+
+              <!-- News and Announcement -->
+              <li class="nav-item">
+                <a class="nav-link" href="#">News and Announcement</a>
+              </li>
+
+              <!-- Admission dropdown -->
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  >Admissions</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="#"
+                      >Admission Requirements</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#"
+                      >Schedule of School Fees</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#"
+                      >FAQS</a
+                    >
+                  </li>
+                </ul>
+              </li>
+
+              <!-- Student services dropdown -->
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  >Research</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      href="research.html#ongoing-projects"
+                      >Rules and Regulation</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#"
+                      >Academic Calendar</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#"
+                      >Student Handbook</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#"
+                      >eResources</a
+                    >
+                  </li>
+                </ul>
+              </li>
+
+              <!-- Online Services -->
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  >Online Services</a
+                >
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="#">Online Application</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#"
+                      >Turnitin</a
+                    >
+                  </li>
+                </ul>
+              </li>
+
+              <!-- Downloads -->
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  >Downloads
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      >Course Prospectus
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#">
+                      Forms
+                    </a>
+                  </li>
+                </ul>
+              </li>
+
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+
+    <!-- SECTION 1 -->
+    <section class="hero-section">
+      <div class="hero-overlay"></div>
+
+      <div class="container hero-content">
+        <div class="row align-items-center">
+          
+          <div class="col-lg-6">
+            <h1 class="hero-title">
+              CLSU Distance, Open and Transnational University <br> (DOT-Uni)
+            </h1>
+
+            <a href="#" class="btn btn-success hero-btn mt-4">
+              Apply Now
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2 -->
+    <section class="partners-section">
+      <div class="container">
+        <div class="divider"></div>
+        <h2 class="section-title">
+          PARTNER INSTITUTIONS AND SERVICES
+        </h2>
+
+        <div class="partners-grid">
+
+          <!-- Card 1 -->
+          <div class="partner-card">
+            <img src="section2.png" alt="Asian Association">
+            <h3>Asian Association of Open Universities</h3>
+            <p>Associate Member</p>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="partner-card">
+            <img src="section2.png" alt="University of Liverpool">
+            <h3>University of Liverpool</h3>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="partner-card">
+            <img src="section2.png" alt="British Council">
+            <h3>British Council</h3>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="partner-card">
+            <img src="section2.png" alt="CLSU Turnitin">
+            <h3>CLSU Turnitin</h3>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="partner-card">
+            <img src="section2.png" alt="Office of Admission">
+            <h3>Office of Admission</h3>
+            <p>Apply now!</p>
+          </div>
+
+          <!-- Card 6 -->
+          <div class="partner-card">
+            <img src="section2.png" alt="CLSU DOT-Uni">
+            <h3>CLSU DOT-Uni</h3>
+            <p>Learning Management System</p>
+          </div>
+
+          <!-- Card 7 -->
+          <div class="partner-card">
+            <img src="section2.png" alt="DOT-Uni E-Library">
+            <h3>DOT-Uni E-Library</h3>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: LATEST NEWS -->
+    <section class="latest-news-section">
+      <div class="container">
+        <div class="divider"></div>
+        <h2 class="section-title">LATEST NEWS</h2>
+
+        <div class="news-grid">
+
+          <!-- Main News Carousel -->
+          <div class="main-news swiper-container">
+            <div class="swiper-wrapper">
+
+              <!-- Slide 1 -->
+              <a href="#" class="swiper-slide">
+                <img src="banner-bg.png" alt="Main News 1" />
+                <div class="news-caption">
+                  <span class="news-category">NEWS</span>
+                  <h3>DOT-Uni QA Coordinator Highlights Research on Distance Learning at AAOU Conference DOT-Uni QA Coordinator Highlights Research on Distance Learning at AAOU Conference DOT-Uni QA Coordinator Highlights Research on Distance Learning at AAOU Conference</h3>
+                  <p>Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                    Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                    Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                    Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                    Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                    Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                  </p>
+
+                  <div class="seo-tags">
+                    <span>#DistanceLearning</span>
+                    <span>#AAOU2026</span>
+                    <span>#Research</span>
+                  </div>
+
+
+                  <div class="card-footer">
+                    <span class="news-date">February 12, 2026</span>
+                    <span class="read-more">Read More</span>
+                  </div>
+                </div>
+              </a>
+
+              <!-- Slide 2 -->
+              <a href="#" class="swiper-slide">
+                <img src="banner-bg.png" alt="Main News 2" />
+                <div class="news-caption">
+                  <span class="news-category">NEWS</span>
+                  <h3>Another News Title Here</h3>
+                  <p>Short description for second news item...</p>
+
+                  <div class="seo-tags">
+                    <span>#DistanceLearning</span>
+                    <span>#AAOU2026</span>
+                    <span>#Research</span>
+                  </div>
+
+                  <div class="card-footer">
+                    <span class="news-date">February 12, 2026</span>
+                    <span class="read-more">Read More</span>
+                  </div>
+                </div>
+              </a>  
+
+              <!-- Add more slides as needed -->
+
+            </div>
+
+            <!-- Navigation -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+          </div>
+
+
+          <!-- Side News Cards -->
+          <div class="side-news">
+            <a href="#" class="news-card">
+              <img src="banner-bg.png" alt="CLSU Student Handbook" />
+              <div class="card-content">
+                <h4>CLSU Student Handbook                     Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+</h4>
+                <p>
+                    Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                </p>
+
+                <div class="card-footer">
+                  <span class="news-date">February 10, 2026</span>
+                  <span class="read-more">Read More</span>
+                </div>
+              </div>
+            </a>
+            <a href="#" class="news-card">
+              <img src="banner-bg.png" alt="CLSU Student Handbook" />
+              <div class="card-content">
+                <h4>CLSU Student Handbook</h4>
+                <p>
+                  Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                </p>
+
+                <div class="card-footer">
+                  <span class="news-date">February 10, 2026</span>
+                  <span class="read-more">Read More</span>
+                </div>
+              </div>
+            </a>
+            <a href="#" class="news-card">
+              <img src="banner-bg.png" alt="CLSU Student Handbook" />
+              <div class="card-content">
+                <h4>CLSU Student Handbook</h4>
+                <p>
+                  Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                </p>
+
+                <div class="card-footer">
+                  <span class="news-date">February 10, 2026</span>
+                  <span class="read-more">Read More</span>
+                </div>
+              </div>
+            </a>
+
+            <a href="#">
+              <button class="btn btn-success view-all-btn mt-3">
+                View All News
+              </button>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: CLSU NEWS AND UPDATES -->
+    <section class="clsu-updates-section">
+      <div class="container">
+        <div class="divider"></div>
+        <h2 class="section-title">CLSU NEWS AND UPDATES</h2>
+
+        <div class="updates-grid">
+
+          <!-- NEWS COLUMN -->
+          <div class="updates-col">
+            <div class="updates-header">
+              <span>News</span>
+              <a href="#">View More</a>
+            </div>
+
+            <div class="side-news">
+              <a href="#" class="news-card">
+                <img src="banner-bg.png" alt="CLSU Student Handbook" />
+                <div class="card-content">
+                  <h4>CLSU Student Handbook </h4>
+                  <p>
+                    Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                  </p>
+
+                  <div class="card-footer">
+                    <span class="news-date">February 10, 2026</span>
+                    <span class="read-more">Read More</span>
+                  </div>
+                </div>
+              </a>
+
+              <a href="#" class="news-card">
+                <img src="banner-bg.png" alt="CLSU Student Handbook" />
+                <div class="card-content">
+                  <h4>CLSU Student Handbook</h4>
+
+                  <p>
+                    Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                  </p>
+
+                  <div class="card-footer">
+                    <span class="news-date">February 10, 2026</span>
+                    <span class="read-more">Read More</span>
+                  </div>
+                </div>
+              </a>
+
+              <a href="#" class="news-card">
+                <img src="banner-bg.png" alt="CLSU Student Handbook" />
+                <div class="card-content">
+                  <h4>CLSU Student Handbook</h4>
+                  <p>
+                    Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                  </p>
+
+                  <div class="card-footer">
+                    <span class="news-date">February 10, 2026</span>
+                    <span class="read-more">Read More</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+
+          <!-- ANNOUNCEMENTS COLUMN -->
+          <div class="updates-col">
+            <div class="updates-header">
+              <span>Announcements</span>
+              <a href="#">View more</a>
+            </div>
+
+            <div class="side-news">
+              <a href="#" class="news-card">
+                <img src="banner-bg.png" alt="CLSU Student Handbook" />
+                <div class="card-content">
+                  <h4>CLSU Student Handbook</h4>
+                  <p>
+                    Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                  </p>
+
+                  <div class="card-footer">
+                    <span class="news-date">February 10, 2026</span>
+                    <span class="read-more">Read More</span>
+                  </div>
+                </div>
+              </a>
+
+              <a href="#" class="news-card">
+                <img src="banner-bg.png" alt="CLSU Student Handbook" />
+                <div class="card-content">
+                  <h4>CLSU Student Handbook</h4>
+                  <p>
+                    Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                  </p>
+
+                  <div class="card-footer">
+                    <span class="news-date">February 10, 2026</span>
+                    <span class="read-more">Read More</span>
+                  </div>
+                </div>
+              </a>
+
+              <a href="#" class="news-card">
+                <img src="banner-bg.png" alt="CLSU Student Handbook" />
+                <div class="card-content">
+                  <h4>CLSU Student Handbook</h4>
+                  <p>
+                    Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference 
+                  </p>
+
+                  <div class="card-footer">
+                    <span class="news-date">February 10, 2026</span>
+                    <span class="read-more">Read More</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: DOT-UNI FEATURES -->
+    <section class="dotuni-features">
+      <div class="features-grid">
+
+        <!-- ITEM 1 -->
+        <div class="feature-item image-box">
+          <img src="banner-bg.png" alt="DOT-UNI Signage">
+        </div>
+
+        <!-- ITEM 2 -->
+        <div class="feature-item text-box">
+          <h3>About Us</h3>
+          <p>
+            The Central Luzon State University Open University (CLSU-O.U) was formally
+            created on August 29, 1997 through CLSU Board of Regents Resolution No. 50-97
+            aligned to the country's goal of developing quality human resources by
+            democratization of access to quality education.
+          </p>
+          <a href="#" class="btn btn-success mt-3">Learn More</a>
+        </div>
+
+        <!-- ITEM 3 -->
+        <div class="feature-item text-box">
+          <h3>Learning Materials</h3>
+          <p>
+            The Open University students are provided with specially packaged printed
+            instructional materials or self-learning modules which they study on their
+            own most of the time.
+          </p>
+          <a href="#" class="btn btn-success mt-3">Learn More</a>
+        </div>
+
+        <!-- ITEM 4 -->
+        <div class="feature-item image-box">
+          <img src="banner-bg.png" alt="DOT-UNI Exhibit">
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION 6: PROGRAMS -->
+    <section class="program-section">
+        <div class="divider"></div>
+        <h2 class="section-title">PROGRAM COURSES</h2>
+
+        <div class="carousel-wrapper">
+            <button class="nav-btn left" id="prevBtn">&#10094;</button>
+
+            <div class="carousel-viewport">
+                <div class="carousel-track" id="carousel">
+                    <div class="card"><img src="program.png"></div>
+                    <div class="card"><img src="program.png"></div>
+                    <div class="card"><img src="program.png"></div>
+                    <div class="card"><img src="program.png"></div>
+                    <div class="card"><img src="program.png"></div>
+                </div>
+            </div>
+
+            <button class="nav-btn right" id="nextBtn">&#10095;</button>
+        </div>
+    </section>
+
+    <!-- SECTION: 7 FAQS -->
+    <section class="faq-section">
+
+      <div class="divider"></div>
+      <h2 class="section-title">FREQUENTLY ASKED QUESTIONS</h2>
+
+      <div class="faq-container">
+
+        <!-- LEFT SIDE LOGO -->
+        <div class="faq-left">
+          <img src="logo.png" alt="DOT UNI Logo">
+        </div>
+
+        <!-- RIGHT SIDE FAQS -->
+        <div class="faq-right">
+
+          <div class="faq-card">
+
+            <div class="faq-item">
+              <span>1. What are the offered programs?</span>
+            </div>
+
+            <div class="faq-item">
+              <span>2. What are the list of requirements for admission in the DOT-Uni Curricular Programs?</span>
+            </div>
+
+            <div class="faq-item">
+              <span>3. What are the steps to be admitted?</span>
+            </div>
+
+            <div class="faq-item">
+              <span>4. How do I contact DOT-Uni?</span>
+            </div>
+
+            <div class="faq-item">
+              <span>5. Where can I request for TOR, COG or CAV?</span>
+            </div>
+
+            <div class="faq-seeall">
+              See all
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="home-footer">
+
+      <div class="footer-overlay"></div>
+
+      <div class="footer-container">
+
+        <!-- LEFT -->
+        <div class="footer-col footer-about">
+          <div class="footer-logo">
+            <img src="clsu.png">
+            <img src="dotuni.png">
+          </div>
+
+          <h4>Central Luzon State University</h4>
+          <h3>Distance, Open, And Transnational University (DOT-Uni)</h3>
+
+          <p class="follow-label">Follow us</p>
+          <div class="footer-social">
+            <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#"><i class="fa-brands fa-youtube"></i></a>
+            <a href="#"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#"><i class="fa-solid fa-envelope"></i></a>
+          </div>
+
+        </div>
+
+        <!-- CENTER -->
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="#">link 1</a></li>
+            <li><a href="#">link 1</a></li>
+            <li><a href="#">link 1</a></li>
+            <li><a href="#">link 1</a></li>
+            <li><a href="#">link 1</a></li>
+            <li><a href="#">link 1</a></li>
+          </ul>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="footer-col">
+          <h4>Find Us</h4>
+
+          <div class="footer-map">
+              <iframe src="https://www.google.com/maps/embed?pb=!1m28!1m12!1m3!1d3840.351211683943!2d120.92863372455018!3d15.732549098364318!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m13!3e9!4m5!1s0x3390d6454e46b4e3%3A0x9dae6dfa8f1f690f!2sCLSU%20Main%20Gate%2C%20PWJH%2B4WP%2C%20CLSU%2C%20University%20Ave%2C%20Mu%C3%B1oz%2C%203120%20Nueva%20Ecija!3m2!1d15.7303383!2d120.9298139!4m5!1s0x3390d65197a8047f%3A0xaa42e06a810cf4ed!2sCLSU%20Distance%2C%20Open%2C%20and%20Transnational%20University%20(DOT-Uni)%2C%20PWMJ%2BVWV%2C%20Central%20Luzon%20State%20University%20(CLSU)%2C%20Milbuen%20St%2C%20Mu%C3%B1oz%2C%203120%20Nueva%20Ecija!3m2!1d15.734749599999999!2d120.93230009999999!5e0!3m2!1sen!2sph!4v1770959809865!5m2!1sen!2sph" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+
+          <div class="footer-contact">
+            <p>
+              <i class="fa-solid fa-location-dot"></i>
+              Milbuen St, CLSU Compound, Brgy. Bantug, Science City of Muñoz,
+              3120 Nueva Ecija, Philippines
+            </p>
+
+            <p>
+              <i class="fa-solid fa-phone"></i>
+              +63 912 345 6789
+            </p>
+
+            <p>
+              <i class="fa-solid fa-envelope"></i>
+              dotuni@clsu.edu.ph
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        © 2026 CLSU Distance, Open, And Transnational University. All rights reserved.
+      </div>
+    </footer>
+
+
+
+    <!-- SCROLL TOP BUTTON -->
+    <button class="scroll-top-btn" onclick="scrollToTop()">
+    <i class="fa-solid fa-chevron-up"></i>  
+    </button>
+
+
+    <!-- AI ASSISTANT BUTTON -->
+    <button class="ai-chat-btn">
+      <img src="dodotgif.png">
+    </button>
+
+
+
+
+    <!-- Bootstrap 5 JS (required for offcanvas, dropdown, toggler) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+<script>
+
+  window.addEventListener("scroll", function() {
+    const btn = document.querySelector(".scroll-top-btn");
+    if (window.scrollY > 300) {
+      btn.style.opacity = "1";
+      btn.style.pointerEvents = "auto";
+    } else {
+      btn.style.opacity = "0";
+      btn.style.pointerEvents = "none";
+    }
+  });
+
+  function scrollToTop() {
+    const start = window.scrollY;
+    const duration = 1000; // increase for smoother (1000–1500 recommended)
+    let startTime = null;
+
+    function animation(currentTime) {
+      if (!startTime) startTime = currentTime;
+      const timeElapsed = currentTime - startTime;
+      const progress = Math.min(timeElapsed / duration, 1);
+
+      // easeInOutCubic
+      const ease = progress < 0.5
+        ? 4 * progress * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+      window.scrollTo(0, start * (1 - ease));
+
+      if (timeElapsed < duration) {
+        requestAnimationFrame(animation);
+      }
+    }
+
+    requestAnimationFrame(animation);
+  }
+</script>
+
+
+
+
+
+    <!-- SECTION 3 JS -->
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+
+    <script>
+      const swiper = new Swiper('.swiper-container', {
+        loop: true,
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev',
+        },
+        autoplay: {
+          delay: 5000,
+          disableOnInteraction: false,
+        },
+        slidesPerView: 1,
+      });
+    </script>
+
+
+
+    <!-- SECTION 6 JS -->
+<script>
+const track = document.getElementById("carousel");
+const cards = document.querySelectorAll(".card");
+let index = Math.floor(cards.length / 2);
+
+function updateCarousel() {
+    cards.forEach((card, i) => {
+        card.classList.toggle("active", i === index);
+    });
+
+    let offset = 0;
+    const gap = 30;
+
+    for (let i = 0; i < index; i++) {
+        offset += cards[i].offsetWidth + gap;
+    }
+
+    const activeWidth = cards[index].offsetWidth;
+    const center = track.parentElement.offsetWidth / 2 - activeWidth / 2;
+
+    track.style.transform = `translateX(${center - offset}px)`;
+}
+
+document.getElementById("nextBtn").onclick = () => {
+    index = (index + 1) % cards.length;
+    updateCarousel();
+};
+
+document.getElementById("prevBtn").onclick = () => {
+    index = (index - 1 + cards.length) % cards.length;
+    updateCarousel();
+};
+
+window.addEventListener("resize", updateCarousel);
+updateCarousel();
+</script>
+
+
+
+  </body>
+</html>
