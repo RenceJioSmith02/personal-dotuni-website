@@ -38,27 +38,17 @@
             </h2>
 
             <div class="partners-grid">
-
-                <!-- Card 1 -->
+            @foreach($linkages as $linkage)
                 <div class="partner-card">
-                    <img src="{{ asset('storage/linkages/linkages-2026-02-09-6a1a4bcc.jpg') }}" alt="Asian Association">
-                    <h3>Asian Association of Open Universities</h3>
-                    <p>Associate Member</p>
+                    <img 
+                    src="{{ asset('storage/'.optional($linkage->logo)->storage_path) 
+                            ?? asset('assets/system_images/placeholder.jpg') }}">
+                    <h3>{{ $linkage->title }}</h3>
+                    <p>{{ $linkage->description }}</p>
                 </div>
-
-                <!-- Card 2 -->
-                <div class="partner-card">
-                    <img src="{{ asset('storage/linkages/linkages-2026-02-09-6a1a4bcc.jpg') }}" alt="University of Liverpool">
-                    <h3>University of Liverpool</h3>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="partner-card">
-                    <img src="{{ asset('storage/linkages/linkages-2026-02-09-6a1a4bcc.jpg') }}" alt="British Council">
-                    <h3>British Council</h3>
-                </div>
-
+            @endforeach
             </div>
+
         </div>
     </section>
 
@@ -73,52 +63,34 @@
                 <!-- Main News Carousel -->
                 <div class="main-news swiper-container">
                     <div class="swiper-wrapper">
-
-                        <!-- Slide 1 -->
+                        @foreach($mainNews as $news)
                         <a href="#" class="swiper-slide">
-                            <img src="{{ asset('storage/dotuni_news/dotuni_news-2026-02-09-bd6c48f1.png') }}" alt="Main News 1" />
+                            <img 
+                            src="{{ optional(optional($news->attachments->first())->asset)->storage_path 
+                                    ? asset('storage/'.optional(optional($news->attachments->first())->asset)->storage_path)
+                                    : asset('assets/system_images/placeholder.jpg') }}">
                             <div class="news-caption">
                                 <span class="news-category">NEWS</span>
-                                <h3>DOT-Uni QA Coordinator Highlights Research on Distance Learning at AAOU Conference</h3>
-                                <p>Quality Assurance Coordinator from the Distance Open and Transnational University</p>
+                                <h3>{{ $news->title }}</h3>
+                                <p>{{ $news->seo_description }}</p>
 
                                 <div class="seo-tags">
-                                    <span>#DistanceLearning</span>
-                                    <span>#AAOU2026</span>
-                                    <span>#Research</span>
+                                    @if(!empty($news->seo_title))
+                                        @foreach(preg_split('/#/', $news->seo_title, -1, PREG_SPLIT_NO_EMPTY) as $tag)
+                                            <span>#{{ trim($tag) }}</span>
+                                        @endforeach
+                                    @endif
                                 </div>
 
-
                                 <div class="card-footer">
-                                    <span class="news-date">February 12, 2026</span>
+                                    <span class="news-date">
+                                        {{ \Carbon\Carbon::parse($news->published_at)->format('F d, Y') }}
+                                    </span>
                                     <span class="read-more">Read More</span>
                                 </div>
                             </div>
                         </a>
-
-                        <!-- Slide 2 -->
-                        <a href="#" class="swiper-slide">
-                            <img src="{{ asset('storage/dotuni_news/dotuni_news-2026-02-09-bd6c48f1.png') }}" alt="Main News 2" />
-                            <div class="news-caption">
-                                <span class="news-category">NEWS</span>
-                                <h3>Another News Title Here</h3>
-                                <p>Short description for second news item...</p>
-
-                                <div class="seo-tags">
-                                    <span>#DistanceLearning</span>
-                                    <span>#AAOU2026</span>
-                                    <span>#Research</span>
-                                </div>
-
-                                <div class="card-footer">
-                                    <span class="news-date">February 12, 2026</span>
-                                    <span class="read-more">Read More</span>
-                                </div>
-                            </div>
-                        </a>
-
-                        <!-- Add more slides as needed -->
-
+                        @endforeach
                     </div>
 
                     <!-- Navigation -->
@@ -129,51 +101,30 @@
 
                 <!-- Side News Cards -->
                 <div class="side-news">
+                    @foreach($sideNews as $news)
                     <a href="#" class="news-card">
-                        <img src="{{ asset('storage/dotuni_news/dotuni_news-2026-02-09-bd6c48f1.png') }}" alt="CLSU Student Handbook" />
-                        <div class="card-content">
-                            <h4>CLSU Student Handbook Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni)</h4>
-                            <p>
-                                Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni)
-                                presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference
-                            </p>
+                        @php
+                            $attachment = $news->attachments->first();
+                            $imagePath = optional($attachment?->asset)->storage_path;
+                        @endphp
 
+                        <img 
+                        src="{{ $imagePath 
+                                ? asset('storage/'.$imagePath) 
+                                : asset('assets/system_images/placeholder.jpg') }}">
+
+                        <div class="card-content">
+                            <h4>{{ $news->title }}</h4>
+                            <p>{{ $news->seo_description }}</p>
                             <div class="card-footer">
-                                <span class="news-date">February 10, 2026</span>
+                                <span class="news-date">
+                                    {{ \Carbon\Carbon::parse($news->published_at)->format('F d, Y') }}
+                                </span>
                                 <span class="read-more">Read More</span>
                             </div>
                         </div>
                     </a>
-                    <a href="#" class="news-card">
-                        <img src="{{ asset('storage/dotuni_news/dotuni_news-2026-02-09-bd6c48f1.png') }}" alt="CLSU Student Handbook" />
-                        <div class="card-content">
-                            <h4>CLSU Student Handbook</h4>
-                            <p>
-                                Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni)
-                                presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference
-                            </p>
-
-                            <div class="card-footer">
-                                <span class="news-date">February 10, 2026</span>
-                                <span class="read-more">Read More</span>
-                            </div>
-                        </div>
-                    </a>
-                    <a href="#" class="news-card">
-                        <img src="{{ asset('storage/dotuni_news/dotuni_news-2026-02-09-bd6c48f1.png') }}" alt="CLSU Student Handbook" />
-                        <div class="card-content">
-                            <h4>CLSU Student Handbook</h4>
-                            <p>
-                                Quality Assurance Coordinator from the Distance Open and Transnational University (DOT-Uni)
-                                presented her studies at the 38th Asian Association of Open Universities (AAOU) Conference
-                            </p>
-
-                            <div class="card-footer">
-                                <span class="news-date">February 10, 2026</span>
-                                <span class="read-more">Read More</span>
-                            </div>
-                        </div>
-                    </a>
+                    @endforeach
 
                     <a href="#">
                         <button class="btn btn-success view-all-btn mt-3">
@@ -202,57 +153,24 @@
                     </div>
 
                     <div class="side-news">
+                        @foreach($clsuNews as $news)
                         <a href="#" class="news-card">
-                            <img src="{{ asset('storage/dotuni_news/dotuni_news-2026-02-09-bd6c48f1.png') }}" alt="CLSU Student Handbook" />
+                            <img 
+                            src="{{ $news->imagePath 
+                                    ? asset('storage/'.$news->imagePath) 
+                                    : asset('assets/system_images/placeholder.jpg') }}">
                             <div class="card-content">
-                                <h4>CLSU Student Handbook </h4>
-                                <p>
-                                    Quality Assurance Coordinator from the Distance Open and Transnational University
-                                    (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities
-                                    (AAOU) Conference
-                                </p>
-
+                                <h4>{{ $news->title }}</h4>
+                                <p>{{ $news->description }}</p>
                                 <div class="card-footer">
-                                    <span class="news-date">February 10, 2026</span>
+                                    <span class="news-date">
+                                        {{ \Carbon\Carbon::parse($news->published_at)->format('F d, Y') }}
+                                    </span>
                                     <span class="read-more">Read More</span>
                                 </div>
                             </div>
                         </a>
-
-                        <a href="#" class="news-card">
-                            <img src="{{ asset('storage/dotuni_news/dotuni_news-2026-02-09-bd6c48f1.png') }}" alt="CLSU Student Handbook" />
-                            <div class="card-content">
-                                <h4>CLSU Student Handbook</h4>
-
-                                <p>
-                                    Quality Assurance Coordinator from the Distance Open and Transnational University
-                                    (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities
-                                    (AAOU) Conference
-                                </p>
-
-                                <div class="card-footer">
-                                    <span class="news-date">February 10, 2026</span>
-                                    <span class="read-more">Read More</span>
-                                </div>
-                            </div>
-                        </a>
-
-                        <a href="#" class="news-card">
-                            <img src="{{ asset('storage/dotuni_news/dotuni_news-2026-02-09-bd6c48f1.png') }}" alt="CLSU Student Handbook" />
-                            <div class="card-content">
-                                <h4>CLSU Student Handbook</h4>
-                                <p>
-                                    Quality Assurance Coordinator from the Distance Open and Transnational University
-                                    (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities
-                                    (AAOU) Conference
-                                </p>
-
-                                <div class="card-footer">
-                                    <span class="news-date">February 10, 2026</span>
-                                    <span class="read-more">Read More</span>
-                                </div>
-                            </div>
-                        </a>
+                        @endforeach
                     </div>
                 </div>
 
@@ -265,56 +183,26 @@
                     </div>
 
                     <div class="side-news">
+                        @foreach($announcements as $announcement)
                         <a href="#" class="news-card">
-                            <img src="{{ asset('storage/dotuni_news/dotuni_news-2026-02-09-bd6c48f1.png') }}" alt="CLSU Student Handbook" />
+                            <img 
+                            src="{{ $announcement->assets->first()
+                                ? asset('storage/'.$announcement->assets->first()->storage_path)
+                                : asset('assets/system_images/placeholder.jpg') }}">
                             <div class="card-content">
-                                <h4>CLSU Student Handbook</h4>
-                                <p>
-                                    Quality Assurance Coordinator from the Distance Open and Transnational University
-                                    (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities
-                                    (AAOU) Conference
-                                </p>
+                                <h4>{{ $announcement->title }}</h4>
+                                <p>{{ Str::limit($announcement->article_body,100) }}</p>
 
                                 <div class="card-footer">
-                                    <span class="news-date">February 10, 2026</span>
+                                    <span class="news-date">
+                                        {{ \Carbon\Carbon::parse($announcement->published_at)->format('F d, Y') }}
+                                    </span>
                                     <span class="read-more">Read More</span>
                                 </div>
                             </div>
                         </a>
+                        @endforeach
 
-                        <a href="#" class="news-card">
-                            <img src="{{ asset('storage/dotuni_news/dotuni_news-2026-02-09-bd6c48f1.png') }}" alt="CLSU Student Handbook" />
-                            <div class="card-content">
-                                <h4>CLSU Student Handbook</h4>
-                                <p>
-                                    Quality Assurance Coordinator from the Distance Open and Transnational University
-                                    (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities
-                                    (AAOU) Conference
-                                </p>
-
-                                <div class="card-footer">
-                                    <span class="news-date">February 10, 2026</span>
-                                    <span class="read-more">Read More</span>
-                                </div>
-                            </div>
-                        </a>
-
-                        <a href="#" class="news-card">
-                            <img src="{{ asset('storage/dotuni_news/dotuni_news-2026-02-09-bd6c48f1.png') }}" alt="CLSU Student Handbook" />
-                            <div class="card-content">
-                                <h4>CLSU Student Handbook</h4>
-                                <p>
-                                    Quality Assurance Coordinator from the Distance Open and Transnational University
-                                    (DOT-Uni) presented her studies at the 38th Asian Association of Open Universities
-                                    (AAOU) Conference
-                                </p>
-
-                                <div class="card-footer">
-                                    <span class="news-date">February 10, 2026</span>
-                                    <span class="read-more">Read More</span>
-                                </div>
-                            </div>
-                        </a>
                     </div>
                 </div>
 
@@ -372,11 +260,14 @@
 
             <div class="carousel-viewport">
                 <div class="carousel-track" id="carousel">
-                    <div class="card"><img src="{{ asset('storage/programs/programs-2026-02-09-1050178a.jpg') }}"></div>
-                    <div class="card"><img src="{{ asset('storage/programs/programs-2026-02-09-1050178a.jpg') }}"></div>
-                    <div class="card"><img src="{{ asset('storage/programs/programs-2026-02-09-1050178a.jpg') }}"></div>
-                    <div class="card"><img src="{{ asset('storage/programs/programs-2026-02-09-1050178a.jpg') }}"></div>
-                    <div class="card"><img src="{{ asset('storage/programs/programs-2026-02-09-1050178a.jpg') }}"></div>
+                    @foreach($programs as $program)
+                    <div class="card">
+                        <img 
+                        src="{{ $program->imagePath 
+                                ? asset('storage/'.$program->imagePath) 
+                                : asset('assets/system_images/placeholder.jpg') }}">
+                    </div>
+                    @endforeach
                 </div>
             </div>
 
@@ -402,25 +293,20 @@
 
                 <div class="faq-card">
 
-                    <div class="faq-item">
-                        <span>1. What are the offered programs?</span>
+                    @foreach($faqs as $faq)
+                    <div class="faq-item-wrapper">
+                        <div class="faq-item">
+                            <span>{{ $faq->question }}</span>
+                        </div>
+                        <div class="faq-answer">
+                            <ul>
+                                @foreach($faq->answers as $answer)
+                                    <li>{!! $answer->answer !!}</li> <!-- or {{ $answer->answer }} if plain text -->
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
-
-                    <div class="faq-item">
-                        <span>2. What are the list of requirements for admission in the DOT-Uni Curricular Programs?</span>
-                    </div>
-
-                    <div class="faq-item">
-                        <span>3. What are the steps to be admitted?</span>
-                    </div>
-
-                    <div class="faq-item">
-                        <span>4. How do I contact DOT-Uni?</span>
-                    </div>
-
-                    <div class="faq-item">
-                        <span>5. Where can I request for TOR, COG or CAV?</span>
-                    </div>
+                    @endforeach
 
                     <div class="faq-seeall">
                         See all
@@ -491,6 +377,29 @@
 
         window.addEventListener("resize", updateCarousel);
         updateCarousel();
+
+
+        // SECTION 7 JS - FAQS
+        document.addEventListener('DOMContentLoaded', () => {
+            const faqItems = document.querySelectorAll('.faq-item');
+
+            faqItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // Toggle active class
+                    item.classList.toggle('active');
+
+                    // Close other items if you want accordion behavior
+                    faqItems.forEach(other => {
+                        if (other !== item) {
+                            other.classList.remove('active');
+                        }
+                    });
+                });
+            });
+        });
+
     </script>
+
+    
 
 @endpush

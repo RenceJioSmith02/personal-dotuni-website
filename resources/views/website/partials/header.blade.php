@@ -118,22 +118,22 @@
           <div class="offcanvas-body">
             <ul class="navbar-nav m-auto">
               <li class="nav-item">
-                <a class="nav-link active" href="{{ route('website.pages.home') }}">Home</a>
+                <a class="nav-link {{ request()->routeIs('website.home') ? 'active' : '' }}" href="{{ route('website.home') }}">Home</a>
               </li>
 
               <!-- About -->
               <li class="nav-item">
-                <a class="nav-link" href="{{ route('website.pages.about') }}">About Us</a>
+                <a class="nav-link {{ request()->routeIs('website.pages.about') ? 'active' : '' }}" href="{{ route('website.pages.about') }}">About Us</a>
               </li>
 
               <!-- Course -->
               <li class="nav-item">
-                <a class="nav-link" href="{{ route('website.pages.courses') }}">Course</a>
+                <a class="nav-link {{ request()->routeIs('website.courses') ? 'active' : '' }}" href="{{ route('website.courses') }}">Course</a>
               </li>
 
               <!-- Gallery -->
               <li class="nav-item">
-                <a class="nav-link" href="{{ route('website.pages.gallery') }}">Gallery</a>
+                <a class="nav-link {{ request()->routeIs('website.gallery') ? 'active' : '' }}" href="{{ route('website.gallery') }}">Gallery</a>
               </li>
 
               <!-- News and Announcement -->
@@ -152,14 +152,10 @@
                 >
                 <ul class="dropdown-menu">
                   <li>
-                    <a class="dropdown-item" href="#"
-                      >Admission Requirements</a
-                    >
+                    <a class="nav-link {{ request()->routeIs('website.pages.admission_requirements') ? 'active' : '' }}" href="{{ route('website.pages.admission-requirements') }}">Admission Requirements</a>
                   </li>
                   <li>
-                    <a class="dropdown-item" href="#"
-                      >Schedule of School Fees</a
-                    >
+                    <a class="nav-link {{ request()->routeIs('website.pages.schedule_school_fees') ? 'active' : '' }}" href="{{ route('website.pages.schedule-school-fees') }}">Schedule of School Fees</a>
                   </li>
                   <li>
                     <a class="dropdown-item" href="#"

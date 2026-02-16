@@ -626,7 +626,9 @@ $(document).on("change", ".media-input", function (e) {
             // EDIT MODE: do not require existing images
             $("#newsMediaContainer .media-row").each(function () {
                 const row = $(this);
-                const hasExisting = row.find('input[name^="media"][name$="[id]"]').length;
+                const hasExisting = row.find(
+                    'input[name^="media"][name$="[id]"]',
+                ).length;
 
                 if (hasExisting) {
                     row.find('input[type="file"]').prop("required", false);
@@ -655,8 +657,19 @@ $(document).on("change", ".media-input", function (e) {
             );
         }
 
-        refreshNewsLayout1Thumbnail();
+        // Populate SEO hashtags for editing
+        if (data.seo_title) {
+            hashtags = []; // clear previous
+            const container = document.getElementById("hashtagContainer"); // correct ID
+            if (container) {
+                container
+                    .querySelectorAll(".hashtag")
+                    .forEach((el) => el.remove()); // remove existing elements
+                populateHashtagsFromString(data.seo_title); // create DOM hashtags
+            }
+        }
 
+        refreshNewsLayout1Thumbnail();
     }
 
     function setStep(step) {
@@ -1629,6 +1642,95 @@ function applyAnnouncementLayout(layoutKey) {
         };
         reader.readAsDataURL(file);
     });
+
+
+
+    // hashtag input for SEO title
+    const container = document.getElementById("hashtagContainer");
+    const input = document.getElementById("hashtagInput");
+    const hiddenInput = document.getElementById("seoTitleInput");
+
+    let hashtags = [];
+
+    // --- Create hashtag element ---
+    function createHashtagElement(tag) {
+        const span = document.createElement("span");
+        span.classList.add("hashtag");
+        span.textContent = tag;
+
+        const removeBtn = document.createElement("span");
+        removeBtn.classList.add("remove-btn");
+        removeBtn.textContent = "×";
+        removeBtn.addEventListener("click", () => {
+            hashtags = hashtags.filter((h) => h !== tag);
+            span.remove();
+            updateHiddenInput();
+        });
+
+        span.appendChild(removeBtn);
+        return span;
+    }
+
+    // --- Add a hashtag ---
+    function addHashtag(tag) {
+        if (!tag) return;
+        if (!tag.startsWith("#")) tag = "#" + tag;
+        if (hashtags.includes(tag)) return; // avoid duplicates
+
+        hashtags.push(tag);
+        const tagElement = createHashtagElement(tag);
+        container.insertBefore(tagElement, input);
+        updateHiddenInput();
+    }
+
+    // --- Update hidden input for form submission ---
+    function updateHiddenInput() {
+        hiddenInput.value = hashtags.join("");
+    }
+
+    // --- Parse stored seo_title string and populate hashtags ---
+    function populateHashtagsFromString(seoString) {
+        if (!seoString) return;
+        const matches = seoString.match(/#[^#]+/g); // split #asd#asdas -> ['#asd','#asdas']
+        if (!matches) return;
+
+        matches.forEach((tag) => addHashtag(tag));
+    }
+
+    // --- Event listeners ---
+    input.addEventListener("input", function () {
+        let value = input.value.trim();
+        if (value.endsWith(" ") || value.endsWith(",")) {
+            value = value.trim();
+            if (value) {
+                addHashtag(value);
+                input.value = "";
+            }
+        }
+    });
+
+    input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === ",") {
+            e.preventDefault();
+            const value = input.value.trim();
+            if (value) {
+                addHashtag(value);
+                input.value = "";
+            }
+        }
+    });
+
+    input.addEventListener("blur", function () {
+        const value = input.value.trim();
+        if (value) {
+            addHashtag(value);
+            input.value = "";
+        }
+    });
+
+    // Focus input on container click
+    container.addEventListener("click", () => input.focus());
+
 
 
 

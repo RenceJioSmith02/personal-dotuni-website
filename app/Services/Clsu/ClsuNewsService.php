@@ -2,7 +2,6 @@
 
 namespace App\Services\Clsu;
 
-use DomainException;
 use App\Models\Asset;
 use App\Models\ClsuNews;
 use Illuminate\Http\Request;
@@ -15,7 +14,13 @@ class ClsuNewsService
 {
     public function list()
     {
-        return ClsuNews::with('thumbnail')->orderBy('sort_order');
+        $clsuNews = ClsuNews::with('thumbnail')->get()->map(function ($news) {
+
+            $news->imagePath = optional($news->thumbnail)->storage_path;
+
+            return $news;
+        });
+        return $clsuNews;
     }
 
 

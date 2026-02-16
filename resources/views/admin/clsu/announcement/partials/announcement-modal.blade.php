@@ -37,8 +37,11 @@
                             </div>
 
                             <div class="form-group col-md-4">
-                                <label>SEO Title</label>
-                                <input type="text" name="seo_title" class="form-control" required>
+                                <label>SEO Title (Hashtags)</label>
+                                <div class="hashtag-input-container" id="hashtagContainer">
+                                    <input type="text" id="hashtagInput" placeholder="Type a word and press Enter">
+                                </div>
+                                <input type="hidden" name="seo_title" id="seoTitleInput">
                             </div>
 
                             <div class="form-group col-md-4">

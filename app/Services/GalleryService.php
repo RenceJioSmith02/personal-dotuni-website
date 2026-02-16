@@ -15,9 +15,30 @@ class GalleryService
     /**
      * List all gallery items
      */
+
     public function list()
     {
         return Gallery::with('asset')->orderBy('sort_order')->get();
+    }
+
+    // Pagination
+    public function listPaginated($page = 1, $perPage = 20)
+    {
+        $query = Gallery::with('asset')->orderBy('sort_order');
+
+        $total = $query->count();
+
+        $items = $query->skip(($page - 1) * $perPage)
+            ->take($perPage)
+            ->get();
+
+        return [
+            'data' => $items,
+            'total' => $total,
+            'per_page' => $perPage,
+            'current_page' => $page,
+            'last_page' => ceil($total / $perPage),
+        ];
     }
 
 
@@ -85,15 +106,6 @@ class GalleryService
                         compact('item')
                     )->render(),
 
-                    // 'actions' => (
-                    //     $item->asset &&
-                    //     str_contains($item->asset->file_name, 'gallery')
-                    // )
-                    //     ? view(
-                    //         'admin.gallery.partials.actions',
-                    //         compact('item')
-                    //     )->render()
-                    //     : '<span class="text-muted">—</span>',
                 ];
             }),
         ];

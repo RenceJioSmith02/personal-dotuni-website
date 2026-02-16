@@ -12,8 +12,16 @@ class FaqQuestionService
 {
     public function list()
     {
-        return FaqQuestion::orderBy('sort_order')->get();
+        // Load the question with all related answers
+        return FaqQuestion::with([
+            'answers' => function ($query) {
+                $query->where('is_active', 1); // optional: only active answers
+            }
+        ])
+            ->orderBy('sort_order')
+            ->get();
     }
+
 
 
 

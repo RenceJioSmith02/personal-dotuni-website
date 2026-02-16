@@ -10,68 +10,94 @@ use App\Http\Controllers\Admin\academic\ProgramController;
 
 // user management
 use App\Http\Controllers\Admin\academic\ProgramRequirementCategoryController;
-use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\AdminController;
 
 // clsu news
-use App\Http\Controllers\Admin\clsu\ClsuNewsController;
+use App\Http\Controllers\Admin\AnnouncementController;
 
 // faqs
-use App\Http\Controllers\Admin\DotuniNewsController;
+use App\Http\Controllers\Admin\clsu\ClsuNewsController;
 
 // rules and regulations
-use App\Http\Controllers\Admin\EResourceController;
+use App\Http\Controllers\Admin\DotuniNewsController;
 
 // academic
+use App\Http\Controllers\Admin\EResourceController;
 use App\Http\Controllers\Admin\faqs\FaqAnswerController;
 use App\Http\Controllers\Admin\faqs\FaqQuestionController;
 use App\Http\Controllers\Admin\FeeController;
 use App\Http\Controllers\Admin\form\FormCategoryController;
 use App\Http\Controllers\Admin\form\FormController;
-use App\Http\Controllers\Admin\GalleryController;
 
 // linkage
+use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\linkage\LinkageCategoryController;
-use App\Http\Controllers\Admin\linkage\LinkageController;
 
 // prospective_student
+use App\Http\Controllers\Admin\linkage\LinkageController;
 use App\Http\Controllers\Admin\prospective_student\ProspectiveStudentCategoryController;
-use App\Http\Controllers\Admin\prospective_student\ProspectiveStudentItemController;
 
 // forms
+use App\Http\Controllers\Admin\prospective_student\ProspectiveStudentItemController;
 use App\Http\Controllers\Admin\rule\RuleArticleController;
-use App\Http\Controllers\Admin\rule\RuleClauseController;
 
 //EResource
+use App\Http\Controllers\Admin\rule\RuleClauseController;
 use App\Http\Controllers\Admin\rule\RuleSectionController;
-use App\Http\Controllers\Admin\rule\RuleSubSectionController;
 // use App\Http\Controllers\Admin\academic\ProgramCourseController;
 // use App\Http\Controllers\Admin\academic\ProgramRequirementController;
 
 // DotUni News
-use App\Http\Controllers\Admin\user\RoleController;
+use App\Http\Controllers\Admin\rule\RuleSubSectionController;
 
 // announcements
+use App\Http\Controllers\Admin\user\RoleController;
 use App\Http\Controllers\Admin\user\UserController;
-use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\WebsiteController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // Public Website Routes
-Route::get('/', function () {
-    return view('website.pages.home');
-})->name('website.pages.home');
+// Route::get('/', function () {
+//     return view('website.pages.home');
+// })->name('website.pages.home');
+
+// Route::get('/gallery', function () {
+//     return view('website.pages.gallery');
+// })->name('website.pages.gallery');
+
+// Route::get('/courses', function () {
+//     return view('website.pages.courses');
+// })->name('website.pages.courses');
+
+Route::get('/admission-requirements', function () {
+    return view('website.pages.admission.admission-requirements');
+})->name('website.pages.admission-requirements');
+
+Route::get('/schedule-school-fees', function () {
+    return view('website.pages.admission.schedule-school-fees');
+})->name('website.pages.schedule-school-fees');
+
+
+
+
+Route::get('/', [WebsiteController::class, 'home'])
+    ->name('website.home');
 
 Route::get('/about', function () {
     return view('website.pages.about');
 })->name('website.pages.about');
 
-Route::get('/gallery', function () {
-    return view('website.pages.gallery');
-})->name('website.pages.gallery');
+Route::get('/gallery', [WebsiteController::class, 'gallery'])->name('website.gallery');
+Route::get('/gallery/data', [WebsiteController::class, 'galleryData'])->name('website.galleryData');
 
-Route::get('/courses', function () {
-    return view('website.pages.courses');
-})->name('website.pages.courses');
+Route::get('/courses', [WebsiteController::class, 'courses'])
+    ->name('website.courses');
+
+Route::get('/courses/data', [WebsiteController::class, 'coursesData'])
+    ->name('website.coursesData');
+
+
 
 
 

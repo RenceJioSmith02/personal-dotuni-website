@@ -13,9 +13,42 @@ use Illuminate\Support\Facades\Storage;
 
 class ProgramService
 {
+
     public function list()
     {
-        return Program::with('asset')->get();
+        $programs = Program::with('asset')->get()->map(function ($program) {
+
+            $program->imagePath = optional($program->asset)->storage_path;
+
+            return $program;
+        });
+
+        return $programs;
+    }
+
+
+    public function listPaginated($page = 1, $perPage = 8)
+    {
+        $query = Program::with('asset')
+            ->where('is_active', true)
+            ->orderByDesc('created_at');
+
+        $paginated = $query->paginate(
+            $perPage,
+            ['*'],
+            'page',
+            $page
+        );
+
+        $paginated->getCollection()->transform(function ($program) {
+            return [
+                'id' => $program->id,
+                'title' => $program->title,
+                'image_url' => $program->image_url,
+            ];
+        });
+
+        return $paginated;
     }
 
 

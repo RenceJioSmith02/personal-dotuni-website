@@ -26,7 +26,6 @@ class AnnouncementService
     }
 
 
-
     public function datatable(Request $request)
     {
         $query = Announcement::with(['author:id,name', 'assets']);

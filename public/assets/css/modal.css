@@ -259,6 +259,45 @@
 }
 
 /* news and announcement css */
+
+
+  .hashtag-input-container {
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 5px;
+    min-height: 40px;
+    cursor: text;
+  }
+
+  .hashtag-input-container input {
+    border: none;
+    outline: none;
+    flex: 1;
+    min-width: 120px;
+    font-size: 14px;
+    padding: 5px;
+  }
+
+  .hashtag {
+    background: rgba(76, 175, 80, 0.7); /* green semi-transparent */
+    color: white;
+    padding: 5px 10px;
+    margin: 2px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    transition: background 0.3s;
+  }
+
+  .hashtag .remove-btn {
+    margin-left: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
 .media-row {
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 10px;
@@ -560,3 +599,6 @@
 .image-card:active {
     cursor: grabbing;
 }
+
+
+
