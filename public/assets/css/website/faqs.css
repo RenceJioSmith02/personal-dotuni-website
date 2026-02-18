@@ -1,0 +1,144 @@
+
+/* ============================= */
+/* 07. FAQS SECTION */
+/* ============================= */
+
+.faq-section {
+  padding: 80px 5%;
+}
+
+.faq-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  max-width: 1300px;
+  margin: auto;
+}
+
+/* LEFT IMAGE */
+.faq-left {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.faq-left img {
+  max-width: 420px;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0px 8px 10px rgba(0,0,0,0.2));
+}
+
+/* RIGHT CONTENT */
+.faq-right {
+  flex: 1;
+  width: 100%;
+}
+
+
+/* CARD */
+.faq-card {
+  background: var(--white);
+  border: 1px solid var(--border-gray);
+  border-radius: 12px;
+  padding: 25px;
+}
+
+/* ITEMS */
+.faq-item {
+  padding: 12px 18px;
+  margin-bottom: 10px;
+  background: #efefef;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.faq-item span {
+  color: var(--d-gray);
+  font-weight: 500;
+}
+
+/* ACTIVE ITEM */
+.faq-item.active {
+  background: var(--primary-gradient);
+}
+
+.faq-item.active span {
+  color: var(--white);
+}
+
+.faq-item:hover {
+  background: var(--primary-gradient);
+  transform: translateX(4px);
+}
+
+.faq-item:hover span {
+  color: var(--white);
+}
+
+/* SEE ALL */
+.faq-seeall {
+  text-align: center;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.faq-seeall a {
+  color: var(--gray-100);
+  text-decoration: none;
+}
+
+.faq-answer {
+  display: none;          /* hidden by default */
+  padding: 10px 18px;
+  margin-bottom: 10px;
+  background: #f9f9f9;
+  border-left: 3px solid var(--primary-color);
+  border-radius: 0 6px 6px 0;
+  color: var(--d-gray);
+  font-size: 14px;
+  line-height: 1.5;
+  transition: all 0.3s ease;
+}
+
+.faq-item.active + .faq-answer {
+  display: block;         /* show when active */
+}
+
+.no-answer{
+  font-style: italic;
+  color: #999;
+}
+
+
+
+/* ============================= */
+/* FAQ RESPONSIVE */
+/* ============================= */
+
+@media (max-width: 1000px) {
+
+  .faq-container {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .faq-left img {
+    max-width: 460px;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .faq-card {
+    padding: 15px;
+  }
+
+  .faq-item span {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+}

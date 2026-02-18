@@ -23,6 +23,27 @@ class FaqQuestionService
     }
 
 
+    public function listPaginated($page = 1, $perPage = 5)
+    {
+        $query = FaqQuestion::with('answers')
+            ->orderBy('created_at', 'desc');
+
+        $total = $query->count();
+
+        $items = $query->skip(($page - 1) * $perPage)
+            ->take($perPage)
+            ->get();
+
+        return [
+            'data' => $items,
+            'total' => $total,
+            'per_page' => $perPage,
+            'current_page' => $page,
+            'last_page' => ceil($total / $perPage),
+        ];
+    }
+
+
 
 
     public function datatable(Request $request)

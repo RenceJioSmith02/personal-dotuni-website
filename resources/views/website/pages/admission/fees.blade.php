@@ -4,9 +4,9 @@
 
 @push('css')
 <style>
+
     .schedule-school-fees-section {
-        background: #f2f2f2;
-        padding: 60px 40px;
+        padding: 60px 0;
     }
 
     .schedule-school-fees-section .content {
@@ -54,11 +54,26 @@
         </h2>
 
         <div class="content">
-            <h4 class="content-title">
-                The following are the requirements for admission to the undergraduate programs of CLSU:
-            </h4>
 
-            <img src="{{ asset('test_images/fees.png') }}" alt="School Fees Schedule">
+            @forelse($fees as $fee)
+                <div class="fee-item" style="margin-bottom: 30px;">
+                    <h4 class="content-title">
+                        {{ $fee->title ?? 'No Title' }}
+                    </h4>
+
+                    @if($fee->asset && !empty($fee->asset->storage_path))
+                        <img src="{{ asset('storage/'.$fee->asset->storage_path) }}" alt="{{ $fee->title }}">
+                    @else
+                        <img src="{{ asset('assets/system_images/placeholder.jpg') }}" alt="{{ $fee->title }}">
+                    @endif
+
+                </div>
+            @empty
+                <p style="text-align:center; color:#999;">
+                    No school fees uploaded yet.
+                </p>
+            @endforelse
+
         </div>
 
     </div>

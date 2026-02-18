@@ -4,6 +4,7 @@
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets/css/website/homepage.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/website/faqs.css') }}" />
 @endpush
 
 @section('content')
@@ -300,17 +301,22 @@
                         </div>
                         <div class="faq-answer">
                             <ul>
-                                @foreach($faq->answers as $answer)
-                                    <li>{!! $answer->answer !!}</li> <!-- or {{ $answer->answer }} if plain text -->
-                                @endforeach
+                                <ul>
+                                    @forelse($faq->answers as $answer)
+                                        <li>{!! $answer->answer !!}</li>
+                                    @empty
+                                        <li class="no-answer">No answer</li>
+                                    @endforelse
+                                </ul>
                             </ul>
                         </div>
                     </div>
                     @endforeach
 
                     <div class="faq-seeall">
-                        See all
+                        <a href="{{ route('website.faqs') }}">See all</a>
                     </div>
+
 
                 </div>
 

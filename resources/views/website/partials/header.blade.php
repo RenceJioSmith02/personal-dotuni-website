@@ -152,15 +152,16 @@
                 >
                 <ul class="dropdown-menu">
                   <li>
-                    <a class="nav-link {{ request()->routeIs('website.pages.admission_requirements') ? 'active' : '' }}" href="{{ route('website.pages.admission-requirements') }}">Admission Requirements</a>
+                    <a class="nav-link {{ request()->routeIs('website.admissionRequirements') ? 'active' : '' }}" href="{{ route('website.admissionRequirements') }}">Admission Requirements</a>
                   </li>
                   <li>
-                    <a class="nav-link {{ request()->routeIs('website.pages.schedule_school_fees') ? 'active' : '' }}" href="{{ route('website.pages.schedule-school-fees') }}">Schedule of School Fees</a>
+                    <a class="nav-link {{ request()->routeIs('website.fees') ? 'active' : '' }}" href="{{ route('website.fees') }}">Schedule of School Fees</a>
                   </li>
                   <li>
-                    <a class="dropdown-item" href="#"
-                      >FAQS</a
-                    >
+                    <a class="nav-link {{ request()->routeIs('website.pages.online_payment') ? 'active' : '' }}" href="{{ route('website.pages.online-payment') }}">Online Payment of School Fees</a>
+                  </li>
+                  <li>
+                    <a class="nav-link {{ request()->routeIs('website.faqs') ? 'active' : '' }}" href="{{ route('website.faqs') }}">FAQs</a>
                   </li>
                 </ul>
               </li>
@@ -172,13 +173,13 @@
                   href="#"
                   role="button"
                   data-bs-toggle="dropdown"
-                  >Research</a
+                  >Student Services</a
                 >
                 <ul class="dropdown-menu">
                   <li>
                     <a
                       class="dropdown-item"
-                      href="research.html#ongoing-projects"
+                      href="{{ route('website.pages.rules-and-regulations') }}"
                       >Rules and Regulation</a
                     >
                   </li>
@@ -193,7 +194,7 @@
                     >
                   </li>
                   <li>
-                    <a class="dropdown-item" href="#"
+                    <a class="dropdown-item" href="{{ route('website.pages.eresources') }}"
                       >eResources</a
                     >
                   </li>

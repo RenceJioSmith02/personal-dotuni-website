@@ -70,13 +70,35 @@ use Illuminate\Support\Facades\Route;
 //     return view('website.pages.courses');
 // })->name('website.pages.courses');
 
-Route::get('/admission-requirements', function () {
-    return view('website.pages.admission.admission-requirements');
-})->name('website.pages.admission-requirements');
+// Route::get('/admission-requirements', function () {
+//     return view('website.pages.admission.admission-requirements');
+// })->name('website.pages.admission-requirements');
 
-Route::get('/schedule-school-fees', function () {
-    return view('website.pages.admission.schedule-school-fees');
-})->name('website.pages.schedule-school-fees');
+// Route::get('/schedule-school-fees', function () {
+//     return view('website.pages.admission.schedule-school-fees');
+// })->name('website.pages.schedule-school-fees');
+
+Route::get('/online-payment', function () {
+    return view('website.pages.admission.online-payment');
+})->name('website.pages.online-payment');
+
+// Route::get('/faqs', function () {
+//     return view('website.pages.admission.faqs');
+// })->name('website.pages.faqs');
+
+Route::get('/rules-and-regulations', function () {
+    return view('website.pages.student-services.rules-and-regulations');
+})->name('website.pages.rules-and-regulations');
+
+Route::get('/eresources', function () {
+    return view('website.pages.student-services.eresources');
+})->name('website.pages.eresources');
+
+
+
+
+
+
 
 
 
@@ -96,6 +118,22 @@ Route::get('/courses', [WebsiteController::class, 'courses'])
 
 Route::get('/courses/data', [WebsiteController::class, 'coursesData'])
     ->name('website.coursesData');
+
+
+// Admission Pages
+Route::get('/faqs', function () {
+    return view('website.pages.admission.faqs');
+})->name('website.faqs');
+
+Route::get('/faqs/data', [WebsiteController::class, 'faqData'])
+    ->name('website.faqData');
+
+Route::get('/fees', [WebsiteController::class, 'fees'])
+    ->name('website.fees');
+
+Route::get('/admission-requirements', [WebsiteController::class, 'admissionRequirements'])
+    ->name('website.admissionRequirements');
+
 
 
 
@@ -184,79 +222,3 @@ Route::prefix('admin')
 
     });
 
-
-// Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
-
-//     Route::resource('users', UserController::class);
-//     Route::resource('roles', RoleController::class)->except(['show']);
-
-
-//     Route::resource('courses', CourseController::class);
-//     Route::resource('programs', ProgramController::class);
-//     Route::resource('program_requirement_categories', ProgramRequirementCategoryController::class);
-
-
-//     Route::get('programs/{program}/builder', [ProgramBuilderController::class, 'show'])
-//         ->name('academic.programs.builder');
-
-//     // AJAX endpoints
-//     Route::post('programs/{program}/requirements/ajax', [ProgramBuilderController::class, 'storeRequirement'])
-//         ->name('programs.requirements.store.ajax');
-//     Route::delete('programs/{program}/requirements/{requirement}/ajax', [ProgramBuilderController::class, 'destroyRequirement'])
-//         ->name('programs.requirements.destroy.ajax');
-
-//     Route::post('programs/{program}/courses/ajax', [ProgramBuilderController::class, 'storeCourse'])
-//         ->name('programs.courses.store.ajax');
-//     Route::delete('programs/{program}/courses/{programCourse}/ajax', [ProgramBuilderController::class, 'destroyCourse'])
-//         ->name('programs.courses.destroy.ajax');
-
-
-
-//     // LINKAGE ROUTES
-//     Route::resource('linkage_categories', LinkageCategoryController::class);
-//     Route::resource('linkages', LinkageController::class);
-
-
-//     // CLSU NEWS ROUTES
-//     Route::resource('clsu_news', ClsuNewsController::class);
-
-//     // FAQS ROUTES
-//     Route::resource('faqs_questions', FaqQuestionController::class);
-//     Route::resource('faqs_answers', FaqAnswerController::class);
-
-//     // Information Prospective Students Routes
-//     Route::resource('prospective_student_categories', ProspectiveStudentCategoryController::class);
-//     Route::resource('prospective_student_items', ProspectiveStudentItemController::class);
-
-
-//     // Rules and Regulations Routes
-//     Route::resource('rule_articles', RuleArticleController::class);
-//     Route::resource('rule_sections', RuleSectionController::class);
-//     Route::resource('rule_sub_sections', RuleSubSectionController::class);
-//     Route::resource('rule_clauses', RuleClauseController::class);
-
-//     // Forms Routes
-//     Route::resource('form_categories', FormCategoryController::class);
-//     Route::resource('forms', FormController::class);
-
-//     // E-Resources Routes
-//     Route::resource('e_resources', EResourceController::class);
-
-//     // Gallery Routes
-//     Route::resource('gallery', GalleryController::class);
-
-//     // DotUni News Routes
-//     Route::resource('dotuni_news', DotuniNewsController::class);
-
-//     // Announcements Routes
-//     Route::resource('announcements', AnnouncementController::class);
-
-//     // Fee Routes
-//     Route::resource('fees', FeeController::class);
-
-// });
-
-
-// Route::fallback('/error404', function () {
-//     return view('error_404');
-// });

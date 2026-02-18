@@ -10,6 +10,10 @@ use App\Services\Faqs\FaqQuestionService;
 use App\Services\GalleryService;
 use App\Services\Linkage\LinkageService;
 use Illuminate\Http\Request;
+use App\Services\FeeService;
+use App\Services\ProspectiveStudent\ProspectiveStudentCategoryService;
+
+
 
 class WebsiteController extends Controller
 {
@@ -20,6 +24,10 @@ class WebsiteController extends Controller
     protected $programService;
     protected $faqQuestionService;
     protected $galleryService;
+    protected $feeService;
+    protected $prospectiveStudentCategoryService;
+
+
 
     public function __construct(
         LinkageService $linkageService,
@@ -30,6 +38,9 @@ class WebsiteController extends Controller
         FaqQuestionService $faqQuestionService,
 
         GalleryService $galleryService,
+        FeeService $feeService,
+        ProspectiveStudentCategoryService $prospectiveStudentCategoryService,
+
     ) {
         $this->linkageService = $linkageService;
         $this->dotuniNewsService = $dotuniNewsService;
@@ -39,8 +50,13 @@ class WebsiteController extends Controller
         $this->faqQuestionService = $faqQuestionService;
 
         $this->galleryService = $galleryService;
+        $this->feeService = $feeService;
+        $this->prospectiveStudentCategoryService = $prospectiveStudentCategoryService;
+
+
     }
 
+    // Home page
     public function home()
     {
         // SECTION 2
@@ -65,7 +81,11 @@ class WebsiteController extends Controller
 
         // SECTION 7
         $faqs = $this->faqQuestionService->list()
+            ->load(['answers:id,faq_id,answer'])
             ->take(5);
+
+        // $faqs = $this->faqQuestionService->list()
+        //     ->take(5);
 
         return view('website.pages.home', compact(
             'linkages',
@@ -98,6 +118,7 @@ class WebsiteController extends Controller
 
 
 
+    // Courses page
     public function courses()
     {
         return view('website.pages.courses');
@@ -112,5 +133,35 @@ class WebsiteController extends Controller
 
         return response()->json($courses);
     }
+
+
+    // Admission Pages
+    public function faqData(Request $request)
+    {
+        $page = $request->input('page', 1);
+        $perPage = 2; // you can adjust
+
+        $faqs = $this->faqQuestionService
+            ->listPaginated($page, $perPage);
+
+        return response()->json($faqs);
+    }
+
+    public function fees()
+    {
+        $fees = $this->feeService->list();
+
+        return view('website.pages.admission.fees', compact('fees'));
+    }
+
+    public function admissionRequirements()
+    {
+        $categories = $this->prospectiveStudentCategoryService
+            ->list()
+            ->load('items'); // eager load items for each category
+
+        return view('website.pages.admission.requirements', compact('categories'));
+    }
+
 
 }

@@ -46,6 +46,9 @@
 .about-content h4 {
   margin-top: 30px;
   font-size: 18px;
+  text-align: left;
+  padding: 0px 10px;
+  border-left: #E8D203 3px solid;
 }
 
 .about-content p {

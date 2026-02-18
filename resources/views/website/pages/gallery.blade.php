@@ -4,6 +4,7 @@
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets/css/website/gallery.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/website/website-pagination.css') }}" />
 @endpush
 
 
@@ -29,7 +30,7 @@
   </div>
 
   <!-- PAGINATION -->
-  <div class="gallery-pagination" id="gallery-pagination">
+  <div class="website-pagination" id="gallery-pagination">
       <!-- AJAX pagination buttons -->
   </div>
 

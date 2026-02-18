@@ -4,6 +4,7 @@
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets/css/website/courses.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/website/website-pagination.css') }}" />
 @endpush
 
 @section('content')
@@ -19,7 +20,7 @@
             <!-- AJAX LOAD -->
         </div>
 
-        <div class="courses-pagination" id="courses-pagination"></div>
+        <div class="website-pagination" id="courses-pagination"></div>
 
 
         {{-- <div class="courses-grid">
