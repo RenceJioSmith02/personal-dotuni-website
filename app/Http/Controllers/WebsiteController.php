@@ -18,6 +18,10 @@ use App\Services\EResourceService;
 
 use App\Services\Form\FormCategoryService;
 
+use App\Services\Academic\ProgramBuilderService;
+use App\Models\Program;
+
+
 
 
 
@@ -37,6 +41,8 @@ class WebsiteController extends Controller
     protected $ruleWebsiteService;
     protected $eResourceService;
     protected $formCategoryService;
+    protected $programBuilderService;
+
 
 
 
@@ -58,6 +64,9 @@ class WebsiteController extends Controller
 
         FormCategoryService $formCategoryService,
 
+        ProgramBuilderService $programBuilderService,
+
+
     ) {
         $this->linkageService = $linkageService;
         $this->dotuniNewsService = $dotuniNewsService;
@@ -74,6 +83,9 @@ class WebsiteController extends Controller
         $this->eResourceService = $eResourceService;
 
         $this->formCategoryService = $formCategoryService;
+
+        $this->programBuilderService = $programBuilderService;
+
 
 
 
@@ -141,10 +153,10 @@ class WebsiteController extends Controller
 
 
 
-    // Courses page
+    // Academic Pages
     public function courses()
     {
-        return view('website.pages.courses');
+        return view('website.pages.course.courses');
     }
 
     public function coursesData(Request $request)
@@ -156,6 +168,20 @@ class WebsiteController extends Controller
 
         return response()->json($courses);
     }
+
+    public function courseView(Program $program)
+    {
+        if (!$program->is_active) {
+            abort(404);
+        }
+
+        $program = $this->programBuilderService
+            ->loadProgram($program);
+
+        return view('website.pages.course.course-view', compact('program'));
+    }
+
+
 
 
     // Admission Pages

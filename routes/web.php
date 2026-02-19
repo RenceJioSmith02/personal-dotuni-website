@@ -103,6 +103,7 @@ Route::get('/eresources', function () {
 
 
 
+
 Route::get('/', [WebsiteController::class, 'home'])
     ->name('website.home');
 
@@ -113,11 +114,18 @@ Route::get('/about', function () {
 Route::get('/gallery', [WebsiteController::class, 'gallery'])->name('website.gallery');
 Route::get('/gallery/data', [WebsiteController::class, 'galleryData'])->name('website.galleryData');
 
+
+// Academic Pages
 Route::get('/courses', [WebsiteController::class, 'courses'])
     ->name('website.courses');
 
 Route::get('/courses/data', [WebsiteController::class, 'coursesData'])
     ->name('website.coursesData');
+
+Route::get('/courses/{program}', [WebsiteController::class, 'courseView'])
+    ->name('website.course.view');
+
+
 
 
 // Admission Pages

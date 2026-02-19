@@ -233,13 +233,13 @@
                 </a>
                 <ul class="dropdown-menu">
                   <li class="dropdown-item">
-                      <a href="{{ route('website.downloads', 'forms') }}">
+                      <a href="{{ route('website.downloads', 'forms') }}" style="color: white;">
                           Forms
                       </a>
                   </li>
 
                   <li class="dropdown-item">
-                      <a href="{{ route('website.downloads', 'course-prospectus') }}">
+                      <a href="{{ route('website.downloads', 'course-prospectus') }}" style="color: white;">
                           Course Prospectus
                       </a>
                   </li>

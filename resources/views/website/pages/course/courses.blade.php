@@ -1,6 +1,6 @@
 @extends('layouts.website')
 
-@section('title', 'About Us | CLSU DOT-Uni')
+@section('title', 'Courses | CLSU DOT-Uni')
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets/css/website/courses.css') }}" />
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     : '/assets/system_images/placeholder.jpg';
 
                 const html = `
-                <a href="#" class="course-card">
+                <a href="/courses/${item.id}" class="course-card">
                     <img src="${imgSrc}" alt="${item.title}">
                 </a>
                 `;
