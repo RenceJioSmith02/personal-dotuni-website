@@ -28,10 +28,18 @@ class FormCategory extends Model
      */
 
     // Category has many forms
+    // public function forms()
+    // {
+    //     return $this->hasMany(Form::class, 'form_category_id');
+    // }
+
     public function forms()
     {
-        return $this->hasMany(Form::class, 'form_category_id');
+        return $this->hasMany(Form::class, 'form_category_id')
+            ->where('is_active', true)
+            ->orderBy('sort_order');
     }
+
 
     // Who last updated this category
     public function updatedBy()

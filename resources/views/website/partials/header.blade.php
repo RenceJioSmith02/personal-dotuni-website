@@ -179,7 +179,7 @@
                   <li>
                     <a
                       class="dropdown-item"
-                      href="{{ route('website.pages.rules-and-regulations') }}"
+                      href="{{ route('website.rules-and-regulations') }}"
                       >Rules and Regulation</a
                     >
                   </li>
@@ -194,7 +194,7 @@
                     >
                   </li>
                   <li>
-                    <a class="dropdown-item" href="{{ route('website.pages.eresources') }}"
+                    <a class="dropdown-item" href="{{ route('website.eresources') }}"
                       >eResources</a
                     >
                   </li>
@@ -232,17 +232,16 @@
                   >Downloads
                 </a>
                 <ul class="dropdown-menu">
-                  <li>
-                    <a
-                      class="dropdown-item"
-                      href="#"
-                      >Course Prospectus
-                    </a>
+                  <li class="dropdown-item">
+                      <a href="{{ route('website.downloads', 'forms') }}">
+                          Forms
+                      </a>
                   </li>
-                  <li>
-                    <a class="dropdown-item" href="#">
-                      Forms
-                    </a>
+
+                  <li class="dropdown-item">
+                      <a href="{{ route('website.downloads', 'course-prospectus') }}">
+                          Course Prospectus
+                      </a>
                   </li>
                 </ul>
               </li>

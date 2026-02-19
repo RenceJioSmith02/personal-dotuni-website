@@ -13,6 +13,14 @@ use Illuminate\Http\Request;
 use App\Services\FeeService;
 use App\Services\ProspectiveStudent\ProspectiveStudentCategoryService;
 
+use App\Services\Rule\RuleWebsiteService;
+use App\Services\EResourceService;
+
+use App\Services\Form\FormCategoryService;
+
+
+
+
 
 
 class WebsiteController extends Controller
@@ -26,6 +34,10 @@ class WebsiteController extends Controller
     protected $galleryService;
     protected $feeService;
     protected $prospectiveStudentCategoryService;
+    protected $ruleWebsiteService;
+    protected $eResourceService;
+    protected $formCategoryService;
+
 
 
 
@@ -41,6 +53,11 @@ class WebsiteController extends Controller
         FeeService $feeService,
         ProspectiveStudentCategoryService $prospectiveStudentCategoryService,
 
+        RuleWebsiteService $ruleWebsiteService,
+        EResourceService $eResourceService,
+
+        FormCategoryService $formCategoryService,
+
     ) {
         $this->linkageService = $linkageService;
         $this->dotuniNewsService = $dotuniNewsService;
@@ -52,6 +69,12 @@ class WebsiteController extends Controller
         $this->galleryService = $galleryService;
         $this->feeService = $feeService;
         $this->prospectiveStudentCategoryService = $prospectiveStudentCategoryService;
+
+        $this->ruleWebsiteService = $ruleWebsiteService;
+        $this->eResourceService = $eResourceService;
+
+        $this->formCategoryService = $formCategoryService;
+
 
 
     }
@@ -162,6 +185,47 @@ class WebsiteController extends Controller
 
         return view('website.pages.admission.requirements', compact('categories'));
     }
+
+
+    // Student Services Pages
+    public function rulesAndRegulations()
+    {
+        $articles = $this->ruleWebsiteService->list();
+
+        return view('website.pages.student-services.rules-and-regulations', compact('articles'));
+    }
+
+    public function eResources()
+    {
+        $resources = $this->eResourceService->websiteList();
+
+        return view('website.pages.student-services.eresources', compact('resources'));
+    }
+
+
+    // Downloads
+    public function downloads($type)
+    {
+        $categories = $this->formCategoryService
+            ->list()
+            ->load(['forms.asset']);
+
+        // ONLY Course Prospectus
+        if ($type === 'course-prospectus') {
+
+            $categories = $categories->where('slug', 'course-prospectus');
+
+        }
+        // EVERYTHING EXCEPT Course Prospectus
+        else {
+
+            $categories = $categories->where('slug', '!=', 'course-prospectus');
+
+        }
+
+        return view('website.pages.downloads', compact('categories', 'type'));
+    }
+
 
 
 }

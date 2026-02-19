@@ -14,9 +14,11 @@ class EResourceService
     /**
      * List all resources
      */
-    public function list()
+    public function websiteList()
     {
-        return EResource::orderBy('sort_order')->get();
+        return EResource::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
     }
 
     public function datatable(Request $request)

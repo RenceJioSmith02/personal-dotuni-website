@@ -86,9 +86,9 @@ Route::get('/online-payment', function () {
 //     return view('website.pages.admission.faqs');
 // })->name('website.pages.faqs');
 
-Route::get('/rules-and-regulations', function () {
-    return view('website.pages.student-services.rules-and-regulations');
-})->name('website.pages.rules-and-regulations');
+// Route::get('/rules-and-regulations', function () {
+//     return view('website.pages.student-services.rules-and-regulations');
+// })->name('website.pages.rules-and-regulations');
 
 Route::get('/eresources', function () {
     return view('website.pages.student-services.eresources');
@@ -135,7 +135,17 @@ Route::get('/admission-requirements', [WebsiteController::class, 'admissionRequi
     ->name('website.admissionRequirements');
 
 
+// Student Services Pages
+Route::get('/rules-and-regulations', [WebsiteController::class, 'rulesAndRegulations'])
+    ->name('website.rules-and-regulations');
 
+Route::get('/e-resources', [WebsiteController::class, 'eResources'])
+    ->name('website.eresources');
+
+
+// Downlaods
+Route::get('/downloads/{type}', [WebsiteController::class, 'downloads'])
+    ->name('website.downloads');
 
 
 

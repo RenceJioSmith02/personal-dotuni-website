@@ -60,7 +60,7 @@
 @section('content')
 
 
-<section class="document-section">
+{{-- <section class="document-section">
 
     <div class="divider"></div>
     <h2 class="section-title">
@@ -71,8 +71,60 @@
         <div class="document-container">
 
             <div class="document-header">
-                <h4 class="document-article">ARTICLE II</h4>
+                <h4 class="document-article">ARTICLE I</h4>
                 <h5 class="document-title">Declaration of Policy</h5>
+            </div>
+
+            <div class="document-body">
+
+                <p>
+                    <strong>Section 1 :</strong>
+                    It is hereby declared the policy of the Distance, Open,
+                    and Transnational University to promote and protect the
+                    right of Filipino citizens to quality education...
+                </p>
+
+                <p>
+                    <strong>Section 2 :</strong>
+                    It is likewise the policy of the Distance, Open,
+                    and Transnational University to uphold CLSU’s
+                    institutional vision...
+                </p>
+
+                <p>
+                    <strong>Section 3 :</strong>
+                    It is also the policy of the Distance, Open,
+                    and Transnational University...
+                </p>
+
+                <ol class="document-list">
+                    <li>
+                        Presented and Approved by the Council of Deans...
+                        <ul>
+                            <li>A school year at DOT-Uni starts...</li>
+                            <li>The First Term starts on August...</li>
+                            <li>The start of the programs...</li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        Presented and Approved by the Academic Council...
+                    </li>
+
+                    <li>
+                        Approved by the Board of Regents...
+                    </li>
+                </ol>
+
+            </div>
+
+        </div>
+
+        <div class="document-container">
+
+            <div class="document-header">
+                <h4 class="document-article">ARTICLE II</h4>
+                <h5 class="document-title">Declaration of Politics</h5>
             </div>
 
             <div class="document-body">
@@ -121,7 +173,72 @@
         </div>
     </div>
 
+</section> --}}
+
+<section class="document-section">
+
+    <div class="divider"></div>
+    <h2 class="section-title">
+        INFORMATION for PROSPECTIVE STUDENTS
+    </h2>
+
+    <div class="content">
+
+        @foreach($articles as $article)
+        <div class="document-container">
+
+            <div class="document-header">
+                <h4 class="document-article">
+                    {{ $article->number }}
+                </h4>
+                <h5 class="document-title">
+                    {{ $article->title }}
+                </h5>
+            </div>
+
+            <div class="document-body">
+
+                {{-- SECTIONS --}}
+                @foreach($article->sections as $section)
+                    <p>
+                        <strong>{{ $section->number }} :</strong>
+                        {!! $section->body !!}
+                    </p>
+
+                    {{-- SUB SECTIONS --}}
+                    @if($section->subSections->count())
+                    <ol class="document-list">
+                        @foreach($section->subSections as $sub)
+                        <li>
+                            {!! $sub->body !!}
+
+                            {{-- CLAUSES --}}
+                            @if($sub->clauses->count())
+                            <ul>
+                                @foreach($sub->clauses as $clause)
+                                <li>
+                                    {!! $clause->body !!}
+                                </li>
+                                @endforeach
+                            </ul>
+                            @endif
+
+                        </li>
+                        @endforeach
+                    </ol>
+                    @endif
+
+                @endforeach
+
+            </div>
+
+        </div>
+        @endforeach
+
+    </div>
+
 </section>
+
 
 
 @endsection
