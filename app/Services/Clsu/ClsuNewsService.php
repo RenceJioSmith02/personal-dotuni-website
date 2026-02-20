@@ -23,10 +23,15 @@ class ClsuNewsService
         return $clsuNews;
     }
 
+    public function query()
+    {
+        return ClsuNews::with('thumbnail');
+    }
+
 
     public function datatable(Request $request)
     {
-        $query = $this->list(); // query builder
+        $query = $this->query();
 
         $total = $query->count();
 
