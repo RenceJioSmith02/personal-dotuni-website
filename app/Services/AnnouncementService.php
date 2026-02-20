@@ -65,8 +65,26 @@ class AnnouncementService
                     default => 'badge-secondary',
                 };
 
+                $docAsset = $item->assets
+                    ->where('pivot.is_thumbnail', false)
+                    ->first();
+
+                $fileUrl = $docAsset?->getPublicUrl();
+                $mimeType = $docAsset?->mime_type;
+
                 return [
                     'title' => $item->title,
+                    'file' => $fileUrl
+                        ? (
+                            Str::contains($mimeType, 'pdf')
+                            ? '<a href="' . $fileUrl . '" target="_blank" title="View PDF">
+                                    <i class="fas fa-file-pdf text-danger fa-2x"></i>
+                            </a>'
+                                                : '<a href="' . $fileUrl . '" target="_blank" title="View File">
+                                    <i class="fas fa-file-alt fa-2x"></i>
+                            </a>'
+                                            )
+                                            : '<span class="text-muted">—</span>',
                     'seo_description' => Str::limit($item->seo_description, 80),
                     'layout' => ucfirst(str_replace('_', ' ', $item->layout)),
                     'visibility' => '<span class="badge ' . $visClass . '">' . ucfirst($item->visibility) . '</span>',
@@ -162,6 +180,16 @@ class AnnouncementService
         });
     }
 
+
+    private function replaceDocumentAssets(Announcement $announcement): void
+    {
+        $announcement->assets()
+            ->wherePivot('is_thumbnail', false)
+            ->wherePivot('is_cover', false)
+            ->get()
+            ->each(fn($a) => $this->deleteAssetPivot($a->pivot));
+    }
+
     /**
      * Handle layout-specific assets and uploads.
      */
@@ -202,8 +230,14 @@ class AnnouncementService
                 // article-only layout, no media
                 break;
         }
-
+        
         if ($request->hasFile('documents')) {
+
+            // IMPORTANT: remove old attached docs first
+            if ($isUpdate) {
+                $this->replaceDocumentAssets($announcement);
+            }
+
             $this->handleDocumentUploads($request, $announcement);
         }
     }

@@ -28,6 +28,7 @@
                 <tr>
                     <th width="10">#</th>
                     <th>Title</th>
+                    <th>File</th>
                     <th>SEO Description</th>
                     <th>Layout</th>
                     <th>Visibility</th>
@@ -69,6 +70,14 @@ $(function () {
             //     return json.data;
             // }
         },
+        columnDefs: [
+        {
+                targets: [2],
+                render: function(data){
+                    return data;
+                }
+            }
+        ],
         columns: [
             {
                 data: null,
@@ -80,6 +89,7 @@ $(function () {
                 }
             },
             { data: 'title' },
+            { data: 'file', orderable:false, searchable:false },
             { data: 'seo_description' },
             { data: 'layout' },
             { data: 'visibility' },
