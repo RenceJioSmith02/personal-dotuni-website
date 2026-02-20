@@ -156,8 +156,39 @@ Route::get('/downloads/{type}', [WebsiteController::class, 'downloads'])
     ->name('website.downloads');
 
 
+// News and Announcement
+Route::get(
+    '/news-and-announcement',
+    [WebsiteController::class, 'newsAndAnnouncement']
+)
+    ->name('website.news');
+
+Route::get(
+    '/news/load-more/{type}',
+    [WebsiteController::class, 'loadMoreNews']
+)
+    ->name('news.load.more');
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 
 // Authentication Routes
 Auth::routes();

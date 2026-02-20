@@ -138,7 +138,7 @@
 
               <!-- News and Announcement -->
               <li class="nav-item">
-                <a class="nav-link" href="#">News and Announcement</a>
+                <a class="nav-link {{ request()->routeIs('website.news') ? 'active' : '' }}" href="{{ route('website.news') }}">News and Announcement</a>
               </li>
 
               <!-- Admission dropdown -->

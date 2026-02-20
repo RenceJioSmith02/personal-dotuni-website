@@ -254,4 +254,292 @@ class WebsiteController extends Controller
 
 
 
+    // public function newsAndAnnouncement()
+    // {
+
+    //     // ANNOUNCEMENTS
+    //     $announcementQuery = $this->announcementService->list()
+    //         ->where('visibility', 'public');
+
+    //     $announcementTotal = $announcementQuery->count();
+
+    //     $announcements = $announcementQuery
+    //         ->take(8)
+    //         ->map(function ($item) {
+
+    //             $thumbnail = $item->thumbnail();
+
+    //             return [
+    //                 'title' => $item->title,
+    //                 'description' => $item->seo_description,
+    //                 'image' => optional($thumbnail)->storage_path,
+    //                 'date' => $item->publish_start,
+    //                 'type' => 'announcement'
+    //             ];
+    //         });
+
+
+
+    //     // DOTUNI
+    //     $dotuniQuery = $this->dotuniNewsService->list()
+    //         ->where('status', 'published');
+
+    //     $dotuniTotal = $dotuniQuery->count();
+
+    //     $dotuniNews = $dotuniQuery
+    //         ->take(8)
+    //         ->map(function ($item) {
+
+    //             $thumb = $item->attachments
+    //                 ->where('is_thumbnail', true)
+    //                 ->first();
+
+    //             return [
+    //                 'title' => $item->title,
+    //                 'description' => $item->seo_description,
+    //                 'image' => optional(optional($thumb)->asset)->storage_path,
+    //                 'date' => $item->published_at,
+    //                 'type' => 'dotuni'
+    //             ];
+    //         });
+
+
+
+    //     // CLSU
+    //     $clsuQuery = $this->clsuNewsService->list()
+    //         ->where('is_active', true);
+
+    //     $clsuTotal = $clsuQuery->count();
+
+    //     $clsuNews = $clsuQuery
+    //         ->take(8)
+    //         ->map(function ($item) {
+
+    //             return [
+    //                 'title' => $item->title,
+    //                 'description' => $item->description,
+    //                 'image' => $item->imagePath,
+    //                 'date' => $item->created_at,
+    //                 'type' => 'clsu'
+    //             ];
+    //         });
+
+
+    //     return view('website.pages.news-and-announcement', [
+    //         'announcements' => $announcements,
+    //         'dotuniNews' => $dotuniNews,
+    //         'clsuNews' => $clsuNews,
+
+    //         'announcementTotal' => $announcementTotal,
+    //         'dotuniTotal' => $dotuniTotal,
+    //         'clsuTotal' => $clsuTotal,
+    //     ]);
+    // }
+
+
+    // public function loadMoreNews($type)
+    // {
+
+    //     if ($type == 'announcement') {
+    //         $data = $this->announcementService->list()
+    //             ->where('visibility', 'public')
+    //             ->skip(8);
+    //     }
+
+    //     if ($type == 'dotuni') {
+    //         $data = $this->dotuniNewsService->list()
+    //             ->where('status', 'published')
+    //             ->skip(8);
+    //     }
+
+    //     if ($type == 'clsu') {
+    //         $data = $this->clsuNewsService->list()
+    //             ->where('is_active', true)
+    //             ->skip(8);
+    //     }
+
+    //     $data = $data->map(function ($item) use ($type) {
+
+    //         if ($type == 'announcement') {
+    //             $thumb = $item->thumbnail();
+    //             $img = optional($thumb)->storage_path;
+    //             $desc = $item->seo_description;
+    //             $date = $item->publish_start;
+    //         }
+
+    //         if ($type == 'dotuni') {
+    //             $thumb = $item->attachments
+    //                 ->where('is_thumbnail', true)
+    //                 ->first();
+    //             $img = optional(optional($thumb)->asset)->storage_path;
+    //             $desc = $item->seo_description;
+    //             $date = $item->published_at;
+    //         }
+
+    //         if ($type == 'clsu') {
+    //             $img = $item->imagePath;
+    //             $desc = $item->description;
+    //             $date = $item->created_at;
+    //         }
+
+    //         return view('website.partials.news-card', [
+    //             'content' => [
+    //                 'title' => $item->title,
+    //                 'description' => $desc,
+    //                 'image' => $img,
+    //                 'date' => $date,
+    //                 'type' => $type
+    //             ]
+    //         ])->render();
+
+    //     });
+
+    //     return response()->json($data->values());
+    // }
+
+
+
+
+    public function newsAndAnnouncement()
+    {
+        // ANNOUNCEMENTS
+        $announcementQuery = $this->announcementService->list()
+            ->where('visibility', 'public');
+
+        $announcementTotal = $announcementQuery->count();
+
+        $announcements = $announcementQuery
+            ->map(function ($item) {
+                return [
+                    'title' => $item->title,
+                    'description' => $item->seo_description,
+                    'image' => optional($item->thumbnail())->storage_path,
+                    'date' => $item->publish_start, // use publish_start for sorting
+                    'type' => 'announcement'
+                ];
+            })
+            ->sortByDesc('date')  // sort by publish_start descending
+            ->take(8);
+
+        // DOTUNI
+        $dotuniQuery = $this->dotuniNewsService->list()
+            ->where('status', 'published');
+
+        $dotuniTotal = $dotuniQuery->count();
+
+        $dotuniNews = $dotuniQuery
+            ->map(function ($item) {
+                $thumb = $item->attachments->where('is_thumbnail', true)->first();
+                return [
+                    'title' => $item->title,
+                    'description' => $item->seo_description,
+                    'image' => optional(optional($thumb)->asset)->storage_path,
+                    'date' => $item->published_at,
+                    'type' => 'dotuni'
+                ];
+            })
+            ->sortByDesc('date')  // sort by published_at
+            ->take(8);
+
+        // CLSU
+        $clsuQuery = $this->clsuNewsService->list()
+            ->where('is_active', true);
+
+        $clsuTotal = $clsuQuery->count();
+
+        $clsuNews = $clsuQuery
+            ->map(function ($item) {
+                return [
+                    'title' => $item->title,
+                    'description' => $item->description,
+                    'image' => $item->imagePath,
+                    'date' => $item->created_at,
+                    'type' => 'clsu'
+                ];
+            })
+            ->sortByDesc('date')  // sort by created_at
+            ->take(8);
+
+        return view('website.pages.news-and-announcement', [
+            'announcements' => $announcements,
+            'dotuniNews' => $dotuniNews,
+            'clsuNews' => $clsuNews,
+            'announcementTotal' => $announcementTotal,
+            'dotuniTotal' => $dotuniTotal,
+            'clsuTotal' => $clsuTotal,
+        ]);
+    }
+
+    public function loadMoreNews($type)
+    {
+        if ($type == 'announcement') {
+            $data = $this->announcementService->list()
+                ->where('visibility', 'public')
+                ->map(function ($item) {
+                    $thumb = $item->thumbnail();
+                    return [
+                        'title' => $item->title,
+                        'description' => $item->seo_description,
+                        'image' => optional($thumb)->storage_path,
+                        'date' => $item->publish_start,
+                        'type' => 'announcement'
+                    ];
+                })
+                ->sortByDesc('date')   // sort first
+                ->slice(8);            // then skip 8
+        }
+
+        if ($type == 'dotuni') {
+            $data = $this->dotuniNewsService->list()
+                ->where('status', 'published')
+                ->map(function ($item) {
+                    $thumb = $item->attachments->where('is_thumbnail', true)->first();
+                    return [
+                        'title' => $item->title,
+                        'description' => $item->seo_description,
+                        'image' => optional(optional($thumb)->asset)->storage_path,
+                        'date' => $item->published_at,
+                        'type' => 'dotuni'
+                    ];
+                })
+                ->sortByDesc('date')
+                ->slice(8);
+        }
+
+        if ($type == 'clsu') {
+            $data = $this->clsuNewsService->list()
+                ->where('is_active', true)
+                ->map(function ($item) {
+                    return [
+                        'title' => $item->title,
+                        'description' => $item->description,
+                        'image' => $item->imagePath,
+                        'date' => $item->created_at,
+                        'type' => 'clsu'
+                    ];
+                })
+                ->sortByDesc('date')
+                ->slice(8);
+        }
+
+        // render news cards
+        $rendered = $data->map(function ($item) {
+            return view('website.partials.news-card', [
+                'content' => $item
+            ])->render();
+        });
+
+        return response()->json($rendered->values());
+    }
+
+
+
+
+
+
+
+
+
+
+
 }
