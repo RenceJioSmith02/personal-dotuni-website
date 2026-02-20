@@ -26,6 +26,12 @@ class DotuniNewsController extends Controller
         return view('admin.dotuni_news.index');
     }
 
+    public function datatable(Request $request)
+    {
+        return response()->json(
+            $this->service->datatable($request)
+        );
+    }
     
     public function store(Request $request)
     {

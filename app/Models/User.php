@@ -19,7 +19,6 @@ class User extends Authenticatable
         'updated_by',
     ];
 
-
     protected $hidden = [
         'password',
     ];

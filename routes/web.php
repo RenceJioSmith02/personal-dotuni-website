@@ -183,6 +183,10 @@ Route::prefix('admin')
         // ============================
         Route::middleware(['role:admin,editor,publisher'])->group(function () {
             Route::resource('dotuni_news', DotuniNewsController::class);
+            Route::post(
+                'dotuni_news/datatable',
+                [DotuniNewsController::class, 'datatable']
+            )->name('dotuni_news.datatable');
             Route::resource('announcements', AnnouncementController::class);
         });
 

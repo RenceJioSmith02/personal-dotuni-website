@@ -61,13 +61,20 @@ $(function () {
         serverSide: true,
         responsive: true,
         autoWidth: false,
+        // ajax: {
+        //     url: "{{ route('admin.dotuni_news.index') }}",
+        //     type: "GET",
+        //     // dataSrc: function(json) {
+        //     //     console.log('News returned:', json.data.length);
+        //     //     return json.data;
+        //     // }
+        // },
         ajax: {
-            url: "{{ route('admin.dotuni_news.index') }}",
-            type: "GET",
-            // dataSrc: function(json) {
-            //     console.log('News returned:', json.data.length);
-            //     return json.data;
-            // }
+            url: "{{ route('admin.dotuni_news.datatable') }}",
+            type: "POST",
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+            }
         },
         columns: [
             {
