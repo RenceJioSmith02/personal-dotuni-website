@@ -1,0 +1,131 @@
+.avatar-button {
+    width: 3vw; /* Set width relative to viewport width */
+    height: 3vw; /* Set height relative to viewport width */
+    border-radius: 50%; /* Makes it circular */
+    background-size: cover;
+    background-position: center;
+    border: none; /* Removes default button border */
+    cursor: pointer; /* Makes it appear clickable */
+    position: fixed; /* Set position to fixed */
+    bottom: 3vh; /* Adjust positioning based on screen height */
+    right: 2vw; /* Adjust positioning based on screen width */
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url(dodotglobe.png);
+    transition: all 0.2s ease;
+    z-index: 9999; /* Set a very high z-index value */
+    animation: pulse 1.5s infinite alternate; /* Add animation */
+    box-shadow: rgba(1, 51, 52, 0.6) 0px 22px 70px 4px;
+}
+
+#webchat > * {
+    font-size: large;
+}
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.1);
+    }
+}
+
+.chat-container {
+    display: none;
+    position: fixed; /* Set position to fixed */
+    bottom: 5vh;
+    right: 1vw;
+    width: 20%;
+    height: 60vh; /* Set fixed height */
+    max-height: 600px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: gray;
+    padding: 0; /* Remove padding here */
+    box-shadow: rgba(1, 51, 52, 0.6) 0px 22px 70px 4px;
+    z-index: 9998; /* Set a z-index value lower than the avatar-button */
+    animation: slideIn 0.5s ease forwards;
+}
+
+
+    .chat-container #webchat {
+        width: 100%;
+        height: 92%; /* Adjusted height to accommodate header */
+        overflow-y: auto; /* Enable vertical scrolling */
+
+    }
+
+    .chat-container .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: .5em;
+        background: linear-gradient(90deg, rgba(0,255,42,0.7) 0%, rgba(9,121,16,0.7) 49%, rgba(1,51,52,0.6979166666666667) 100%);
+        border-bottom: 1px solid #ccc;
+        font-family: "Lucida Console", "Courier New", monospace;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        align-items: center; /* Align items to the bottom */
+        height: 8%; /* Set the height of the header to 100% */
+    }
+
+        .chat-container .header .title {
+            font-weight: bold;
+            color: white;
+            font-size: large;
+            align-items: center; /* Remove any default margin */
+        }
+            .chat-container .header .title .profile-pic {
+                width: 25%; /* Adjust the width as needed */
+                max-width: 50px; /* Set a maximum width to prevent the image from becoming too large */
+                height: auto; /* Automatically adjust the height to maintain the aspect ratio */
+                border-radius: 50%; /* This creates a circular profile picture */
+                margin-right: 10px; /* Adjust the margin as needed to separate the picture from the text */
+                align-items: center;
+            }
+        .chat-container .header .btns {
+            display: flex; /* Use flexbox */
+            width: auto; /* Adjust the width as needed */
+            position: relative;
+            display: inline-block;
+            color: white;
+            height: auto; /* Automatically adjust the height to maintain the aspect ratio */
+        }
+
+            /* Optionally, you can adjust the individual button styles if needed */
+            .chat-container .header .btns button {
+                /* Add any styles for individual buttons */
+                margin-right: 10px; /* Add margin between buttons */
+            }
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #toggleButton {
+        height: 4vw; /* Adjust height for smaller screens */
+        width: 4vw; /* Adjust width for smaller screens */
+        bottom: 3%; /* Adjust positioning for smaller screens */
+        right: 3%; /* Adjust positioning for smaller screens */
+    }
+
+    .chat-container {
+        width: 90vw; /* Adjust width for smaller screens */
+        bottom: calc(100% + 5vh); /* Adjust positioning for smaller screens */
+        right: 50%; /* Center it horizontally relative to the avatar button */
+        transform: translateX(50%); /* Center it horizontally relative to the avatar button */
+    }
+}

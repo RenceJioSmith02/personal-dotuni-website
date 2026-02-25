@@ -75,7 +75,7 @@ table.dataTable tbody td:last-child {
 
 /* Keep buttons inline */
 table.dataTable tbody td:last-child > * {
-    display: inline-flex !important;
+    display: inline-flex;
     gap: 6px;
     white-space: nowrap !important;
     overflow: visible !important;
@@ -225,4 +225,50 @@ table td .btn:hover {
 table.dataTable input[type="checkbox"] {
     width: 16px;
     height: 16px;
+}
+
+
+
+
+
+
+/* ==================================
+   FAQ ANSWERS CHILD ROW DESIGN
+================================== */
+
+.answers-wrapper {
+    background: #f9fafb;
+    padding: 16px;
+    border-radius: 12px;
+}
+
+.answer-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+}
+
+.answer-card:last-child {
+    margin-bottom: 0;
+}
+
+.answer-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-color: #dbeafe;
+}
+
+.answer-content {
+    font-size: 14px;
+    color: #111827;
+    margin-bottom: 8px;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.answer-meta {
+    display: flex;
+    justify-content: flex-end;
 }

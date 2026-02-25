@@ -46,7 +46,12 @@
             </a>
           </div>
           <div class="nav-header-left align-items-center">
-            <div class="row nav-header-college">
+            <div class="row nav-header-address">
+              <h6>
+                Institue of Graduate Studies
+              </h6>
+            </div>
+           <div class="row nav-header-college">
               <h2> DISTANCE, OPEN, AND TRANSNATIONAL UNIVERSITY</h2>
             </div>
             <div class="row nav-header-address">

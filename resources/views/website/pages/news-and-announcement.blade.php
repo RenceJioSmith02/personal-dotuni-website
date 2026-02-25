@@ -12,6 +12,21 @@
             animation:drop .4s ease forwards;
         }
 
+        .view-all-wrapper {
+            text-align: center;
+            margin-top: 3%;
+            cursor: pointer;
+        }
+
+        .view-all-btn{
+            color: var(--gray-100);
+            text-decoration: none;
+            font-size: 20px;
+            border: none;
+            background: none;
+        }
+
+
         @keyframes drop{
             to{
             opacity:1;
@@ -28,6 +43,7 @@
         <div class="container">
 
         <div class="section-header">
+        <div class="divider"></div>
         <h2 class="section-title">ANNOUNCEMENTS</h2>
         </div>
 
@@ -43,10 +59,12 @@
 
         @if($announcementTotal > 8)
         <div class="view-all-wrapper">
-        <button class="view-all-btn load-more"
-        data-section="announcement">
-        See All
-        </button>
+            <button class="view-all-btn toggle-news" 
+                    data-section="announcement"
+                    data-is-full="false">
+                See All
+            </button>
+        </div>
 
         @endif
 
@@ -57,6 +75,7 @@
     <div class="container">
 
     <div class="section-header">
+    <div class="divider"></div>
     <h2 class="section-title">DOTUNI NEWS</h2>
     </div>
 
@@ -72,10 +91,12 @@
 
     @if($dotuniTotal > 8)
     <div class="view-all-wrapper">
-    <button class="view-all-btn load-more"
-    data-section="dotuni">
-    See All
-    </button>
+        <button class="view-all-btn toggle-news" 
+                data-section="dotuni"
+                data-is-full="false">
+            See All
+        </button>
+    </div>
 
     @endif
 
@@ -86,6 +107,7 @@
     <div class="container">
 
     <div class="section-header">
+    <div class="divider"></div>
     <h2 class="section-title">CLSU NEWS</h2>
     </div>
 
@@ -101,53 +123,126 @@
 
     @if($clsuTotal > 8)
     <div class="view-all-wrapper">
-    <button class="view-all-btn load-more"
-    data-section="clsu">
-    See All
-    </button>
+        <button class="view-all-btn toggle-news" 
+                data-section="clsu"
+                data-is-full="false">
+            See All
+        </button>
+    </div>
 
     @endif
     </section>
 
 @endsection
 
-@push('js')
 
+@push('js')
 <script>
-function scrollToSection(id){
-    document.getElementById(id).scrollIntoView({
-        behavior:'smooth'
+let sectionData = {}; 
+
+document.addEventListener('DOMContentLoaded', function() {
+    ['announcement', 'dotuni-news', 'clsu-news'].forEach(section => {
+        const grid = document.querySelector(`#${section} .content-grid`);
+        if (grid) {
+            sectionData[section] = Array.from(grid.children);
+        }
     });
+});
+
+function formatDate(dateStr) {
+    try {
+        const date = new Date(dateStr);
+        if (!date || isNaN(date.getTime())) return 'Invalid date';
+        return date.toLocaleDateString('en-US', { 
+            month: 'short', day: 'numeric', year: 'numeric' 
+        }).replace(/,/g, '');
+    } catch (e) {
+        return 'Invalid date';
+    }
 }
 
+document.querySelectorAll('.toggle-news').forEach(btn => {
+    btn.addEventListener('click', function() {
 
+        const type = this.dataset.section;
 
-document.querySelectorAll('.load-more').forEach(btn=>{
+        const sectionId = type === 'announcement' 
+            ? 'announcement'
+            : type === 'dotuni' 
+                ? 'dotuni-news'
+                : 'clsu-news';
 
-    btn.addEventListener('click',function(){
+        const grid = document.querySelector(`#${sectionId} .content-grid`);
+        const isFull = this.dataset.isFull === 'true';
 
-        let type=this.dataset.section
-        let grid=this.closest('section')
-        .querySelector('.content-grid')
+        if (isFull) {
+            grid.innerHTML = '';
+            if (sectionData[sectionId]) {
+                sectionData[sectionId].forEach(card => {
+                    const clone = card.cloneNode(true);
+                    clone.classList.add('fade-in');
+                    grid.appendChild(clone);
+                });
+            }
+            this.textContent = 'See All';
+            this.dataset.isFull = 'false';
+            return;
+        }
 
-        fetch('/news/load-more/'+type)
-        .then(res=>res.json())
-        .then(data=>{
+        this.disabled = true;
+        this.textContent = 'Loading...';
 
-            data.forEach(card=>{
-                let div=document.createElement('div')
-                div.innerHTML=card
-                div.classList.add('fade-in')
-                grid.appendChild(div)
+        fetch(`/news/load-more/${type}`)
+            .then(res => res.json())
+            .then(moreData => {
+
+                grid.innerHTML = '';
+
+                if (sectionData[sectionId]) {
+                    sectionData[sectionId].forEach(card => {
+                        const clone = card.cloneNode(true);
+                        clone.classList.add('fade-in');
+                        grid.appendChild(clone);
+                    });
+                }
+
+                moreData.forEach(item => {
+                    const imageSrc = item.image ? '/storage/' + item.image : '/assets/system_images/placeholder.jpg';
+
+                    const cardHTML = `
+                        <a href="#" class="content-card">
+                            <img src="${imageSrc}" alt="${item.title || ''}" loading="lazy">
+                            <div class="card-content">
+                                <span class="card-category">${(item.type || 'news').toUpperCase()}</span>
+                                <h4>${item.title || 'No title'}</h4>
+                                <p>${item.description || ''}</p>
+                                <div class="card-footer">
+                                    <span class="news-date">${formatDate(item.date)}</span>
+                                    <span class="read-more">Read More</span>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = cardHTML;
+                    const newCard = tempDiv.firstElementChild;
+                    if (newCard) {
+                        newCard.classList.add('fade-in');
+                        grid.appendChild(newCard);
+                    }
+                });
+
+                this.textContent = 'See Less';
+                this.dataset.isFull = 'true';
             })
-
-            this.remove()
-
-        })
-
-    })
-
-})
-
+            .catch(err => {
+                console.error(err);
+            })
+            .finally(() => {
+                this.disabled = false;
+            });
+    });
+});
 </script>
 @endpush

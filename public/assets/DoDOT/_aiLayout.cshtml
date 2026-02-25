@@ -1,0 +1,182 @@
+﻿<script src="~/Content/Chatbotasset/webchat-es5.js"></script>
+<script src="~/Content/Chatbotasset/webchat-minimal.js"></script>
+<script src="~/Content/Chatbotasset/webchat.js"></script>
+<link href="~/Content/Chatbotasset/minimizablewebchat.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+<link href="https://webchat.botframework.com/css/webchat-stable/botchat.css" rel="stylesheet" />
+
+<div class="chat-container" id="chat-container" style="display: none;">
+    <div class="header">
+        <div class="title">
+            <img src="~/Content/chatbotasset/dodotglobe.png" alt="DoDOT" class="profile-pic">
+            <span style="letter-spacing: .2rem">DoDOT</span>
+        </div>
+        <div class="btns">
+            <a id="minimize_chat"><em class="icon bi bi-dash-circle-fill"></em></a>
+            <a id="close_chat"><em class="icon bi bi-x-circle-fill"></em></a>
+        </div>
+    </div>
+    <!-- This is where you embed the Web Chat component -->
+    <div id="webchat" role="main"></div>
+</div>
+
+<button class="avatar-button" data-toggle="popover" id="toggleButton"></button>
+
+<script>
+
+    const token = 'O_STxcOI5IQ.NjpTuhmbN3Cc4By58dTp78FL5lSyIsPoLtMLXRyQuMk';
+    const toggleButton = document.getElementById('toggleButton');
+    const webchatContainer = document.getElementById('chat-container');
+    let isChatOpen = false;
+
+
+
+    const styleSet = window.WebChat.createStyleSet({
+        bubbleBackground: 'White',
+        bubbleFromUserBackground: 'rgb(240, 240, 240)',
+        rootHeight: '100%',
+        rootWidth: '100%',
+
+
+    });
+    styleSet.textContent = {
+        ...styleSet.textContent,
+        fontFamily: "'Lucida Console', 'Courier New', monospace",
+        fontWeight: 'normal',
+        fontSize: 'large',
+        // Change bubble from BOT
+        bubbleTextColor: "#FFFFFF",
+        bubbleBackground: "#007D85",
+        bubbleBorderRadius: 10,
+
+        bubbleBorderColor: "#FFFFFF",
+
+
+        // Change bubble from USER
+        bubbleFromUserBackground: "#EDEDED",
+        bubbleFromUserTextColor: "#000000",
+        bubbleFromUserBorderRadius: 10,
+        bubbleFromUserBorderColor: "#EDEDED",
+
+        //Change the suggested action layout buttons
+        suggestedActionLayout: 'carousel',
+        suggestedActionBorderRadius: 10,
+        suggestedActionBackgroundColorOnHover: '#007D85',
+        suggestedActionTextColorOnHover: '#FFFFFF',
+    };
+
+    // Set the avatar options.
+    const styleOptions = {
+        hideSendBox: false,
+        hideUploadButton: true,
+        botAvatarInitials: '',
+        botAvatarImage: './Content/chatbotasset/dodotglobe.png',
+
+
+        primaryFont: "Source Sans Pro",
+    };
+
+
+    var d = new Date();
+    var tzoffset = d.getTimezoneOffset();
+    const store = window.WebChat.createStore(
+        {},
+        function (_ref) {
+            const dispatch = _ref.dispatch;
+            return function (next) {
+                return function (action) {
+                    if (action.type === 'DIRECT_LINE/CONNECT_FULFILLED') {
+                        dispatch({
+                            type: 'WEB_CHAT/SEND_EVENT',
+                            payload: {
+                                name: 'webchat/join',
+                                value: tzoffset.toString()
+                            }
+                        });
+                    }
+                    return next(action);
+                };
+            };
+        });
+
+    window.WebChat.renderWebChat({
+        directLine: window.WebChat.createDirectLine({ token: token }),
+        styleSet,
+        styleOptions: styleOptions,
+        store: store,
+        webSpeechPonyfillFactory: window.WebChat.createBrowserWebSpeechPonyfillFactory()
+    }, document.getElementById('webchat'));
+
+    // Scroll to the bottom when the chat is opened
+
+    document.getElementById('webchat').addEventListener('focus', scrollToBottom);
+
+    // Automatically scroll to the bottom when new messages are added
+    store.subscribe(() => {
+        const activities = store.getState().activities;
+        if (activities.some(activity => activity.type === 'message')) {
+            scrollToBottom();
+        }
+    });
+    function scrollToBottom() {
+        var webchatContainer = document.getElementById('webchat');
+        webchatContainer.scrollTop = webchatContainer.scrollHeight;
+    }
+    function resetChat() {
+        window.location.reload();
+    }
+
+
+
+    toggleButton.addEventListener('click', () => {
+        if (!isChatOpen) {
+            webchatContainer.style.display = 'block';
+            toggleButton.style.display = 'none';
+            isChatOpen = true;
+        } else {
+            webchatContainer.style.display = 'none';
+            isChatOpen = false;
+        }
+    });
+
+    const minimizeButton = document.querySelector('#minimize_chat');
+    const closeButton = document.querySelector('#close_chat');
+    minimizeButton.addEventListener('click', () => {
+        webchatContainer.style.display = 'none';
+        toggleButton.style.display = 'block';
+        isChatOpen = false;
+    });
+
+    closeButton.addEventListener('click', () => {
+        webchatContainer.style.display = 'none';
+        toggleButton.style.display = 'block';
+        isChatOpen = false;
+        resetChat(); // Function to reset the chat
+    });
+
+
+    $(document).ready(function () {
+        $('[data-toggle="popover"]').popover({
+            html: true,
+            trigger: 'hover',
+            placement: 'top',
+            title: '',
+            content: function () { return '<img src="./Content/chatbotasset/dodotchatbubbles.png" style="border:none;" />'; }
+        });
+
+        // Adjust the popover position to align image to top right corner
+        $('[data-toggle="popover"]').on('inserted.bs.popover', function () {
+            $('.popover').css({
+                'top': '0',
+                'right': 'auto',
+                'bottom': 'auto',
+                'left': 'auto',
+                'width': 'auto',
+                'height': 'auto',
+                'padding': '0',
+                'border': 'none',
+                'border-radius': '0'
+            });
+        });
+    });
+</script>

@@ -118,7 +118,7 @@
             ----------------------------- */
             function renderAnswers(rowData) {
                 let html = `
-            <div class="p-2">
+            <div class="p-2" style="display: block;">
                 <button
                     class="btn btn-sm btn-primary mb-2 add-answer"
                     data-faq="${rowData.id}">
