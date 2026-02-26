@@ -95,8 +95,9 @@
                     </div>
 
                     <!-- Navigation -->
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
+                    <div class="carousel-btn next"></div>
+                    <div class="carousel-btn prev"></div>
+
                 </div>
 
 
@@ -337,8 +338,8 @@
         const swiper = new Swiper('.swiper-container', {
             loop: true,
             navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
+                nextEl: '.carousel-btn.next',
+                prevEl: '.carousel-btn.prev',
             },
             autoplay: {
                 delay: 5000,

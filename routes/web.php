@@ -78,10 +78,6 @@ use Illuminate\Support\Facades\Route;
 //     return view('website.pages.admission.schedule-school-fees');
 // })->name('website.pages.schedule-school-fees');
 
-Route::get('/online-payment', function () {
-    return view('website.pages.admission.online-payment');
-})->name('website.pages.online-payment');
-
 // Route::get('/faqs', function () {
 //     return view('website.pages.admission.faqs');
 // })->name('website.pages.faqs');
@@ -90,10 +86,23 @@ Route::get('/online-payment', function () {
 //     return view('website.pages.student-services.rules-and-regulations');
 // })->name('website.pages.rules-and-regulations');
 
-Route::get('/eresources', function () {
-    return view('website.pages.student-services.eresources');
-})->name('website.pages.eresources');
+// Route::get('/eresources', function () {
+//     return view('website.pages.student-services.eresources');
+// })->name('website.pages.eresources');
 
+
+Route::get('/layout1', function () {
+    return view('website.pages.news-and-announcements-layouts.layout1');
+});
+Route::get('/layout2', function () {
+    return view('website.pages.news-and-announcements-layouts.layout2');
+});
+Route::get('/layout3', function () {
+    return view('website.pages.news-and-announcements-layouts.layout3');
+});
+Route::get('/layout4', function () {
+    return view('website.pages.news-and-announcements-layouts.layout4');
+});
 
 
 
@@ -110,6 +119,12 @@ Route::get('/', [WebsiteController::class, 'home'])
 Route::get('/about', function () {
     return view('website.pages.about');
 })->name('website.pages.about');
+
+Route::get('/online-payment', function () {
+    return view('website.pages.admission.online-payment');
+})->name('website.pages.online-payment');
+
+
 
 Route::get('/gallery', [WebsiteController::class, 'gallery'])->name('website.gallery');
 Route::get('/gallery/data', [WebsiteController::class, 'galleryData'])->name('website.galleryData');
