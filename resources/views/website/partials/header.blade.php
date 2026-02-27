@@ -217,12 +217,21 @@
                 >
                 <ul class="dropdown-menu">
                   <li>
-                    <a class="dropdown-item" href="#">Online Application</a>
+                      <a class="dropdown-item" 
+                        href="https://cais.oad.clsu2.edu.ph/login"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        Online Application
+                      </a>
                   </li>
+
                   <li>
-                    <a class="dropdown-item" href="#"
-                      >Turnitin</a
-                    >
+                      <a class="dropdown-item" 
+                        href="https://clsu.turnitin.com/home/sign-in"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        Turnitin
+                      </a>
                   </li>
                 </ul>
               </li>

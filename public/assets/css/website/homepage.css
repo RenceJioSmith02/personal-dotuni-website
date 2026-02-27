@@ -642,8 +642,6 @@
 
 
 
-
-
 /* SECTION 6: PROGRAMS */
 
 .program-section {
@@ -666,18 +664,18 @@
     display: flex;
     align-items: center;
     gap: 30px;
-    transition: transform .55s cubic-bezier(.4,0,.2,1);
+    /* NO transition here — JS controls it directly */
 }
 
 .card {
     flex: 0 0 220px;
     opacity: .6;
-    transition: 
-        flex-basis .45s ease,
-        transform .45s ease,
-        opacity .3s ease;
+    transition:
+        flex-basis .15s ease,
+        opacity .80s ease;
+    --bs-card-border-width: none;
+    --bs-card-border-color: none;
 }
-
 .card.active {
     flex: 0 0 300px;
     opacity: 1;
@@ -685,7 +683,7 @@
 
 .card img {
     width: 100%;
-    height: auto;
+    height: 425px; /* from auto */
     display: block;
     object-fit: contain;
 }
@@ -696,24 +694,28 @@
     font-size: 40px;
     cursor: pointer;
     color: #333;
+    z-index: 2;
+    flex-shrink: 0;
 }
 
 .nav-btn:hover {
     color: #1a8f1a;
 }
 
-
 @media (max-width: 768px) {
-    .card { flex: 0 0 160px; }
+    .card        { flex: 0 0 160px; }
     .card.active { flex: 0 0 220px; }
+    .carousel-viewport {
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+        mask-image:         linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+    }
 }
 
 @media (max-width: 480px) {
-    .card { flex: 0 0 130px; }
+    .card        { flex: 0 0 130px; }
     .card.active { flex: 0 0 180px; }
+    .carousel-viewport {
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+        mask-image:         linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    }
 }
-
-
-
-
-

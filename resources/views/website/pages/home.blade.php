@@ -355,41 +355,122 @@
         });
 
 
-        //  SECTION 6 JS - CAROUSEL
-        const track = document.getElementById("carousel");
-        const cards = document.querySelectorAll(".card");
-        let index = Math.floor(cards.length / 2);
 
-        function updateCarousel() {
-            cards.forEach((card, i) => {
-                card.classList.toggle("active", i === index);
-            });
+// SECTION 6 JS - CAROUSEL
+const track = document.getElementById("carousel");
+const gap = 30;
 
-            let offset = 0;
-            const gap = 30;
+const originalCards = Array.from(track.querySelectorAll(".card"));
+const total = originalCards.length;
+const CLONE_SETS = 3;
 
-            for (let i = 0; i < index; i++) {
-                offset += cards[i].offsetWidth + gap;
-            }
+for (let s = 0; s < CLONE_SETS; s++) {
+    originalCards.forEach(card => track.appendChild(card.cloneNode(true)));
+}
+for (let s = 0; s < CLONE_SETS; s++) {
+    [...originalCards].reverse().forEach(card => track.prepend(card.cloneNode(true)));
+}
 
-            const activeWidth = cards[index].offsetWidth;
-            const center = track.parentElement.offsetWidth / 2 - activeWidth / 2;
+const MID = Math.floor(CLONE_SETS / 2) + 1;
+let index = total * MID;
+let isAnimating = false;
+let autoplayTimer;
+let resizeDebounce;
 
-            track.style.transform = `translateX(${center - offset}px)`;
-        }
+// Card sizes — must match your CSS exactly
+const CARD_SIZES = {
+    active:   300,
+    inactive: 220,
+};
 
-        document.getElementById("nextBtn").onclick = () => {
-            index = (index + 1) % cards.length;
-            updateCarousel();
-        };
+function getResponsiveSize() {
+    const w = window.innerWidth;
+    if (w <= 480) return { active: 180, inactive: 130 };
+    if (w <= 768) return { active: 220, inactive: 160 };
+    return { active: 300, inactive: 220 };
+}
 
-        document.getElementById("prevBtn").onclick = () => {
-            index = (index - 1 + cards.length) % cards.length;
-            updateCarousel();
-        };
+function allCards() {
+    return Array.from(track.querySelectorAll(".card"));
+}
 
-        window.addEventListener("resize", updateCarousel);
-        updateCarousel();
+function getOffset(idx) {
+    // Use known CSS sizes — no DOM measurement, always accurate
+    const sizes = getResponsiveSize();
+    let offset = 0;
+    const cards = allCards();
+    for (let i = 0; i < idx; i++) {
+        const isActive = i === index;
+        offset += (isActive ? sizes.active : sizes.inactive) + gap;
+    }
+    return offset;
+}
+
+function updateCarousel(animate = true) {
+    const cards = allCards();
+    const sizes = getResponsiveSize();
+
+    // Toggle active — triggers grow/shrink CSS transition simultaneously
+    cards.forEach((card, i) => card.classList.toggle("active", i === index));
+
+    track.style.transition = animate
+        ? "transform .55s cubic-bezier(.4, 0, .2, 1)"
+        : "none";
+
+    // Calculate using known final sizes — not measured offsetWidth
+    let offset = 0;
+    for (let i = 0; i < index; i++) {
+        offset += (i === index ? sizes.active : sizes.inactive) + gap;
+    }
+
+    const center = track.parentElement.offsetWidth / 2 - sizes.active / 2;
+    track.style.transform = `translateX(${center - offset}px)`;
+}
+
+track.addEventListener("transitionend", (e) => {
+    if (e.target !== track || e.propertyName !== "transform") return;
+
+    isAnimating = false;
+
+    const posInSet     = ((index % total) + total) % total;
+    const snappedIndex = total * MID + posInSet;
+
+    if (snappedIndex !== index) {
+        index = snappedIndex;
+        updateCarousel(false);
+    }
+});
+
+function navigate(dir) {
+    if (isAnimating) return;
+    isAnimating = true;
+    index += dir;
+    updateCarousel(true);
+    resetAutoplay();
+}
+
+function startAutoplay() {
+    autoplayTimer = setInterval(() => {
+        if (!isAnimating) navigate(1);
+    }, 5000);
+}
+
+function resetAutoplay() {
+    clearInterval(autoplayTimer);
+    startAutoplay();
+}
+
+document.getElementById("nextBtn").onclick = () => navigate(1);
+document.getElementById("prevBtn").onclick = () => navigate(-1);
+
+window.addEventListener("resize", () => {
+    isAnimating = false;
+    clearTimeout(resizeDebounce);
+    resizeDebounce = setTimeout(() => updateCarousel(false), 100);
+});
+
+updateCarousel(false);
+startAutoplay();
 
 
         // SECTION 7 JS - FAQS
