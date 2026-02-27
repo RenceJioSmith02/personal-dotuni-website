@@ -153,6 +153,7 @@ h1 {
 }
 a {
   text-decoration: none !important;
+  color: var(--black);
 }
 .card-body2 a {
   text-decoration: none !important;
@@ -204,7 +205,7 @@ span {
 }
 
 li::marker {
-  color: var(--tertiary); /* Change bullet color */
+  color: var(--d-gray); /* Change bullet color */
 }
 .a-link:hover,
 span .a-link:hover a {
@@ -489,7 +490,6 @@ span .a-link:hover a {
 }
 
 .footer-overlay {
-
   position: absolute;
   inset: 0;
   background: linear-gradient(

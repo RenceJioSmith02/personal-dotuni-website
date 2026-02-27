@@ -222,26 +222,32 @@
             </div>
 
             <!-- ITEM 2 -->
-            <div class="feature-item text-box">
-                <h3>About Us</h3>
-                <p>
-                    The Central Luzon State University Open University (CLSU-O.U) was formally
-                    created on August 29, 1997 through CLSU Board of Regents Resolution No. 50-97
-                    aligned to the country's goal of developing quality human resources by
-                    democratization of access to quality education.
-                </p>
-                <a href="#" class="btn btn-success mt-3">Learn More</a>
+            <div class="feature-item text-box first">
+                <div class="feature-overlay"></div>
+                <div class="feature-content">
+                    <h3>About Us</h3>
+                    <p>
+                        The Central Luzon State University Open University (CLSU-O.U) was formally
+                        created on August 29, 1997 through CLSU Board of Regents Resolution No. 50-97
+                        aligned to the country's goal of developing quality human resources by
+                        democratization of access to quality education.
+                    </p>
+                    <a href="#" class="btn btn-success mt-3">Learn More</a>
+                </div>
             </div>
 
             <!-- ITEM 3 -->
-            <div class="feature-item text-box">
-                <h3>Learning Materials</h3>
-                <p>
-                    The Open University students are provided with specially packaged printed
-                    instructional materials or self-learning modules which they study on their
-                    own most of the time.
-                </p>
-                <a href="#" class="btn btn-success mt-3">Learn More</a>
+            <div class="feature-item text-box second">
+                <div class="feature-overlay"></div>
+                <div class="feature-content">
+                    <h3>Learning Materials</h3>
+                    <p>
+                        The Open University students are provided with specially packaged printed
+                        instructional materials or self-learning modules which they study on their
+                        own most of the time.
+                    </p>
+                    <a href="#" class="btn btn-success mt-3">Learn More</a>
+                </div>
             </div>
 
             <!-- ITEM 4 -->

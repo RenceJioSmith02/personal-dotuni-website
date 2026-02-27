@@ -15,7 +15,7 @@ src="{{ $content['image']
 
 <p>{{ $content['description'] }}</p>
 
-<div class="card-footer">
+<div class="card-footer" style="color: #777">
 <span class="news-date">
     {{ \Carbon\Carbon::parse($content['date'])->format('M d, Y') }}
 </span>
