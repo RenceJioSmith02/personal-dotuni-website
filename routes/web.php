@@ -57,38 +57,6 @@ use App\Http\Controllers\WebsiteController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Public Website Routes
-// Route::get('/', function () {
-//     return view('website.pages.home');
-// })->name('website.pages.home');
-
-// Route::get('/gallery', function () {
-//     return view('website.pages.gallery');
-// })->name('website.pages.gallery');
-
-// Route::get('/courses', function () {
-//     return view('website.pages.courses');
-// })->name('website.pages.courses');
-
-// Route::get('/admission-requirements', function () {
-//     return view('website.pages.admission.admission-requirements');
-// })->name('website.pages.admission-requirements');
-
-// Route::get('/schedule-school-fees', function () {
-//     return view('website.pages.admission.schedule-school-fees');
-// })->name('website.pages.schedule-school-fees');
-
-// Route::get('/faqs', function () {
-//     return view('website.pages.admission.faqs');
-// })->name('website.pages.faqs');
-
-// Route::get('/rules-and-regulations', function () {
-//     return view('website.pages.student-services.rules-and-regulations');
-// })->name('website.pages.rules-and-regulations');
-
-// Route::get('/eresources', function () {
-//     return view('website.pages.student-services.eresources');
-// })->name('website.pages.eresources');
 
 
 Route::get('/layout1', function () {
@@ -103,12 +71,9 @@ Route::get('/layout3', function () {
 Route::get('/layout4', function () {
     return view('website.pages.news-and-announcements-layouts.layout4');
 });
-
-
-
-
-
-
+Route::get('/layout5', function () {
+    return view('website.pages.news-and-announcements-layouts.layout5');
+});
 
 
 
@@ -184,6 +149,13 @@ Route::get(
 )
     ->name('news.load.more');
 
+Route::get(
+    '/news/{type}/{id}',
+    [WebsiteController::class, 'showNews']
+)
+    ->where('type', 'announcement|dotuni') 
+    ->where('id', '[0-9]+')
+    ->name('news.show');
 
 
 
@@ -192,18 +164,6 @@ Route::get(
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-    
 
 // Authentication Routes
 Auth::routes();

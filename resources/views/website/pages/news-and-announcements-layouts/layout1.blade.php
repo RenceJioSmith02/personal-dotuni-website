@@ -1,53 +1,75 @@
+{{-- Layout 1: Alternating image-left / image-right rows --}}
 @extends('layouts.website')
 
-@section('title', 'News and Announcement | CLSU DOT-Uni')
+@section('title', ($item['title'] ?? 'News') . ' | CLSU DOT-Uni')
 
 @push('css')
   <link rel="stylesheet" href="{{ asset('assets/css/website/news-and-announcement-layout.css') }}" />
 
   <style>
-    /* MAIN */
-    .main-content {
-      background: #fff;
-      border-radius: 6px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
+    .main-content { background:#fff; border-radius:6px; overflow:hidden; }
+    .main-content-body { padding:20px; }
+
+    .content-row {
+      overflow:hidden;
+      margin-bottom:20px;
+      padding-bottom:20px;
+      border-bottom:1px solid #eee;
     }
+    .content-row:last-of-type { border-bottom:none; margin-bottom:0; }
 
     .content-image-wrapper {
-      position: relative;
+      position:relative;
+      width:45%;
+      float:left;
+      margin:0 20px 10px 0;
     }
-
+    .content-row.reverse .content-image-wrapper {
+      float:right;
+      margin:0 0 10px 20px;
+    }
     .content-image-wrapper img {
-      width: 100%;
-      height: 400px;
-      object-fit: cover;
+      width:100%;
+      height:220px;
+      object-fit:cover;
+      display:block;
     }
 
     .content-badge {
-      position: absolute;
-      bottom: 15px;
-      left: 0;
-      background: #ffd400;
-      color: #000;
-      font-weight: bold;
-      padding: 8px 20px;
+      position:absolute;
+      bottom:15px;
+      left:0;
+      background:#ffd400;
+      color:#000;
+      font-weight:bold;
+      font-size:13px;
+      padding:6px 18px;
     }
 
-    .main-content-body {
-      padding: 20px;
-    }
+    .meta-row { font-size:12px; color:#777; margin-bottom:8px; }
 
     .content-title {
-      color: #0f7c2e;
-      text-align: center;
-      padding: 10px;
-      margin: 0;
+      color:#0f7c2e;
+      font-size:17px;
+      font-weight:700;
+      line-height:1.4;
+      margin-bottom:10px;
     }
 
     .content-description {
-      margin: 15px 0;
+      font-size:13px;
+      color:#333;
+      line-height:1.7;
+      text-align:justify;
+    }
+
+    .content-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; clear:both; }
+
+    @media (max-width:768px) {
+      .content-image-wrapper,
+      .content-row.reverse .content-image-wrapper {
+        float:none; width:100%; margin:0 0 15px 0;
+      }
     }
   </style>
 @endpush
@@ -59,87 +81,70 @@
 
       <!-- ================= MAIN CONTENT ================= -->
       <div class="main-content">
-        <div class="content-image-wrapper">
-          <h2 class="content-title">
-            CLSU DOT-Uni Breaks New Ground as an Associate Member of the Asian Association of Open Universities
-          </h2>
-          <img src="https://picsum.photos/900/500" alt="Main Content">
-          <span class="content-badge">NEWS</span>
-        </div>
-
         <div class="main-content-body">
-          <div class="card-footer">
-            <span class="content-date">November 08, 2025</span>
+
+          @php
+            $imageSrc = $item['image']
+              ? asset('storage/' . $item['image'])
+              : asset('assets/system_images/placeholder.jpg');
+
+            $assets = $item['assets'] ?? collect();
+            // Additional images beyond the thumbnail
+            $extraImages = $assets->where('is_thumbnail', false)->values();
+          @endphp
+
+          <!-- ROW 1: Thumbnail LEFT, body text RIGHT -->
+          <div class="content-row">
+            <div class="content-image-wrapper">
+              <img src="{{ $imageSrc }}" alt="{{ $item['title'] }}">
+              <span class="content-badge">{{ strtoupper($item['type']) }}</span>
+            </div>
+
+            <div class="meta-row">
+              {{ \Carbon\Carbon::parse($item['date'])->format('F d, Y') }}
+            </div>
+
+            <h2 class="content-title">{{ $item['title'] }}</h2>
+
+            <p class="content-description">
+              {!! nl2br(e($item['body'] ?? $item['description'])) !!}
+            </p>
           </div>
 
-          <p class="content-description">
-            Quality Assurance Coordinator from DOT-Uni presented studies at the 38th AAOU conference
-            transitioning from measuring outputs to tracking transformative learning impact.
-          </p>
+          {{-- Extra image rows (alternating) --}}
+          @foreach($extraImages as $index => $attachment)
+            @php
+              $asset    = $attachment->asset ?? $attachment;
+              $extraSrc = $asset->storage_path
+                ? asset('storage/' . $asset->storage_path)
+                : asset('assets/system_images/placeholder.jpg');
+              $rowClass = $index % 2 === 0 ? 'reverse' : '';
+            @endphp
 
-          <div class="content-tags">
-            <span>#clsuDOTUni</span>
-            <span>#AAOUConference</span>
-            <span>#DistanceEducation</span>
-            <span>#TransformativeEducation</span>
-            <span>#lifelonglearning</span>
-          </div>
+            <div class="content-row {{ $rowClass }}">
+              <div class="content-image-wrapper">
+                <img src="{{ $extraSrc }}" alt="{{ $attachment->caption ?? '' }}">
+              </div>
+              @if($attachment->caption)
+                <p class="content-description">{{ $attachment->caption }}</p>
+              @endif
+            </div>
+          @endforeach
+
+          <!-- TAGS -->
+          @if(!empty($item['tags']))
+            <div class="content-tags">
+              @foreach($item['tags'] as $tag)
+                <span>#{{ $tag }}</span>
+              @endforeach
+            </div>
+          @endif
+
         </div>
       </div>
 
       <!-- ================= SIDE CONTENT ================= -->
-      <div class="side-content-container">
-        <div class="other-content-header">
-          <span>Other Updates</span>
-        </div>
-
-        <div class="side-content">
-          <!-- CARD -->
-          <a class="content-card" href="#">
-            <img src="https://picsum.photos/200/150" alt="Content 1">
-            <div class="card-body">
-              <h4>CLSU Student Handbook</h4>
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipiscing elit
-              </p>
-              <div class="card-footer">
-                <span class="content-date">Nov 10, 2025</span>
-                <span class="read-more">Read More</span>
-              </div>
-            </div>
-          </a>
-
-          <a class="content-card" href="#">
-            <img src="https://picsum.photos/200/150" alt="Content 2">
-            <div class="card-body">
-              <h4>University Announcement</h4>
-              <p>Lorem ipsum dolor sit amet consectetur adipiscing elit</p>
-              <div class="card-footer">
-                <span class="content-date">Nov 8, 2025</span>
-                <span class="read-more">Read More</span>
-              </div>
-            </div>
-          </a>
-
-          <a class="content-card" href="#">
-            <img src="https://picsum.photos/200/150" alt="Content 3">
-            <div class="card-body">
-              <h4>Enrollment Guidelines</h4>
-              <p>Lorem ipsum dolor sit amet consectetur adipiscing elit</p>
-              <div class="card-footer">
-                <span class="content-date">Nov 5, 2025</span>
-                <span class="read-more">Read More</span>
-              </div>
-            </div>
-          </a>
-        </div>
-
-        <div class="btn-wrapper">
-          <a class="view-all-btn" href="#">
-            View All Updates
-          </a>
-        </div>
-      </div>
+      @include('website.partials.news-side-content', ['currentType' => $item['type']])
 
     </div>
   </section>

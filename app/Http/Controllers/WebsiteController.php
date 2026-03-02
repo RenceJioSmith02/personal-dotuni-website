@@ -266,11 +266,12 @@ class WebsiteController extends Controller
             ->take(8)
             ->map(function ($item) {
                 return [
+                    'id' => $item->id,
                     'title' => $item->title,
                     'description' => $item->seo_description,
                     'image' => optional($item->thumbnail())->storage_path,
                     'date' => $item->publish_start ?? now(),
-                    'type' => 'announcement'
+                    'type' => 'announcement',
                 ];
             });
 
@@ -288,11 +289,12 @@ class WebsiteController extends Controller
                 $thumb = $item->attachments->where('is_thumbnail', true)->first();
 
                 return [
+                    'id' => $item->id,
                     'title' => $item->title,
                     'description' => $item->seo_description,
                     'image' => optional(optional($thumb)->asset)->storage_path,
                     'date' => $item->published_at ?? $item->created_at ?? now(),
-                    'type' => 'dotuni'
+                    'type' => 'dotuni',
                 ];
             });
 
@@ -308,11 +310,13 @@ class WebsiteController extends Controller
             ->take(8)
             ->map(function ($item) {
                 return [
+                    'id' => $item->id,
                     'title' => $item->title,
                     'description' => $item->description,
-                    'image' => $item->imagePath,
+                    'image' => optional($item->thumbnail)->storage_path,
                     'date' => $item->created_at ?? now(),
-                    'type' => 'clsu'
+                    'type' => 'clsu',
+                    'url' => $item->url,   // external redirect
                 ];
             });
 
@@ -341,11 +345,12 @@ class WebsiteController extends Controller
                     ->slice(8, $limit)
                     ->map(function ($item) {
                         return [
+                            'id' => $item->id,
                             'title' => $item->title,
                             'description' => $item->seo_description,
                             'image' => optional($item->thumbnail())->storage_path,
                             'date' => $item->publish_start ?? now(),
-                            'type' => 'announcement'
+                            'type' => 'announcement',
                         ];
                     });
                 break;
@@ -361,11 +366,12 @@ class WebsiteController extends Controller
                         $thumb = $item->attachments->where('is_thumbnail', true)->first();
 
                         return [
+                            'id' => $item->id,
                             'title' => $item->title,
                             'description' => $item->seo_description,
                             'image' => optional(optional($thumb)->asset)->storage_path,
                             'date' => $item->published_at ?? $item->created_at ?? now(),
-                            'type' => 'dotuni'
+                            'type' => 'dotuni',
                         ];
                     });
                 break;
@@ -379,11 +385,13 @@ class WebsiteController extends Controller
                     ->slice(8, $limit)
                     ->map(function ($item) {
                         return [
+                            'id' => $item->id,
                             'title' => $item->title,
                             'description' => $item->description,
-                            'image' => $item->imagePath,
+                            'image' => optional($item->thumbnail)->storage_path,
                             'date' => $item->created_at ?? now(),
-                            'type' => 'clsu'
+                            'type' => 'clsu',
+                            'url' => $item->url,
                         ];
                     });
                 break;
@@ -393,6 +401,81 @@ class WebsiteController extends Controller
         }
 
         return response()->json($data->values());
+    }
+
+
+
+    public function showNews(string $type, int $id)
+    {
+        switch ($type) {
+
+            // ── ANNOUNCEMENT ──────────────────────────────────
+            case 'announcement':
+                $item = $this->announcementService
+                    ->list()
+                    ->where('visibility', 'public')
+                    ->firstWhere('id', $id);
+
+                if (!$item)
+                    abort(404);
+
+                // Resolve layout view: 'layout_1' → 'layout1', etc.
+                $layoutKey = str_replace('_', '', $item->layout ?? 'layout_1'); // e.g. 'layout1'
+                $layoutView = "website.pages.news-and-announcements-layouts.{$layoutKey}";
+
+                // Build a unified data object for the view
+                $thumb = $item->thumbnail();
+                $allAssets = $item->assets ?? collect();
+
+                return view($layoutView, [
+                    'item' => [
+                        'id' => $item->id,
+                        'title' => $item->title,
+                        'description' => $item->seo_description,
+                        'body' => $item->article_body,
+                        'image' => optional($thumb)->storage_path,
+                        'assets' => $allAssets,
+                        'date' => $item->publish_start ?? $item->created_at,
+                        'type' => 'announcement',
+                        'tags' => [],
+                    ],
+                ]);
+
+
+            // ── DOTUNI ────────────────────────────────────────
+            case 'dotuni':
+                $item = $this->dotuniNewsService
+                    ->list()
+                    ->where('status', 'published')
+                    ->firstWhere('id', $id);
+
+                if (!$item)
+                    abort(404);
+
+                $layoutKey = str_replace('_', '', $item->layout ?? 'layout_1');
+                $layoutView = "website.pages.news-and-announcements-layouts.{$layoutKey}";
+
+                $thumb = $item->attachments->where('is_thumbnail', true)->first();
+                $allAssets = $item->attachments; // all attached assets
+
+                return view($layoutView, [
+                    'item' => [
+                        'id' => $item->id,
+                        'title' => $item->title,
+                        'description' => $item->seo_description,
+                        'body' => $item->article_body,
+                        'image' => optional(optional($thumb)->asset)->storage_path,
+                        'assets' => $allAssets,
+                        'date' => $item->published_at ?? $item->created_at,
+                        'type' => 'dotuni',
+                        'tags' => [],
+                    ],
+                ]);
+
+
+            default:
+                abort(404);
+        }
     }
 
 
