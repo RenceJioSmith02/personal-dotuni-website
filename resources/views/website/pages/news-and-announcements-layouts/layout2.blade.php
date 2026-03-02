@@ -49,6 +49,9 @@
       <!-- ================= MAIN CONTENT ================= -->
       <div class="main-content">
 
+        {{-- Floating download button (announcement + non-image assets only) --}}
+        @include('website.partials.announcement-download-btn', ['item' => $item])
+
         @php
           $imageSrc = $item['image']
             ? asset('storage/' . $item['image'])
