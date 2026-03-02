@@ -6,7 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'App\\Http\\Controllers\\AdminController' => $baseDir . '/app/Http/Controllers/AdminController.php',
+    'App\\Http\\Controllers\\Admin\\AdminController' => $baseDir . '/app/Http/Controllers/Admin/AdminController.php',
     'App\\Http\\Controllers\\Admin\\AnnouncementController' => $baseDir . '/app/Http/Controllers/Admin/AnnouncementController.php',
     'App\\Http\\Controllers\\Admin\\DotuniNewsController' => $baseDir . '/app/Http/Controllers/Admin/DotuniNewsController.php',
     'App\\Http\\Controllers\\Admin\\EResourceController' => $baseDir . '/app/Http/Controllers/Admin/EResourceController.php',
@@ -30,6 +30,7 @@ return array(
     'App\\Http\\Controllers\\Auth\\ResetPasswordController' => $baseDir . '/app/Http/Controllers/Auth/ResetPasswordController.php',
     'App\\Http\\Controllers\\Auth\\VerificationController' => $baseDir . '/app/Http/Controllers/Auth/VerificationController.php',
     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',
+    'App\\Http\\Controllers\\WebsiteController' => $baseDir . '/app/Http/Controllers/WebsiteController.php',
     'App\\Http\\Middleware\\RoleMiddleware' => $baseDir . '/app/Http/Middleware/RoleMiddleware.php',
     'App\\Models\\Announcement' => $baseDir . '/app/Models/Announcement.php',
     'App\\Models\\AnnouncementAsset' => $baseDir . '/app/Models/AnnouncementAsset.php',
@@ -87,6 +88,7 @@ return array(
     'App\\Services\\Rule\\RuleClauseService' => $baseDir . '/app/Services/Rule/RuleClauseService.php',
     'App\\Services\\Rule\\RuleSectionService' => $baseDir . '/app/Services/Rule/RuleSectionService.php',
     'App\\Services\\Rule\\RuleSubSectionService' => $baseDir . '/app/Services/Rule/RuleSubSectionService.php',
+    'App\\Services\\Rule\\RuleWebsiteService' => $baseDir . '/app/Services/Rule/RuleWebsiteService.php',
     'App\\Services\\User\\RoleService' => $baseDir . '/app/Services/User/RoleService.php',
     'App\\Services\\User\\UserService' => $baseDir . '/app/Services/User/UserService.php',
     'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',

@@ -27,7 +27,7 @@ class ClsuNewsController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:150',
             'url' => 'nullable|string|max:1000',
-            'description' => 'nullable|string|max:500',
+            'description' => 'nullable|string',
             'sort_order' => 'nullable|integer',
             'is_active' => 'required|boolean',
             'image' => 'nullable|image|max:2048',
@@ -48,7 +48,7 @@ class ClsuNewsController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:150',
             'url' => 'nullable|string|max:1000',
-            'description' => 'nullable|string|max:500',
+            'description' => 'nullable|string',
             'sort_order' => 'nullable|integer',
             'is_active' => 'required|boolean',
             'image' => 'nullable|image|max:2048',
@@ -66,4 +66,5 @@ class ClsuNewsController extends Controller
         return response()->json(['message' => 'News deleted successfully']);
     }
 }
+
 

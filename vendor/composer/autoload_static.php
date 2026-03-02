@@ -573,7 +573,7 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
     );
 
     public static $classMap = array (
-        'App\\Http\\Controllers\\AdminController' => __DIR__ . '/../..' . '/app/Http/Controllers/AdminController.php',
+        'App\\Http\\Controllers\\Admin\\AdminController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/AdminController.php',
         'App\\Http\\Controllers\\Admin\\AnnouncementController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/AnnouncementController.php',
         'App\\Http\\Controllers\\Admin\\DotuniNewsController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/DotuniNewsController.php',
         'App\\Http\\Controllers\\Admin\\EResourceController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/EResourceController.php',
@@ -597,6 +597,7 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         'App\\Http\\Controllers\\Auth\\ResetPasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ResetPasswordController.php',
         'App\\Http\\Controllers\\Auth\\VerificationController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/VerificationController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
+        'App\\Http\\Controllers\\WebsiteController' => __DIR__ . '/../..' . '/app/Http/Controllers/WebsiteController.php',
         'App\\Http\\Middleware\\RoleMiddleware' => __DIR__ . '/../..' . '/app/Http/Middleware/RoleMiddleware.php',
         'App\\Models\\Announcement' => __DIR__ . '/../..' . '/app/Models/Announcement.php',
         'App\\Models\\AnnouncementAsset' => __DIR__ . '/../..' . '/app/Models/AnnouncementAsset.php',
@@ -654,6 +655,7 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         'App\\Services\\Rule\\RuleClauseService' => __DIR__ . '/../..' . '/app/Services/Rule/RuleClauseService.php',
         'App\\Services\\Rule\\RuleSectionService' => __DIR__ . '/../..' . '/app/Services/Rule/RuleSectionService.php',
         'App\\Services\\Rule\\RuleSubSectionService' => __DIR__ . '/../..' . '/app/Services/Rule/RuleSubSectionService.php',
+        'App\\Services\\Rule\\RuleWebsiteService' => __DIR__ . '/../..' . '/app/Services/Rule/RuleWebsiteService.php',
         'App\\Services\\User\\RoleService' => __DIR__ . '/../..' . '/app/Services/User/RoleService.php',
         'App\\Services\\User\\UserService' => __DIR__ . '/../..' . '/app/Services/User/UserService.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
