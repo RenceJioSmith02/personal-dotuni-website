@@ -247,7 +247,7 @@ span .a-link:hover a {
 
   /* Main soft drop shadow */
   box-shadow: 
-        12px 12px 25px rgba(0, 0, 0, 0.25);
+        12px 12px 25px rgba(0, 0, 0, 0.10);
 
   /* Optional smoother rendering */
   transition: 0.3s ease;
