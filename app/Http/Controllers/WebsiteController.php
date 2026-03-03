@@ -404,12 +404,11 @@ class WebsiteController extends Controller
     }
 
 
-
     public function showNews(string $type, int $id)
     {
         switch ($type) {
 
-            // ── ANNOUNCEMENT ──────────────────────────────────
+            // ── ANNOUNCEMENT ──────────────────────────────────────────
             case 'announcement':
                 $item = $this->announcementService
                     ->list()
@@ -419,13 +418,22 @@ class WebsiteController extends Controller
                 if (!$item)
                     abort(404);
 
-                // Resolve layout view: 'layout_1' → 'layout1', etc.
-                $layoutKey = str_replace('_', '', $item->layout ?? 'layout_1'); // e.g. 'layout1'
-                $layoutView = "website.pages.news-and-announcements-layouts.{$layoutKey}";
+                // $item->assets = Collection<Asset> with pivot (id, caption, is_thumbnail, is_cover, sort_order)
+                $normalizedAssets = $item->assets->map(function ($asset) {
+                    return (object) [
+                        'storage_path' => $asset->storage_path,
+                        'kind' => $asset->kind,
+                        'caption' => $asset->pivot->caption,
+                        'is_thumbnail' => (bool) $asset->pivot->is_thumbnail,
+                        'is_cover' => (bool) $asset->pivot->is_cover,
+                        'sort_order' => $asset->pivot->sort_order,
+                    ];
+                });
 
-                // Build a unified data object for the view
-                $thumb = $item->thumbnail();
-                $allAssets = $item->assets ?? collect();
+                $thumbnail = $normalizedAssets->firstWhere('is_thumbnail', true);
+
+                $layoutKey = str_replace('_', '', $item->layout ?? 'layout_1');
+                $layoutView = "website.pages.news-and-announcements-layouts.{$layoutKey}";
 
                 return view($layoutView, [
                     'item' => [
@@ -433,8 +441,8 @@ class WebsiteController extends Controller
                         'title' => $item->title,
                         'description' => $item->seo_description,
                         'body' => $item->article_body,
-                        'image' => optional($thumb)->storage_path,
-                        'assets' => $allAssets,
+                        'image' => $thumbnail?->storage_path,
+                        'assets' => $normalizedAssets,   // normalized
                         'date' => $item->publish_start ?? $item->created_at,
                         'type' => 'announcement',
                         'tags' => [],
@@ -442,7 +450,7 @@ class WebsiteController extends Controller
                 ]);
 
 
-            // ── DOTUNI ────────────────────────────────────────
+            // ── DOTUNI ────────────────────────────────────────────────
             case 'dotuni':
                 $item = $this->dotuniNewsService
                     ->list()
@@ -452,11 +460,24 @@ class WebsiteController extends Controller
                 if (!$item)
                     abort(404);
 
+                // $item->attachments = Collection<DotuniNewsAsset> pivot rows
+                // each has: ->asset (Asset model), ->caption, ->is_thumbnail, ->is_cover, ->sort_order
+                $normalizedAssets = $item->attachments->map(function ($attachment) {
+                    $asset = $attachment->asset; // the actual Asset model
+                    return (object) [
+                        'storage_path' => $asset?->storage_path,
+                        'kind' => $asset?->kind,
+                        'caption' => $attachment->caption,
+                        'is_thumbnail' => (bool) $attachment->is_thumbnail,
+                        'is_cover' => (bool) $attachment->is_cover,
+                        'sort_order' => $attachment->sort_order,
+                    ];
+                });
+
+                $thumbnail = $normalizedAssets->firstWhere('is_thumbnail', true);
+
                 $layoutKey = str_replace('_', '', $item->layout ?? 'layout_1');
                 $layoutView = "website.pages.news-and-announcements-layouts.{$layoutKey}";
-
-                $thumb = $item->attachments->where('is_thumbnail', true)->first();
-                $allAssets = $item->attachments; // all attached assets
 
                 return view($layoutView, [
                     'item' => [
@@ -464,8 +485,8 @@ class WebsiteController extends Controller
                         'title' => $item->title,
                         'description' => $item->seo_description,
                         'body' => $item->article_body,
-                        'image' => optional(optional($thumb)->asset)->storage_path,
-                        'assets' => $allAssets,
+                        'image' => $thumbnail?->storage_path,
+                        'assets' => $normalizedAssets,   // normalized
                         'date' => $item->published_at ?? $item->created_at,
                         'type' => 'dotuni',
                         'tags' => [],
@@ -477,6 +498,80 @@ class WebsiteController extends Controller
                 abort(404);
         }
     }
+    
+    
+    // public function showNews(string $type, int $id)
+    // {
+    //     switch ($type) {
+
+    //         // ── ANNOUNCEMENT ──────────────────────────────────
+    //         case 'announcement':
+    //             $item = $this->announcementService
+    //                 ->list()
+    //                 ->where('visibility', 'public')
+    //                 ->firstWhere('id', $id);
+
+    //             if (!$item)
+    //                 abort(404);
+
+    //             // Resolve layout view: 'layout_1' → 'layout1', etc.
+    //             $layoutKey = str_replace('_', '', $item->layout ?? 'layout_1'); // e.g. 'layout1'
+    //             $layoutView = "website.pages.news-and-announcements-layouts.{$layoutKey}";
+
+    //             // Build a unified data object for the view
+    //             $thumb = $item->thumbnail();
+    //             $allAssets = $item->assets ?? collect();
+
+    //             return view($layoutView, [
+    //                 'item' => [
+    //                     'id' => $item->id,
+    //                     'title' => $item->title,
+    //                     'description' => $item->seo_description,
+    //                     'body' => $item->article_body,
+    //                     'image' => optional($thumb)->storage_path,
+    //                     'assets' => $allAssets,
+    //                     'date' => $item->publish_start ?? $item->created_at,
+    //                     'type' => 'announcement',
+    //                     'tags' => [],
+    //                 ],
+    //             ]);
+
+
+    //         // ── DOTUNI ────────────────────────────────────────
+    //         case 'dotuni':
+    //             $item = $this->dotuniNewsService
+    //                 ->list()
+    //                 ->where('status', 'published')
+    //                 ->firstWhere('id', $id);
+
+    //             if (!$item)
+    //                 abort(404);
+
+    //             $layoutKey = str_replace('_', '', $item->layout ?? 'layout_1');
+    //             $layoutView = "website.pages.news-and-announcements-layouts.{$layoutKey}";
+
+    //             $thumb = $item->attachments->where('is_thumbnail', true)->first();
+    //             $allAssets = $item->attachments; // all attached assets
+
+    //             return view($layoutView, [
+    //                 'item' => [
+    //                     'id' => $item->id,
+    //                     'title' => $item->title,
+    //                     'description' => $item->seo_description,
+    //                     'body' => $item->article_body,
+    //                     'image' => optional(optional($thumb)->asset)->storage_path,
+    //                     'assets' => $allAssets,
+    //                     'date' => $item->published_at ?? $item->created_at,
+    //                     'type' => 'dotuni',
+    //                     'tags' => [],
+    //                 ],
+    //             ]);
+
+
+    //         default:
+    //             abort(404);
+    //     }
+    // }
 
 
 

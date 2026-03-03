@@ -47,15 +47,15 @@
           </div>
           <div class="nav-header-left align-items-center">
             <div class="row nav-header-address">
-              <h6>
+              <h6 style="margin-bottom: 0;">
                 Institue of Graduate Studies
               </h6>
             </div>
            <div class="row nav-header-college">
-              <h2> DISTANCE, OPEN, AND TRANSNATIONAL UNIVERSITY</h2>
+              <h2 style="margin-bottom: 0;"> DISTANCE, OPEN, AND TRANSNATIONAL UNIVERSITY</h2>
             </div>
             <div class="row nav-header-address">
-              <h6>
+              <h6 style="margin-bottom: 0;">
                 Central Luzon State University, Science City of Muñoz, Nueva
                 Ecija, 3120
               </h6>

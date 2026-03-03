@@ -86,25 +86,6 @@
                         <div class="row">
 
                             <div class="col-md-4 mb-3">
-                                <div class="card layout-card announcement-layout-card" data-layout="layout_1">
-                                    <div class="card-body p-2">
-                                        <div class="layout-preview layout-1">
-                                            <div class="lp-row">
-                                                <div class="lp-img"></div>
-                                                <div class="lp-text"></div>
-                                            </div>
-                                            <div class="lp-row">
-                                                <div class="lp-text"></div>
-                                                <div class="lp-img"></div>
-                                            </div>
-                                        </div>
-                                        <small class="d-block text-center mt-2">Layout 1</small>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <div class="col-md-4 mb-3">
                                 <div class="card layout-card announcement-layout-card" data-layout="layout_2">
                                     <div class="card-body p-2">
                                         <div class="layout-preview layout-2">
@@ -144,23 +125,7 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-md-4 mb-3">
-                                <div class="card layout-card announcement-layout-card" data-layout="layout_5">
-                                    <div class="card-body p-2">
-                                        <div class="layout-preview layout-5">
-                                            <div class="lp-slider">
-                                                <span class="lp-arrow left">‹</span>
-                                                <div class="lp-slide"></div>
-                                                <span class="lp-arrow right">›</span>
-                                            </div>
-                                            <div class="lp-caption"></div>
-                                        </div>
-                                        <small class="d-block text-center mt-2">Layout 5</small>
-                                    </div>
-                                </div>
-                            </div>
-
+                            
                         </div>
 
                         
