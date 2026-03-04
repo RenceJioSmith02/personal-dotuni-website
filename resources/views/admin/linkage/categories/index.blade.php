@@ -32,6 +32,7 @@
                     <th width="10">#</th>
                     <th>Name</th>
                     <th>Sort Order</th>
+                    <th>Status</th>
                     <th>Created At</th>
                     <th>Updated At</th>
                     <th width="150">Actions</th>
@@ -52,73 +53,52 @@
 
 <script>
 
+let table; 
+
 $(function () {
 
-    /* ================================
-     * DataTable
-     * ================================ */
     if ($.fn.DataTable.isDataTable('#categoriesTable')) {
         $('#categoriesTable').DataTable().destroy();
     }
 
-    const table = $('#categoriesTable').DataTable({
+    table = $('#categoriesTable').DataTable({ // ✅ Assigned, not declared
         processing: true,
         serverSide: true,
         responsive: true,
         pageLength: 10,
         lengthMenu: [10, 20, 50, 100],
-
         ajax: {
             url: "{{ route('admin.linkage_categories.index') }}",
             type: "GET",
-            // dataSrc: function (json) {
-            //     console.log('Categories returned:', json.data.length);
-            //     return json.data;
-            // }
         },
-
         columns: [
             {
                 data: null,
                 searchable: false,
                 orderable: false,
-                textAlign: "center",
                 render: function (data, type, row, meta) {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
             },
             { data: "name" },
             { data: "sort_order" },
-            {
-                data: "created_at",
-                render: function (data) {
-                    return data ? new Date(data).toLocaleString() : "";
-                }
-            },
-            {
-                data: "updated_at",
-                render: function (data) {
-                    return data ? new Date(data).toLocaleString() : "";
-                }
-            },
-            {
-                data: "actions",
-                orderable: false,
-                searchable: false
-            }
+            { data: 'status',     orderable: false, searchable: false },
+            { data: "created_at", render: (data) => data ? new Date(data).toLocaleString() : "" },
+            { data: "updated_at", render: (data) => data ? new Date(data).toLocaleString() : "" },
+            { data: "actions",    orderable: false, searchable: false }
         ]
     });
-
 
     /* ================================
      * AJAX DELETE CATEGORY
      * ================================ */
+
+    // ✅ Delete handler
     $(document).on("submit", ".ajax-delete-category", function (e) {
         e.preventDefault();
 
         const form = $(this);
-        const url = form.attr("action");
-        const row = form.closest("tr");
+        const row  = form.closest("tr");
 
         Swal.fire({
             title: "Delete this category?",
@@ -126,15 +106,13 @@ $(function () {
             type: "warning",
             showCancelButton: true,
             confirmButtonText: "Yes, delete it",
-            cancelButtonText: "Cancel",
             confirmButtonColor: "#dc3545",
             reverseButtons: true
         }).then((result) => {
-
             if (!result.value) return;
 
             $.ajax({
-                url: url,
+                url: form.attr("action"),
                 type: "POST",
                 data: {
                     _token: $('meta[name="csrf-token"]').attr("content"),
@@ -144,7 +122,7 @@ $(function () {
                     Swal.fire({
                         type: "success",
                         title: "Deleted",
-                        text: res.message || "Category deleted successfully",
+                        text: res.message,
                         timer: 1200,
                         showConfirmButton: false
                     });
@@ -155,6 +133,57 @@ $(function () {
                     Swal.fire({
                         type: "error",
                         title: "Delete failed",
+                        text: xhr.responseJSON?.message || "Something went wrong"
+                    });
+                }
+            });
+        });
+    });
+
+    // ✅ Archive / Unarchive handler
+    $(document).on("submit", ".ajax-archive-linkage-category", function (e) {
+        e.preventDefault();
+
+        const form      = $(this);
+        const url       = form.attr("action");
+        const isArchive = url.includes("/archive") && !url.includes("/unarchive");
+
+        Swal.fire({
+            title: isArchive ? "Archive this category?" : "Unarchive this category?",
+            text: isArchive
+                ? "This will mark the category as archived."
+                : "This will restore the category.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: isArchive ? "Yes, archive it" : "Yes, unarchive it",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: isArchive ? "#ffc107" : "#6c757d",
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.value) return;
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr("content"),
+                    _method: "PATCH"
+                },
+                success: function (res) {
+                    Swal.fire({
+                        type: "success",
+                        title: isArchive ? "Archived" : "Unarchived",
+                        text: res.message,
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                    table.ajax.reload(null, false);
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        type: "error",
+                        title: "Action failed",
                         text: xhr.responseJSON?.message || "Something went wrong"
                     });
                 }

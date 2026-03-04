@@ -53,89 +53,47 @@
 
 @push('js')
 <script>
+
+
+let table;
+
 $(function () {
 
-    /* ================================
-     * DataTable
-     * ================================ */
     if ($.fn.DataTable.isDataTable('#linkagesTable')) {
         $('#linkagesTable').DataTable().destroy();
     }
 
-    const table = $('#linkagesTable').DataTable({
+    table = $('#linkagesTable').DataTable({ // ✅ update to your table ID
         processing: true,
         serverSide: true,
         responsive: true,
+        autoWidth: false,
         pageLength: 10,
-        lengthMenu: [10, 20, 50, 100],
-
-        ajax: {
-            url: "{{ route('admin.linkages.index') }}",
-            type: "GET",
-            // dataSrc: function (json) {
-            //     console.log('Linkages returned:', json.data.length);
-            //     return json.data;
-            // }
-        },
-
-        ajax: {
-            url: "{{ route('admin.linkages.index') }}",
-            type: "GET",
-        },
-
+        ajax: "{{ route('admin.linkages.index') }}",
         columns: [
             {
                 data: null,
                 searchable: false,
                 orderable: false,
-                textAlign: "center",
-                render: function (data, type, row, meta) {
-                    return meta.row + meta.settings._iDisplayStart + 1;
-                }
+                render: (data, type, row, meta) =>
+                    meta.row + meta.settings._iDisplayStart + 1
             },
-            { data: "title" },
-            { data: "category" },
-            {
-                data: "url",
-                render: (data) =>
-                    `<a href="${data}" target="_blank">${data.substring(0,40)}</a>`
-            },
-            {
-                data: "status",
-                render: (data) =>
-                    data
-                        ? '<span class="badge badge-success">Active</span>'
-                        : '<span class="badge badge-danger">Inactive</span>'
-            },
-            {
-                data: "created_at",
-                render: (data) =>
-                    new Date(data).toLocaleString()
-            },
-            {
-                data: "updated_at",
-                render: (data) =>
-                    new Date(data).toLocaleString()
-            },
-            {
-                data: "actions",
-                orderable: false,
-                searchable: false
-            }
+            { data: 'title' },
+            { data: 'category' },
+            { data: 'url',     orderable: false },
+            { data: 'status',  orderable: false, searchable: false }, // ✅ Add
+            { data: 'created_at', render: (data) => new Date(data).toLocaleString() },
+            { data: 'updated_at', render: (data) => new Date(data).toLocaleString() },
+            { data: 'actions', orderable: false, searchable: false }
         ]
     });
 
-
-
-    /* ================================
-     * AJAX DELETE LINKAGE
-     * ================================ */
+    // ✅ Delete handler
     $(document).on("submit", ".ajax-delete-linkage", function (e) {
         e.preventDefault();
 
         const form = $(this);
-        const url = form.attr("action");
-        const row = form.closest("tr");
+        const row  = form.closest("tr");
 
         Swal.fire({
             title: "Delete this linkage?",
@@ -143,15 +101,13 @@ $(function () {
             type: "warning",
             showCancelButton: true,
             confirmButtonText: "Yes, delete it",
-            cancelButtonText: "Cancel",
             confirmButtonColor: "#dc3545",
             reverseButtons: true
         }).then((result) => {
-
             if (!result.value) return;
 
             $.ajax({
-                url: url,
+                url: form.attr("action"),
                 type: "POST",
                 data: {
                     _token: $('meta[name="csrf-token"]').attr("content"),
@@ -161,7 +117,7 @@ $(function () {
                     Swal.fire({
                         type: "success",
                         title: "Deleted",
-                        text: res.message || "Linkage deleted successfully",
+                        text: res.message,
                         timer: 1200,
                         showConfirmButton: false
                     });
@@ -179,10 +135,59 @@ $(function () {
         });
     });
 
+    // ✅ Archive / Unarchive handler
+    $(document).on("submit", ".ajax-archive-linkage", function (e) {
+        e.preventDefault();
 
+        const form      = $(this);
+        const url       = form.attr("action");
+        const isArchive = url.includes("/archive") && !url.includes("/unarchive");
 
+        Swal.fire({
+            title: isArchive ? "Archive this linkage?" : "Unarchive this linkage?",
+            text: isArchive
+                ? "This will mark the linkage as inactive and archived."
+                : "This will restore the linkage and mark it as active.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: isArchive ? "Yes, archive it" : "Yes, unarchive it",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: isArchive ? "#ffc107" : "#6c757d",
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.value) return;
 
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr("content"),
+                    _method: "PATCH"
+                },
+                success: function (res) {
+                    Swal.fire({
+                        type: "success",
+                        title: isArchive ? "Archived" : "Unarchived",
+                        text: res.message,
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                    table.ajax.reload(null, false);
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        type: "error",
+                        title: "Action failed",
+                        text: xhr.responseJSON?.message || "Something went wrong"
+                    });
+                }
+            });
+        });
+    });
 
 });
+
+
 </script>
 @endpush

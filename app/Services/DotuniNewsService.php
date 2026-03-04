@@ -169,12 +169,30 @@ class DotuniNewsService
     /**
      * Delete news and all media
      */
+    /**
+     * ✅ Hard delete — visibility must be 'private' or 'unlisted'
+     */
     public function delete(DotuniNews $news): void
     {
-        DB::transaction(function () use ($news) {
-            $this->deleteAllMedia($news);
-            $news->delete();
-        });
+        try {
+            DB::transaction(function () use ($news) {
+
+                // ✅ Guard: must not be public before deleting
+                if ($news->visibility === 'public') {
+                    throw new \DomainException(
+                        "Cannot delete '{$news->title}'. Please set visibility to private or unlisted before deleting."
+                    );
+                }
+
+                $this->deleteAllMedia($news);
+                $news->delete();
+            });
+        } catch (\DomainException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            report($e);
+            throw new \DomainException('Failed to delete news.');
+        }
     }
 
     /* ================================
@@ -415,8 +433,7 @@ class DotuniNewsService
         $i = 2;
 
         while (
-            DotuniNews::withTrashed()
-                ->where('slug', $slug)
+            DotuniNews::where('slug', $slug) // ✅ Remove withTrashed()
                 ->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
                 ->exists()
         ) {

@@ -112,9 +112,10 @@ $(function () {
 $(document).on("submit", ".ajax-delete-dotuni-news", function (e) {
     e.preventDefault();
 
-    const form = $(this);
-    const row = form.closest("tr");
-    const table = $("#dotuniNewsTable").DataTable();
+    const form  = $(this);
+    const url   = form.attr("action");
+    const row   = form.closest("tr");
+    const table = $("#dotuniNewsTable").DataTable(); // ✅ update to your table ID
 
     Swal.fire({
         title: "Delete this news?",
@@ -122,13 +123,14 @@ $(document).on("submit", ".ajax-delete-dotuni-news", function (e) {
         type: "warning",
         showCancelButton: true,
         confirmButtonText: "Yes, delete it",
+        cancelButtonText: "Cancel",
         confirmButtonColor: "#dc3545",
         reverseButtons: true
     }).then((result) => {
         if (!result.value) return;
 
         $.ajax({
-            url: form.attr("action"),
+            url: url,
             type: "POST",
             data: {
                 _token: $('meta[name="csrf-token"]').attr("content"),
@@ -138,18 +140,19 @@ $(document).on("submit", ".ajax-delete-dotuni-news", function (e) {
                 Swal.fire({
                     type: "success",
                     title: "Deleted",
-                    text: res.message || "News deleted successfully",
+                    text: res.message,
                     timer: 1200,
                     showConfirmButton: false
                 });
 
                 table.row(row).remove().draw(false);
             },
-            error: function () {
+            error: function (xhr) {
+                // ✅ Catches the DomainException guard message
                 Swal.fire({
                     type: "error",
-                    title: "Error",
-                    text: "Failed to delete news."
+                    title: "Delete failed",
+                    text: xhr.responseJSON?.message || "Something went wrong"
                 });
             }
         });

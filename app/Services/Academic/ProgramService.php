@@ -13,32 +13,25 @@ use Illuminate\Support\Facades\Storage;
 
 class ProgramService
 {
-
     public function list()
     {
-        $programs = Program::with('asset')->get()->map(function ($program) {
-
-            $program->imagePath = optional($program->asset)->storage_path;
-
-            return $program;
-        });
-
-        return $programs;
+        return Program::with('asset')
+            ->whereNull('deleted_at')
+            ->get()
+            ->map(function ($program) {
+                $program->imagePath = optional($program->asset)->storage_path;
+                return $program;
+            });
     }
-
 
     public function listPaginated($page = 1, $perPage = 8)
     {
         $query = Program::with('asset')
             ->where('is_active', true)
+            ->whereNull('deleted_at') // ✅ Exclude archived
             ->orderByDesc('created_at');
 
-        $paginated = $query->paginate(
-            $perPage,
-            ['*'],
-            'page',
-            $page
-        );
+        $paginated = $query->paginate($perPage, ['*'], 'page', $page);
 
         $paginated->getCollection()->transform(function ($program) {
             return [
@@ -51,17 +44,13 @@ class ProgramService
         return $paginated;
     }
 
-
-    // Server-side DataTables
     public function datatable(Request $request)
     {
+        // ✅ Show ALL records including archived
         $query = Program::with('asset');
 
         $total = $query->count();
 
-        /* ======================
-         * SEARCH
-         * ====================== */
         if ($search = $request->input('search.value')) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
@@ -72,24 +61,15 @@ class ProgramService
 
         $filtered = $query->count();
 
-        /* ======================
-         * ORDERING
-         * ====================== */
         $columns = ['title', 'description', 'type', 'total_units', 'is_active', 'created_at', 'updated_at', 'actions'];
         $orderColumn = $columns[$request->input('order.0.column', 1)] ?? 'title';
         $orderDir = $request->input('order.0.dir', 'asc');
         $query->orderBy($orderColumn, $orderDir);
 
-        /* ======================
-         * PAGINATION
-         * ====================== */
         $data = $query->skip($request->start)
             ->take($request->length)
             ->get();
 
-        /* ======================
-         * RESPONSE
-         * ====================== */
         return [
             'draw' => intval($request->draw),
             'recordsTotal' => $total,
@@ -104,6 +84,7 @@ class ProgramService
                     : '<span class="badge badge-danger">Inactive</span>',
                 'created_at' => $p->created_at->toDateTimeString(),
                 'updated_at' => $p->updated_at->toDateTimeString(),
+                'archived' => !is_null($p->deleted_at), // ✅ Pass archive state
                 'actions' => view('admin.academic.programs.partials.actions', compact('p'))->render()
             ])
         ];
@@ -120,11 +101,10 @@ class ProgramService
                     'program_asset_id' => $assetId,
                 ]);
             } catch (\Throwable $e) {
-                // Rollback any stored image if exists
                 if (isset($assetId)) {
                     $this->deleteAssetById($assetId);
                 }
-                throw $e; // rethrow to be handled by caller
+                throw $e;
             }
         });
     }
@@ -140,16 +120,25 @@ class ProgramService
                 $program->update($data);
                 return $program;
             } catch (\Throwable $e) {
-                throw $e; // transaction automatically rolls back
+                throw $e;
             }
         });
     }
 
-
+    /**
+     * ✅ Hard delete — must be inactive first
+     */
     public function delete(Program $program): void
     {
         try {
             DB::transaction(function () use ($program) {
+
+                // ✅ Guard: must be inactive before hard deleting
+                if ($program->is_active) {
+                    throw new DomainException(
+                        "Cannot delete '{$program->title}'. Please deactivate it before deleting."
+                    );
+                }
 
                 $courseCount = $program->programCourses()->count();
                 $reqCount = $program->programRequirements()->count();
@@ -175,6 +164,43 @@ class ProgramService
         }
     }
 
+    /**
+     * ✅ Archive — sets is_active = false + deleted_at = now()
+     */
+    public function archive(Program $program): Program
+    {
+        try {
+            return DB::transaction(function () use ($program) {
+                $program->update([
+                    'is_active' => false,
+                    'deleted_at' => now(),
+                ]);
+                return $program;
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to archive program.');
+        }
+    }
+
+    /**
+     * ✅ Unarchive — sets is_active = true + deleted_at = null
+     */
+    public function unarchive(Program $program): Program
+    {
+        try {
+            return DB::transaction(function () use ($program) {
+                $program->update([
+                    'is_active' => true,
+                    'deleted_at' => null,
+                ]);
+                return $program;
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to unarchive program.');
+        }
+    }
 
     protected function storeImage(UploadedFile $file): int
     {

@@ -1,4 +1,3 @@
-
 <button
     class="open-modal btn btn-sm btn-info"
     data-action="edit"
@@ -15,13 +14,45 @@
     <i class="fas fa-cogs"></i>
 </a>
 
+{{-- ✅ Archive / Unarchive toggle --}}
+@if(is_null($p->deleted_at))
+    <form
+        action="{{ route('admin.programs.archive', $p) }}"
+        method="POST"
+        class="d-inline ajax-archive-program">
+        @csrf
+        @method('PATCH')
+        <button type="submit" class="btn btn-sm btn-warning">
+            Archive
+        </button>
+    </form>
+@else
+    <form
+        action="{{ route('admin.programs.unarchive', $p) }}"
+        method="POST"
+        class="d-inline ajax-archive-program">
+        @csrf
+        @method('PATCH')
+        <button type="submit" class="btn btn-sm btn-secondary">
+            Unarchive
+        </button>
+    </form>
+@endif
+
+{{-- ✅ Hard delete — only enabled when inactive --}}
 <form
     action="{{ route('admin.programs.destroy', $p) }}"
     method="POST"
     class="d-inline ajax-delete-program">
     @csrf
     @method('DELETE')
-    <button class="btn btn-sm btn-danger">
+    <button
+        type="submit"
+        class="btn btn-sm btn-danger"
+        @if($p->is_active)
+            disabled
+            title="Deactivate the program before deleting"
+        @endif>
         Delete
     </button>
 </form>

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Throwable;
+use DomainException;
 use App\Models\EResource;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -11,23 +12,21 @@ use Illuminate\Support\Facades\Auth;
 
 class EResourceService
 {
-    /**
-     * List all resources
-     */
     public function websiteList()
     {
         return EResource::where('is_active', true)
+            ->whereNull('deleted_at') // ✅ Exclude archived
             ->orderBy('sort_order')
             ->get();
     }
 
     public function datatable(Request $request)
     {
+        // ✅ Show ALL records including archived
         $query = EResource::query();
 
         $total = $query->count();
 
-        // Search
         if ($search = $request->input('search.value')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -38,16 +37,12 @@ class EResourceService
 
         $filtered = $query->count();
 
-        // Ordering
         $columns = ['name', 'description', 'link_url', 'sort_order', 'status', 'created_at', 'updated_at', 'actions'];
         $orderColumnIndex = $request->input('order.0.column', 0);
         $orderColumn = $columns[$orderColumnIndex] ?? 'sort_order';
-        $orderDir = $request->input('order.0.dir', 'asc');
-
+        $orderDir = $request->input('order.0.dir', 'asc') === 'asc' ? 'asc' : 'desc';
         $start = (int) $request->input('start', 0);
         $length = (int) $request->input('length', 10);
-
-        $orderDir = $orderDir === 'asc' ? 'asc' : 'desc';
 
         if (!in_array($orderColumn, ['actions'])) {
             $query->orderBy($orderColumn, $orderDir);
@@ -60,7 +55,6 @@ class EResourceService
             'recordsTotal' => $total,
             'recordsFiltered' => $filtered,
             'data' => $data->map(function ($item) {
-
                 return [
                     'name' => $item->name,
                     'description' => \Str::limit($item->description, 80),
@@ -73,16 +67,13 @@ class EResourceService
                         : '<span class="badge badge-danger">Inactive</span>',
                     'created_at' => $item->created_at->toDateTimeString(),
                     'updated_at' => $item->updated_at->toDateTimeString(),
+                    'archived' => !is_null($item->deleted_at), // ✅ Pass archive state
                     'actions' => view('admin.e_resources.partials.actions', compact('item'))->render(),
                 ];
             }),
         ];
     }
 
-
-    /**
-     * Create a new E-Resource
-     */
     public function create(Request $request): EResource
     {
         return DB::transaction(function () use ($request) {
@@ -104,9 +95,6 @@ class EResourceService
         });
     }
 
-    /**
-     * Update an existing E-Resource
-     */
     public function update(Request $request, EResource $resource): EResource
     {
         return DB::transaction(function () use ($request, $resource) {
@@ -131,18 +119,68 @@ class EResourceService
     }
 
     /**
-     * Delete an E-Resource
+     * ✅ Hard delete — must be inactive first
      */
     public function delete(EResource $resource): void
     {
-        DB::transaction(function () use ($resource) {
-            $resource->delete();
-        });
+        try {
+            DB::transaction(function () use ($resource) {
+
+                // ✅ Guard: must be inactive before hard deleting
+                if ($resource->is_active) {
+                    throw new DomainException(
+                        "Cannot delete '{$resource->name}'. Please deactivate it before deleting."
+                    );
+                }
+
+                $resource->delete();
+            });
+        } catch (DomainException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to delete E-Resource.');
+        }
     }
 
     /**
-     * Validate request
+     * ✅ Archive — sets is_active = false + deleted_at = now()
      */
+    public function archive(EResource $resource): EResource
+    {
+        try {
+            return DB::transaction(function () use ($resource) {
+                $resource->update([
+                    'is_active' => false,
+                    'deleted_at' => now(),
+                ]);
+                return $resource;
+            });
+        } catch (Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to archive E-Resource.');
+        }
+    }
+
+    /**
+     * ✅ Unarchive — sets is_active = true + deleted_at = null
+     */
+    public function unarchive(EResource $resource): EResource
+    {
+        try {
+            return DB::transaction(function () use ($resource) {
+                $resource->update([
+                    'is_active' => true,
+                    'deleted_at' => null,
+                ]);
+                return $resource;
+            });
+        } catch (Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to unarchive E-Resource.');
+        }
+    }
+
     private function validate(Request $request, ?EResource $resource = null): array
     {
         return $request->validate([
@@ -154,9 +192,7 @@ class EResourceService
                     ->ignore($resource?->id)
                     ->whereNull('deleted_at'),
             ],
-
             'description' => 'nullable|string|max:500',
-
             'link_url' => [
                 'nullable',
                 'string',
@@ -165,10 +201,8 @@ class EResourceService
                     ->ignore($resource?->id)
                     ->whereNull('deleted_at'),
             ],
-
             'sort_order' => 'nullable|integer',
             'is_active' => 'required|boolean',
         ]);
     }
-
 }

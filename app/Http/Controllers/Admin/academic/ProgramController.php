@@ -7,7 +7,7 @@ use App\Models\Program;
 use App\Services\Academic\ProgramService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-
+use DomainException;
 
 class ProgramController extends Controller
 {
@@ -18,12 +18,10 @@ class ProgramController extends Controller
 
     public function index(Request $request)
     {
-        // If AJAX request (DataTables server-side)
         if ($request->ajax()) {
             return response()->json($this->service->datatable($request));
         }
 
-        // Normal page load
         return view('admin.academic.programs.index');
     }
 
@@ -34,8 +32,7 @@ class ProgramController extends Controller
                 'required',
                 'string',
                 'max:250',
-                Rule::unique('programs', 'title')
-                    ->whereNull('deleted_at'),
+                Rule::unique('programs', 'title')->whereNull('deleted_at'),
             ],
             'description' => 'required|string',
             'type' => 'required|string|max:50',
@@ -43,7 +40,6 @@ class ProgramController extends Controller
             'is_active' => 'required|boolean',
             'image' => 'nullable|image|max:2048',
         ]);
-
 
         $this->service->create($validated, $request->file('image'));
 
@@ -83,14 +79,39 @@ class ProgramController extends Controller
         try {
             $this->service->delete($program);
 
-            return response()->json([
-                'message' => 'Program deleted successfully'
-            ]);
-        } catch (\DomainException $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 422);
+            return response()->json(['message' => 'Program deleted successfully']);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
+    // ✅ New
+    public function archive(Program $program)
+    {
+        try {
+            $program = $this->service->archive($program);
+
+            return response()->json([
+                'message' => 'Program archived successfully',
+                'program' => $program,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function unarchive(Program $program)
+    {
+        try {
+            $program = $this->service->unarchive($program);
+
+            return response()->json([
+                'message' => 'Program unarchived successfully',
+                'program' => $program,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
 }

@@ -45,8 +45,14 @@ class AnnouncementController extends Controller
 
     public function destroy(Announcement $announcement)
     {
-        $this->service->delete($announcement);
-        return response()->json(['message' => 'Announcement deleted successfully']);
+        try {
+            $this->service->delete($announcement);
+
+            return response()->json(['message' => 'Announcement deleted successfully']);
+        } catch (\DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
     }
+    
 }
 

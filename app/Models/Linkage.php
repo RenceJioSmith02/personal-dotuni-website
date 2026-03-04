@@ -3,12 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 class Linkage extends Model
 {
-    use SoftDeletes;
 
     protected $table = 'linkages';
 
@@ -20,11 +18,13 @@ class Linkage extends Model
         'logo_asset_id',
         'sort_order',
         'is_active',
+        'deleted_at',
         'updated_by',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'deleted_at' => 'datetime',
     ];
 
     /**

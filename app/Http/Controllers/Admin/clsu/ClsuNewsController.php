@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Admin\clsu;
+namespace App\Http\Controllers\Admin\Clsu;
 
 use App\Http\Controllers\Controller;
 use App\Models\ClsuNews;
+use DomainException;
 use Illuminate\Http\Request;
 use App\Services\Clsu\ClsuNewsService;
 
@@ -61,10 +62,42 @@ class ClsuNewsController extends Controller
 
     public function destroy(ClsuNews $clsuNews)
     {
-        $this->service->delete($clsuNews);
+        try {
+            $this->service->delete($clsuNews);
 
-        return response()->json(['message' => 'News deleted successfully']);
+            return response()->json(['message' => 'News deleted successfully']);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function archive(ClsuNews $clsuNews)
+    {
+        try {
+            $news = $this->service->archive($clsuNews);
+
+            return response()->json([
+                'message' => 'News archived successfully',
+                'news' => $news,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function unarchive(ClsuNews $clsuNews)
+    {
+        try {
+            $news = $this->service->unarchive($clsuNews);
+
+            return response()->json([
+                'message' => 'News unarchived successfully',
+                'news' => $news,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
     }
 }
-
-

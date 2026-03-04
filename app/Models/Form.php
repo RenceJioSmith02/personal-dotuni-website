@@ -3,11 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Form extends Model
 {
-    use SoftDeletes;
 
     protected $table = 'forms';
 
@@ -18,12 +16,14 @@ class Form extends Model
         'form_category_id',
         'asset_id',
         'sort_order',
+        'deleted_at',
         'is_active',
         'updated_by',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'deleted_at' => 'datetime',
     ];
 
     /**

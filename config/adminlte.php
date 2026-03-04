@@ -511,23 +511,29 @@ return [
         ],
         [
             'text' => 'FAQs',
+            'route' => 'admin.faqs_questions.index',
             'icon' => 'fas fa-question-circle',
             'can' => 'manage-content',
-            'submenu' => [
-                [
-                    'text' => 'Questions',
-                    'url' => 'admin/faqs_questions',
-                    'icon' => 'fas fa-question',
-                    'can' => 'manage-content',
-                ],
-                [
-                    'text' => 'Answers',
-                    'url' => 'admin/faqs_answers',
-                    'icon' => 'fas fa-comment-dots',
-                    'can' => 'manage-content',
-                ],
-            ],
         ],
+        // [
+        //     'text' => 'FAQs',
+        //     'icon' => 'fas fa-question-circle',
+        //     'can' => 'manage-content',
+        //     'submenu' => [
+        //         [
+        //             'text' => 'Questions',
+        //             'url' => 'admin/faqs_questions',
+        //             'icon' => 'fas fa-question',
+        //             'can' => 'manage-content',
+        //         ],
+        //         [
+        //             'text' => 'Answers',
+        //             'url' => 'admin/faqs_answers',
+        //             'icon' => 'fas fa-comment-dots',
+        //             'can' => 'manage-content',
+        //         ],
+        //     ],
+        // ],
 
 
 

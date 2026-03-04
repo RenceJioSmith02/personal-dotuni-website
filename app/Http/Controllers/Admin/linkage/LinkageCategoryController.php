@@ -15,7 +15,6 @@ class LinkageCategoryController extends Controller
     {
     }
 
-
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -31,17 +30,14 @@ class LinkageCategoryController extends Controller
             'name' => [
                 'required',
                 'string',
-                Rule::unique('linkage_categories')->whereNull('deleted_at'),
+                Rule::unique('linkage_categories')->whereNull('deleted_at')
             ],
             'sort_order' => 'nullable|integer',
         ]);
 
         $category = $this->service->create($validated);
 
-        return response()->json([
-            'message' => 'Category created successfully',
-            'data' => $category,
-        ], 201);
+        return response()->json(['message' => 'Category created successfully', 'data' => $category], 201);
     }
 
     public function edit(LinkageCategory $linkageCategory)
@@ -54,9 +50,7 @@ class LinkageCategoryController extends Controller
         $validated = $request->validate([
             'name' => [
                 'required',
-                Rule::unique('linkage_categories')
-                    ->ignore($linkageCategory->id)
-                    ->whereNull('deleted_at'),
+                Rule::unique('linkage_categories')->ignore($linkageCategory->id)->whereNull('deleted_at')
             ],
             'sort_order' => 'nullable|integer',
         ]);
@@ -76,5 +70,34 @@ class LinkageCategoryController extends Controller
 
         return response()->json(['message' => 'Category deleted successfully']);
     }
-}
 
+    // ✅ New
+    public function archive(LinkageCategory $linkageCategory)
+    {
+        try {
+            $category = $this->service->archive($linkageCategory);
+
+            return response()->json([
+                'message' => 'Category archived successfully',
+                'category' => $category,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function unarchive(LinkageCategory $linkageCategory)
+    {
+        try {
+            $category = $this->service->unarchive($linkageCategory);
+
+            return response()->json([
+                'message' => 'Category unarchived successfully',
+                'category' => $category,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+}

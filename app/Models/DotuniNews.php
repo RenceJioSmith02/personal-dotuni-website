@@ -3,11 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DotuniNews extends Model
 {
-    use SoftDeletes;
 
     protected $table = 'dotuni_news';
 

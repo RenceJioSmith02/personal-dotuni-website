@@ -30,11 +30,10 @@ class FormCategoryController extends Controller
             'name' => [
                 'required',
                 'string',
-                Rule::unique('form_categories', 'name')->whereNull('deleted_at'),
+                Rule::unique('form_categories', 'name')->whereNull('deleted_at')
             ],
             'sort_order' => 'nullable|integer',
         ]);
-
 
         try {
             $category = $this->service->create($validated);
@@ -42,10 +41,7 @@ class FormCategoryController extends Controller
             return response()->json(['message' => $e->getMessage()], 422);
         }
 
-        return response()->json([
-            'message' => 'Category saved successfully',
-            'data' => $category,
-        ], 201);
+        return response()->json(['message' => 'Category saved successfully', 'data' => $category], 201);
     }
 
     public function edit(FormCategory $formCategory)
@@ -61,11 +57,10 @@ class FormCategoryController extends Controller
                 'string',
                 Rule::unique('form_categories', 'name')
                     ->ignore($formCategory->id)
-                    ->whereNull('deleted_at'),
+                    ->whereNull('deleted_at')
             ],
             'sort_order' => 'nullable|integer',
         ]);
-
 
         $this->service->update($formCategory, $validated);
 
@@ -82,5 +77,34 @@ class FormCategoryController extends Controller
 
         return response()->json(['message' => 'Category deleted successfully']);
     }
-}
 
+    // ✅ New
+    public function archive(FormCategory $formCategory)
+    {
+        try {
+            $category = $this->service->archive($formCategory);
+
+            return response()->json([
+                'message' => 'Category archived successfully',
+                'category' => $category,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function unarchive(FormCategory $formCategory)
+    {
+        try {
+            $category = $this->service->unarchive($formCategory);
+
+            return response()->json([
+                'message' => 'Category unarchived successfully',
+                'category' => $category,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+}   

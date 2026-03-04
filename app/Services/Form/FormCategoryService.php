@@ -12,50 +12,37 @@ class FormCategoryService
 {
     public function list()
     {
-        return FormCategory::orderBy('sort_order')->get();
+        return FormCategory::whereNull('deleted_at') // ✅ Exclude archived
+            ->orderBy('sort_order')
+            ->get();
     }
-
 
     public function datatable(Request $request)
     {
+        // ✅ Show ALL records including archived
         $query = FormCategory::query();
 
         $total = $query->count();
 
-        /* ======================
-         * SEARCH
-         * ====================== */
         if ($search = $request->input('search.value')) {
             $query->where('name', 'like', "%{$search}%");
         }
 
         $filtered = $query->count();
 
-        /* ======================
-         * ORDERING
-         * ====================== */
         $columns = ['name', 'sort_order', 'status', 'created_at', 'updated_at', 'actions'];
         $orderColumnIndex = $request->input('order.0.column', 0);
         $orderColumn = $columns[$orderColumnIndex] ?? 'sort_order';
-        $orderDir = $request->input('order.0.dir', 'asc');
-
-        $orderDir = $orderDir === 'asc' ? 'asc' : 'desc';
+        $orderDir = $request->input('order.0.dir', 'asc') === 'asc' ? 'asc' : 'desc';
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
 
         if (!in_array($orderColumn, ['actions', 'status'])) {
             $query->orderBy($orderColumn, $orderDir);
         }
 
-        /* ======================
-         * PAGINATION
-         * ====================== */
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
-
         $data = $query->offset($start)->limit($length)->get();
 
-        /* ======================
-         * RESPONSE
-         * ====================== */
         return [
             'draw' => intval($request->draw),
             'recordsTotal' => $total,
@@ -69,6 +56,7 @@ class FormCategoryService
                         : '<span class="badge badge-danger">Inactive</span>',
                     'created_at' => $category->created_at->toDateTimeString(),
                     'updated_at' => $category->updated_at->toDateTimeString(),
+                    'archived' => !is_null($category->deleted_at), // ✅ Pass archive state
                     'actions' => view(
                         'admin.form.categories.partials.actions',
                         compact('category')
@@ -78,27 +66,25 @@ class FormCategoryService
         ];
     }
 
-
     public function create(array $data): FormCategory
     {
         return DB::transaction(function () use ($data) {
-            $existing = FormCategory::withTrashed()
-                ->where('name', $data['name'])
-                ->first();
+            // ✅ Restore if same name was archived
+            $existing = FormCategory::where('name', $data['name'])->first();
 
-            if ($existing) {
-                if (!$existing->trashed()) {
-                    throw new DomainException('Category already exists.');
-                }
-
-                $existing->restore();
-                $existing->update([
+            if ($existing && !is_null($existing->deleted_at)) {
+                DB::table('form_categories')->where('id', $existing->id)->update([
                     'name' => $data['name'],
                     'slug' => Str::slug($data['name']),
                     'sort_order' => $data['sort_order'] ?? 0,
+                    'is_active' => true,
+                    'deleted_at' => null,
                 ]);
+                return $existing->fresh();
+            }
 
-                return $existing;
+            if ($existing) {
+                throw new DomainException('Category already exists.');
             }
 
             return FormCategory::create([
@@ -122,12 +108,70 @@ class FormCategoryService
         });
     }
 
+    /**
+     * ✅ Hard delete — must be inactive first
+     */
     public function delete(FormCategory $category): void
     {
-        if ($category->forms()->exists()) {
-            throw new DomainException('Category has forms and cannot be deleted.');
-        }
+        try {
+            DB::transaction(function () use ($category) {
 
-        $category->delete();
+                // ✅ Guard: must be inactive before hard deleting
+                if ($category->is_active) {
+                    throw new DomainException(
+                        "Cannot delete '{$category->name}'. Please deactivate it before deleting."
+                    );
+                }
+
+                if ($category->forms()->exists()) {
+                    throw new DomainException(
+                        "Cannot delete '{$category->name}'. It has forms assigned to it."
+                    );
+                }
+
+                $category->delete();
+            });
+        } catch (DomainException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to delete category.');
+        }
+    }
+
+    /**
+     * ✅ Archive — sets is_active = false + deleted_at = now()
+     */
+    public function archive(FormCategory $category): FormCategory
+    {
+        try {
+            DB::table('form_categories')->where('id', $category->id)->update([
+                'is_active' => false,
+                'deleted_at' => now(),
+            ]);
+
+            return $category->fresh();
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to archive category.');
+        }
+    }
+
+    /**
+     * ✅ Unarchive — sets is_active = true + deleted_at = null
+     */
+    public function unarchive(FormCategory $category): FormCategory
+    {
+        try {
+            DB::table('form_categories')->where('id', $category->id)->update([
+                'is_active' => true,
+                'deleted_at' => null,
+            ]);
+
+            return $category->fresh();
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to unarchive category.');
+        }
     }
 }

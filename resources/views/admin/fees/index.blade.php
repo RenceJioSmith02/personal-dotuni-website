@@ -32,6 +32,7 @@
                     <th>Order</th>
                     <th>Created At</th>
                     <th>Updated At</th>
+                    <th>Status</th>
                     <th width="180">Actions</th>
                 </tr>
             </thead>
@@ -84,6 +85,7 @@ $(function () {
                 render: (data) =>
                     new Date(data).toLocaleString()
             },
+            { data: 'status',   orderable: false, searchable: false },
             { data: 'actions', orderable: false, searchable: false }
         ]
     });
@@ -133,6 +135,58 @@ $(document).on("submit", ".ajax-delete-fee", function (e) {
                     type: "error",
                     title: "Error",
                     text: "Failed to delete fee."
+                });
+            }
+        });
+    });
+});
+
+
+$(document).on("submit", ".ajax-archive-fee", function (e) {
+    e.preventDefault();
+
+    const form      = $(this);
+    const url       = form.attr("action");
+    const isArchive = url.includes("/archive") && !url.includes("/unarchive");
+    const table     = $("#feeTable").DataTable(); // ✅ update to your table ID
+
+    Swal.fire({
+        title: isArchive ? "Archive this fee?" : "Unarchive this fee?",
+        text: isArchive
+            ? "This will mark the fee as inactive and archived."
+            : "This will restore the fee and mark it as active.",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonText: isArchive ? "Yes, archive it" : "Yes, unarchive it",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: isArchive ? "#ffc107" : "#6c757d",
+        reverseButtons: true
+    }).then((result) => {
+        if (!result.value) return;
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr("content"),
+                _method: "PATCH"
+            },
+            success: function (res) {
+                Swal.fire({
+                    type: "success",
+                    title: isArchive ? "Archived" : "Unarchived",
+                    text: res.message,
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                table.ajax.reload(null, false);
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    type: "error",
+                    title: "Action failed",
+                    text: xhr.responseJSON?.message || "Something went wrong"
                 });
             }
         });

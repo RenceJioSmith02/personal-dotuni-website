@@ -3,11 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class FaqAnswer extends Model
 {
-    use SoftDeletes;
 
     protected $table = 'faqs_answers';
 
@@ -16,8 +14,13 @@ class FaqAnswer extends Model
         'answer',
         'is_active',
         'updated_by',
+        'deleted_at',
     ];
 
+    protected $casts = [
+        'is_active' => 'boolean',
+        'deleted_at' => 'datetime',
+    ];
     /* ===============================
        Relationships
     =============================== */

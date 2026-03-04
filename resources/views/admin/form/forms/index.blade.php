@@ -58,7 +58,16 @@ $(function () {
         $('#formsTable').DataTable().destroy();
     }
 
-    $('#formsTable').DataTable({
+let table;
+
+$(function () {
+
+    if ($.fn.DataTable.isDataTable('#formsTable')) {
+        $('#formsTable').DataTable().destroy();
+    }
+
+    // ✅ Assign to the outer variable
+    table = $('#formsTable').DataTable({
         processing: true,
         serverSide: true,
         responsive: true,
@@ -73,27 +82,18 @@ $(function () {
                 data: null,
                 searchable: false,
                 orderable: false,
-                textAlign: "center",
                 render: function (data, type, row, meta) {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
             },
-            { data: 'file', orderable: false, searchable: false },
+            { data: 'file',     orderable: false, searchable: false },
             { data: 'name' },
             { data: 'category' },
-            { data: 'type', searchable: false },
-            { data: 'status', orderable: false, searchable: false },
-            {
-                data: "created_at",
-                render: (data) =>
-                    new Date(data).toLocaleString()
-            },
-            {
-                data: "updated_at",
-                render: (data) =>
-                    new Date(data).toLocaleString()
-            },
-            { data: 'actions', orderable: false, searchable: false }
+            { data: 'type',     searchable: false },
+            { data: 'status',   orderable: false, searchable: false },
+            { data: "created_at", render: (data) => new Date(data).toLocaleString() },
+            { data: "updated_at", render: (data) => new Date(data).toLocaleString() },
+            { data: 'actions',  orderable: false, searchable: false }
         ]
     });
 
@@ -101,7 +101,7 @@ $(function () {
         e.preventDefault();
 
         const form = $(this);
-        const row = form.closest("tr");
+        const row  = form.closest("tr");
 
         Swal.fire({
             title: "Delete this form?",
@@ -111,7 +111,6 @@ $(function () {
             confirmButtonColor: "#dc3545",
             reverseButtons: true
         }).then((result) => {
-
             if (!result.value) return;
 
             $.ajax({
@@ -130,6 +129,7 @@ $(function () {
                         showConfirmButton: false
                     });
 
+                    // ✅ Now table is accessible
                     table.row(row).remove().draw(false);
                 },
                 error: function (xhr) {
@@ -143,6 +143,111 @@ $(function () {
         });
     });
 
+    $(document).on("submit", ".ajax-archive-form", function (e) {
+        e.preventDefault();
+
+        const form      = $(this);
+        const url       = form.attr("action");
+        const isArchive = url.includes("/archive") && !url.includes("/unarchive");
+
+        Swal.fire({
+            title: isArchive ? "Archive this form?" : "Unarchive this form?",
+            text: isArchive
+                ? "This will mark the form as inactive and archived."
+                : "This will restore the form and mark it as active.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: isArchive ? "Yes, archive it" : "Yes, unarchive it",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: isArchive ? "#ffc107" : "#6c757d",
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.value) return;
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr("content"),
+                    _method: "PATCH"
+                },
+                success: function (res) {
+                    Swal.fire({
+                        type: "success",
+                        title: isArchive ? "Archived" : "Unarchived",
+                        text: res.message,
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                    table.ajax.reload(null, false);
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        type: "error",
+                        title: "Action failed",
+                        text: xhr.responseJSON?.message || "Something went wrong"
+                    });
+                }
+            });
+        });
+    });
+
 });
+
+
+});
+
+$(document).on("submit", ".ajax-archive-form", function (e) {
+    e.preventDefault();
+
+    const form      = $(this);
+    const url       = form.attr("action");
+    const isArchive = url.includes("/archive") && !url.includes("/unarchive");
+    const table     = $("#formsTable").DataTable(); // ✅ update to your table ID
+
+    Swal.fire({
+        title: isArchive ? "Archive this form?" : "Unarchive this form?",
+        text: isArchive
+            ? "This will mark the form as inactive and archived."
+            : "This will restore the form and mark it as active.",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonText: isArchive ? "Yes, archive it" : "Yes, unarchive it",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: isArchive ? "#ffc107" : "#6c757d",
+        reverseButtons: true
+    }).then((result) => {
+        if (!result.value) return;
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr("content"),
+                _method: "PATCH"
+            },
+            success: function (res) {
+                Swal.fire({
+                    type: "success",
+                    title: isArchive ? "Archived" : "Unarchived",
+                    text: res.message,
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                table.ajax.reload(null, false);
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    type: "error",
+                    title: "Action failed",
+                    text: xhr.responseJSON?.message || "Something went wrong"
+                });
+            }
+        });
+    });
+});
+
 </script>
 @endpush

@@ -12,27 +12,22 @@ class FaqQuestionService
 {
     public function list()
     {
-        // Load the question with all related answers
         return FaqQuestion::with([
-            'answers' => function ($query) {
-                $query->where('is_active', 1); // optional: only active answers
-            }
+            'answers' => fn($q) => $q->where('is_active', 1)->whereNull('deleted_at')
         ])
+            ->whereNull('deleted_at') // ✅ Exclude archived
             ->orderBy('sort_order')
             ->get();
     }
 
-
     public function listPaginated($page = 1, $perPage = 5)
     {
         $query = FaqQuestion::with('answers')
+            ->whereNull('deleted_at') // ✅ Exclude archived
             ->orderBy('created_at', 'desc');
 
         $total = $query->count();
-
-        $items = $query->skip(($page - 1) * $perPage)
-            ->take($perPage)
-            ->get();
+        $items = $query->skip(($page - 1) * $perPage)->take($perPage)->get();
 
         return [
             'data' => $items,
@@ -43,37 +38,30 @@ class FaqQuestionService
         ];
     }
 
-
-
-
     public function datatable(Request $request)
     {
+        // ✅ Show ALL records including archived
         $query = FaqQuestion::with('answers');
 
-        // Total records BEFORE filtering
         $total = $query->count();
 
-        // Search
         if ($search = $request->input('search.value')) {
             $query->where('question', 'like', "%{$search}%");
         }
 
-        // Total records AFTER filtering
         $filtered = $query->count();
 
-        // Ordering
         $columns = ['question', 'sort_order', 'status', 'created_at', 'updated_at'];
         $orderColumnIndex = (int) $request->input('order.0.column', 0);
         $orderColumn = $columns[$orderColumnIndex] ?? 'sort_order';
         $orderDir = $request->input('order.0.dir') === 'desc' ? 'desc' : 'asc';
+
         if (!in_array($orderColumn, ['actions'])) {
             $query->orderBy($orderColumn, $orderDir);
         }
 
-        // Pagination
         $start = (int) $request->input('start', 0);
         $length = (int) $request->input('length', 10);
-
         $items = $query->skip($start)->take($length)->get();
 
         $data = $items->map(function ($item) {
@@ -84,14 +72,14 @@ class FaqQuestionService
                     ? '<span class="badge badge-success">Active</span>'
                     : '<span class="badge badge-danger">Inactive</span>',
                 'created_at' => $item->created_at->toDateTimeString(),
+                'archived' => !is_null($item->deleted_at), // ✅ Pass archive state
                 'actions' => view('admin.faqs.questions.partials.actions', compact('item'))->render(),
-                'answers' => $item->answers->map(function ($answer) {
-                    return [
-                        'id' => $answer->id,
-                        'answer' => $answer->answer,
-                        'status' => $answer->is_active,
-                    ];
-                }),
+                'answers' => $item->answers->map(fn($answer) => [
+                    'id' => $answer->id,
+                    'answer' => $answer->answer,
+                    'status' => $answer->is_active,
+                    'archived' => !is_null($answer->deleted_at),
+                ]),
             ];
         });
 
@@ -103,20 +91,17 @@ class FaqQuestionService
         ]);
     }
 
-
-
     public function create(array $data): FaqQuestion
     {
         return DB::transaction(function () use ($data) {
-            $existing = FaqQuestion::withTrashed()
-                ->where('question', $data['question'])
-                ->first();
+            // ✅ Restore if same question was archived
+            $existing = FaqQuestion::where('question', $data['question'])->first();
 
-            if ($existing) {
-                $existing->restore();
+            if ($existing && !is_null($existing->deleted_at)) {
                 $existing->update([
                     'sort_order' => $data['sort_order'] ?? $existing->sort_order,
                     'is_active' => $data['is_active'] ?? 1,
+                    'deleted_at' => null,
                     'updated_by' => Auth::id(),
                 ]);
                 return $existing;
@@ -134,13 +119,12 @@ class FaqQuestionService
     public function update(FaqQuestion $question, array $data): FaqQuestion
     {
         return DB::transaction(function () use ($question, $data) {
-            $conflict = FaqQuestion::withTrashed()
-                ->where('question', $data['question'])
+            $conflict = FaqQuestion::where('question', $data['question'])
                 ->where('id', '!=', $question->id)
                 ->first();
 
             if ($conflict) {
-                throw new DomainException('This FAQ question already exists (including archived records).');
+                throw new DomainException('This FAQ question already exists.');
             }
 
             $question->update([
@@ -154,31 +138,73 @@ class FaqQuestionService
         });
     }
 
+    /**
+     * ✅ Hard delete — must be inactive first
+     */
     public function delete(FaqQuestion $question): void
     {
         try {
             DB::transaction(function () use ($question) {
 
-                // Count linked answers
-                $answerCount = $question->answers()->count();
-
-                if ($answerCount > 0) {
-                    // User-friendly message
+                // ✅ Guard: must be inactive before hard deleting
+                if ($question->is_active) {
                     throw new DomainException(
-                        "Cannot delete this FAQ question because it has {$answerCount} answer(s) in the FAQ Answers table. Please delete the answers first."
+                        "Cannot delete this FAQ question. Please deactivate it before deleting."
                     );
                 }
 
-                // Safe to delete
+                $answerCount = $question->answers()->count();
+                if ($answerCount > 0) {
+                    throw new DomainException(
+                        "Cannot delete this FAQ question because it has {$answerCount} answer(s). Please delete the answers first."
+                    );
+                }
+
                 $question->delete();
             });
         } catch (DomainException $e) {
-            throw $e; // Controller will handle this
+            throw $e;
         } catch (\Exception $e) {
             report($e);
             throw new DomainException('Failed to delete FAQ question: ' . $e->getMessage());
         }
     }
 
+    /**
+     * ✅ Archive — sets is_active = false + deleted_at = now()
+     */
+    public function archive(FaqQuestion $question): FaqQuestion
+    {
+        try {
+            return DB::transaction(function () use ($question) {
+                $question->update([
+                    'is_active' => false,
+                    'deleted_at' => now(),
+                ]);
+                return $question;
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to archive FAQ question.');
+        }
+    }
 
+    /**
+     * ✅ Unarchive — sets is_active = true + deleted_at = null
+     */
+    public function unarchive(FaqQuestion $question): FaqQuestion
+    {
+        try {
+            return DB::transaction(function () use ($question) {
+                $question->update([
+                    'is_active' => true,
+                    'deleted_at' => null,
+                ]);
+                return $question;
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to unarchive FAQ question.');
+        }
+    }
 }

@@ -8,51 +8,38 @@ use DomainException;
 use Exception;
 use Illuminate\Http\Request;
 
-
 class ProgramRequirementCategoryService
 {
-    // Returns all categories (for non-DataTables usage)
     public function list()
     {
-        return ProgramRequirementCategory::orderBy('sort_order')->get();
+        return ProgramRequirementCategory::whereNull('deleted_at')
+            ->orderBy('sort_order')
+            ->get();
     }
 
-    // Server-side DataTables
     public function datatable(Request $request)
     {
+        // ✅ Show ALL records including archived
         $query = ProgramRequirementCategory::query();
 
         $total = $query->count();
 
-        /* ======================
-         * SEARCH
-         * ====================== */
         if ($search = $request->input('search.value')) {
             $query->where('name', 'like', "%{$search}%");
         }
 
         $filtered = $query->count();
 
-        /* ======================
-         * ORDERING
-         * ====================== */
-        $columns = ['name', 'sort_order', 'status', 'created_at', 'updated_at', 'actions'];
+        $columns = ['name', 'sort_order', 'created_at', 'updated_at'];
         $orderColumn = $columns[$request->input('order.0.column', 0)] ?? 'sort_order';
         $orderDir = $request->input('order.0.dir', 'asc');
-
         $query->orderBy($orderColumn, $orderDir);
 
-        /* ======================
-         * PAGINATION
-         * ====================== */
         $data = $query
             ->skip($request->start)
             ->take($request->length)
             ->get();
 
-        /* ======================
-         * RESPONSE
-         * ====================== */
         return [
             'draw' => intval($request->draw),
             'recordsTotal' => $total,
@@ -60,8 +47,9 @@ class ProgramRequirementCategoryService
             'data' => $data->map(fn($c) => [
                 'name' => $c->name,
                 'sort_order' => $c->sort_order,
-            'created_at' => $c->created_at->toDateTimeString(),
-            'updated_at' => $c->updated_at->toDateTimeString(),
+                'created_at' => $c->created_at->toDateTimeString(),
+                'updated_at' => $c->updated_at->toDateTimeString(),
+                'archived' => !is_null($c->deleted_at), // ✅ Pass archive state
                 'actions' => view(
                     'admin.academic.program_requirement_categories.partials.actions',
                     compact('c')
@@ -70,20 +58,15 @@ class ProgramRequirementCategoryService
         ];
     }
 
-    /**
-     * Create a new category or restore if soft-deleted
-     */
-    public function createOrRestore(array $data): ProgramRequirementCategory
+    public function create(array $data): ProgramRequirementCategory
     {
         try {
             return DB::transaction(function () use ($data) {
-                $existing = ProgramRequirementCategory::withTrashed()
-                    ->where('name', $data['name'])
-                    ->first();
+                // ✅ Restore if same name was previously archived
+                $existing = ProgramRequirementCategory::where('name', $data['name'])->first();
 
-                if ($existing) {
-                    $existing->restore();
-                    $existing->update($data);
+                if ($existing && !is_null($existing->deleted_at)) {
+                    $existing->update(array_merge($data, ['deleted_at' => null]));
                     return $existing;
                 }
 
@@ -91,31 +74,20 @@ class ProgramRequirementCategoryService
             });
         } catch (Exception $e) {
             report($e);
-            throw new DomainException('Failed to create or restore category: ' . $e->getMessage());
+            throw new DomainException('Failed to create category: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Update a category or restore if soft-deleted with the same name
-     */
-    public function updateOrRestore(ProgramRequirementCategory $category, array $data): ProgramRequirementCategory
+    public function update(ProgramRequirementCategory $category, array $data): ProgramRequirementCategory
     {
         try {
             return DB::transaction(function () use ($category, $data) {
-                $conflict = ProgramRequirementCategory::withTrashed()
-                    ->where('name', $data['name'])
+                $conflict = ProgramRequirementCategory::where('name', $data['name'])
                     ->where('id', '!=', $category->id)
                     ->first();
 
                 if ($conflict) {
-                    // Restore the soft-deleted conflicting record instead of updating this one
-                    if ($conflict->trashed()) {
-                        $conflict->restore();
-                        $conflict->update($data);
-                        return $conflict;
-                    }
-
-                    throw new DomainException('Category already exists (including archived).');
+                    throw new DomainException('A category with this name already exists.');
                 }
 
                 $category->update($data);
@@ -123,58 +95,34 @@ class ProgramRequirementCategoryService
             });
         } catch (Exception $e) {
             report($e);
-            throw new DomainException('Failed to update or restore category: ' . $e->getMessage());
+            throw new DomainException('Failed to update category: ' . $e->getMessage());
         }
     }
 
     /**
-     * Soft delete a category
+     * ✅ Hard delete — must be archived first
      */
-    // public function delete(ProgramRequirementCategory $category): void
-    // {
-    //     try {
-    //         DB::transaction(function () use ($category) {
-
-    //             // Check relations
-    //             if ($category->programRequirements()->exists()) {
-    //                 throw new DomainException(
-    //                     "Cannot delete '{$category->name}'. It is used in program requirements."
-    //                 );
-    //             }
-
-    //             if ($category->programCourses()->exists()) {
-    //                 throw new DomainException(
-    //                     "Cannot delete '{$category->name}'. It is used in program courses."
-    //                 );
-    //             }
-
-    //             $category->delete();
-    //         });
-    //     } catch (DomainException $e) {
-    //         throw $e;
-    //     } catch (Exception $e) {
-    //         report($e);
-    //         throw new DomainException('Failed to delete category: ' . $e->getMessage());
-    //     }
-    // }
-
     public function delete(ProgramRequirementCategory $category): void
     {
         try {
             DB::transaction(function () use ($category) {
 
-                // Count usages
+                // ✅ Guard: must be archived before hard deleting
+                if (is_null($category->deleted_at)) {
+                    throw new DomainException(
+                        "Cannot delete '{$category->name}'. Please archive it before deleting."
+                    );
+                }
+
                 $reqCount = $category->programRequirements()->count();
                 $courseCount = $category->programCourses()->count();
 
-                // Block delete if used
                 if ($reqCount || $courseCount) {
                     throw new DomainException(
                         "Cannot delete '{$category->name}'. Used in {$reqCount} requirements and {$courseCount} program courses."
                     );
                 }
 
-                // Safe delete
                 $category->delete();
             });
         } catch (DomainException $e) {
@@ -185,5 +133,35 @@ class ProgramRequirementCategoryService
         }
     }
 
+    /**
+     * ✅ Archive — sets deleted_at = now()
+     */
+    public function archive(ProgramRequirementCategory $category): ProgramRequirementCategory
+    {
+        try {
+            return DB::transaction(function () use ($category) {
+                $category->update(['deleted_at' => now()]);
+                return $category;
+            });
+        } catch (Exception $e) {
+            report($e);
+            throw new DomainException('Failed to archive category: ' . $e->getMessage());
+        }
+    }
 
+    /**
+     * ✅ Unarchive — sets deleted_at = null
+     */
+    public function unarchive(ProgramRequirementCategory $category): ProgramRequirementCategory
+    {
+        try {
+            return DB::transaction(function () use ($category) {
+                $category->update(['deleted_at' => null]);
+                return $category;
+            });
+        } catch (Exception $e) {
+            report($e);
+            throw new DomainException('Failed to unarchive category: ' . $e->getMessage());
+        }
+    }
 }

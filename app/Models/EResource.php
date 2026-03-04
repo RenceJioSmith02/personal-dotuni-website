@@ -4,11 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EResource extends Model
 {
-    use HasFactory, SoftDeletes;
 
     protected $table = 'e_resources';
 
@@ -19,11 +17,13 @@ class EResource extends Model
         'sort_order',
         'is_active',
         'updated_by',
+        'deleted_at',
     ];
 
     // Optional: cast is_active to boolean
     protected $casts = [
         'is_active' => 'boolean',
+        'deleted_at' => 'datetime',
     ];
 
     // Relation to user who updated

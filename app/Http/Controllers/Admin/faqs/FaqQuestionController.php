@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Controllers\Admin\faqs;
 
 use App\Http\Controllers\Controller;
@@ -12,7 +11,9 @@ use DomainException;
 
 class FaqQuestionController extends Controller
 {
-    public function __construct(protected FaqQuestionService $service) {}
+    public function __construct(protected FaqQuestionService $service)
+    {
+    }
 
     public function index(Request $request)
     {
@@ -20,7 +21,7 @@ class FaqQuestionController extends Controller
             return $this->service->datatable($request);
         }
 
-        $questions = FaqQuestion::orderBy('sort_order')->get();
+        $questions = FaqQuestion::whereNull('deleted_at')->orderBy('sort_order')->get();
 
         return view('admin.faqs.questions.index', compact('questions'));
     }
@@ -29,7 +30,9 @@ class FaqQuestionController extends Controller
     {
         $validated = $request->validate([
             'question' => [
-                'required','string','max:500',
+                'required',
+                'string',
+                'max:500',
                 Rule::unique('faqs_questions')->whereNull('deleted_at')
             ],
             'sort_order' => 'nullable|integer',
@@ -50,7 +53,9 @@ class FaqQuestionController extends Controller
     {
         $validated = $request->validate([
             'question' => [
-                'required','string','max:500',
+                'required',
+                'string',
+                'max:500',
                 Rule::unique('faqs_questions')->ignore($faqs_question->id)->whereNull('deleted_at')
             ],
             'sort_order' => 'nullable|integer',
@@ -71,17 +76,33 @@ class FaqQuestionController extends Controller
         try {
             $this->service->delete($faqs_question);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'FAQ question deleted successfully',
-                'id' => $faqs_question->id
-            ]);
+            return response()->json(['success' => true, 'message' => 'FAQ question deleted successfully', 'id' => $faqs_question->id]);
         } catch (DomainException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 422);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
         }
     }
 
+    // ✅ New
+    public function archive(FaqQuestion $faqs_question)
+    {
+        try {
+            $question = $this->service->archive($faqs_question);
+
+            return response()->json(['message' => 'FAQ question archived successfully', 'question' => $question]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function unarchive(FaqQuestion $faqs_question)
+    {
+        try {
+            $question = $this->service->unarchive($faqs_question);
+
+            return response()->json(['message' => 'FAQ question unarchived successfully', 'question' => $question]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
 }

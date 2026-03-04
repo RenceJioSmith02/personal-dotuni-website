@@ -4,12 +4,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 class Program extends Model
 {
-    use SoftDeletes;
 
     protected $fillable = [
         'type',
@@ -18,11 +16,13 @@ class Program extends Model
         'total_units',
         'is_active',
         'updated_by',
+        'deleted_at',
         'program_asset_id',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'deleted_at' => 'datetime',
     ];
 
     /**

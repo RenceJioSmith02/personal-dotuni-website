@@ -1,17 +1,3 @@
-{{--
-    Floating download button partial.
-    Only renders if:
-      1. $item['type'] === 'announcement'
-      2. At least one non-image asset exists in $item['assets']
-
-    Expects $item['assets'] to be the NORMALIZED collection from showNews(),
-    where each entry is a stdClass with:
-      ->storage_path, ->kind, ->caption, ->is_thumbnail, ->is_cover, ->sort_order
-    
-    file_name is resolved from storage_path (basename) since the normalized
-    shape does not carry file_name directly.
---}}
-
 @php
     $isAnnouncement = ($item['type'] ?? '') === 'announcement';
     $downloadables  = collect();

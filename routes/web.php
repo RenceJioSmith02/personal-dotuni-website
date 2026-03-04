@@ -211,8 +211,17 @@ Route::prefix('admin')
         Route::middleware(['role:admin,editor'])->group(function () {
 
             Route::resource('courses', CourseController::class);
+            Route::patch('courses/{course}/archive', [CourseController::class, 'archive'])->name('courses.archive');
+            Route::patch('courses/{course}/unarchive', [CourseController::class, 'unarchive'])->name('courses.unarchive');
+
+
             Route::resource('programs', ProgramController::class);
+            Route::patch('programs/{program}/archive', [ProgramController::class, 'archive'])->name('programs.archive');
+            Route::patch('programs/{program}/unarchive', [ProgramController::class, 'unarchive'])->name('programs.unarchive');
+
             Route::resource('program_requirement_categories', ProgramRequirementCategoryController::class);
+            Route::patch('program_requirement_categories/{program_requirement_category}/archive', [ProgramRequirementCategoryController::class, 'archive'])->name('program_requirement_categories.archive');
+            Route::patch('program_requirement_categories/{program_requirement_category}/unarchive', [ProgramRequirementCategoryController::class, 'unarchive'])->name('program_requirement_categories.unarchive');
 
             Route::get('programs/{program}/builder', [ProgramBuilderController::class, 'show'])
                 ->name('academic.programs.builder');
@@ -229,22 +238,52 @@ Route::prefix('admin')
             Route::delete('programs/{program}/courses/{programCourse}/ajax', [ProgramBuilderController::class, 'destroyCourse'])
                 ->name('programs.courses.destroy.ajax');
 
+            Route::patch('linkage_categories/{linkageCategory}/archive', [LinkageCategoryController::class, 'archive'])->name('linkage_categories.archive');
+            Route::patch('linkage_categories/{linkageCategory}/unarchive', [LinkageCategoryController::class, 'unarchive'])->name('linkage_categories.unarchive');
             Route::resource('linkage_categories', LinkageCategoryController::class);
+
+            Route::patch('linkages/{linkage}/archive', [LinkageController::class, 'archive'])->name('linkages.archive');
+            Route::patch('linkages/{linkage}/unarchive', [LinkageController::class, 'unarchive'])->name('linkages.unarchive');
             Route::resource('linkages', LinkageController::class);
+            
             Route::resource('clsu_news', ClsuNewsController::class);
+            Route::patch('clsu-news/{clsuNews}/archive', [ClsuNewsController::class, 'archive'])->name('clsu_news.archive');
+            Route::patch('clsu-news/{clsuNews}/unarchive', [ClsuNewsController::class, 'unarchive'])->name('clsu_news.unarchive');
+
             Route::resource('faqs_questions', FaqQuestionController::class);
+            Route::patch('faqs-questions/{faqs_question}/archive', [FaqQuestionController::class, 'archive'])->name('faqs_questions.archive');
+            Route::patch('faqs-questions/{faqs_question}/unarchive', [FaqQuestionController::class, 'unarchive'])->name('faqs_questions.unarchive');
+            
             Route::resource('faqs_answers', FaqAnswerController::class);
+            Route::patch('faqs-answers/{faqs_answer}/archive', [FaqAnswerController::class, 'archive'])->name('faqs_answers.archive');
+            Route::patch('faqs-answers/{faqs_answer}/unarchive', [FaqAnswerController::class, 'unarchive'])->name('faqs_answers.unarchive');
+
             Route::resource('prospective_student_categories', ProspectiveStudentCategoryController::class);
             Route::resource('prospective_student_items', ProspectiveStudentItemController::class);
             Route::resource('rule_articles', RuleArticleController::class);
             Route::resource('rule_sections', RuleSectionController::class);
             Route::resource('rule_sub_sections', RuleSubSectionController::class);
             Route::resource('rule_clauses', RuleClauseController::class);
+
             Route::resource('form_categories', FormCategoryController::class);
+            Route::patch('form-categories/{formCategory}/archive', [FormCategoryController::class, 'archive'])->name('form_categories.archive');
+            Route::patch('form-categories/{formCategory}/unarchive', [FormCategoryController::class, 'unarchive'])->name('form_categories.unarchive');
+            
             Route::resource('forms', FormController::class);
+            Route::patch('forms/{form}/archive', [FormController::class, 'archive'])->name('forms.archive');
+            Route::patch('forms/{form}/unarchive', [FormController::class, 'unarchive'])->name('forms.unarchive');
+
             Route::resource('e_resources', EResourceController::class);
+            Route::patch('e-resources/{eResource}/archive', [EResourceController::class, 'archive'])->name('e_resources.archive');
+            Route::patch('e-resources/{eResource}/unarchive', [EResourceController::class, 'unarchive'])->name('e_resources.unarchive');
+
             Route::resource('gallery', GalleryController::class);
+            Route::patch('gallery/{gallery}/archive', [GalleryController::class, 'archive'])->name('gallery.archive');
+            Route::patch('gallery/{gallery}/unarchive', [GalleryController::class, 'unarchive'])->name('gallery.unarchive');
+
             Route::resource('fees', FeeController::class);
+            Route::patch('fees/{fee}/archive', [FeeController::class, 'archive'])->name('fees.archive');
+            Route::patch('fees/{fee}/unarchive', [FeeController::class, 'unarchive'])->name('fees.unarchive');
             
         });
 

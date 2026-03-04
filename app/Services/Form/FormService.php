@@ -4,6 +4,7 @@ namespace App\Services\Form;
 
 use App\Models\Form;
 use App\Models\Asset;
+use DomainException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,93 +17,64 @@ class FormService
     public function list()
     {
         return Form::with(['category', 'asset'])
+            ->whereNull('deleted_at') // ✅ Exclude archived
             ->orderBy('sort_order')
             ->get();
     }
 
-
     public function datatable(Request $request)
     {
+        // ✅ Show ALL records including archived
         $query = Form::with(['category', 'asset']);
 
         $total = $query->count();
 
-        /* ======================
-         * SEARCH
-         * ====================== */
         if ($search = $request->input('search.value')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhereHas('category', function ($qc) use ($search) {
-                        $qc->where('name', 'like', "%{$search}%");
-                    })
-                    ->orWhereHas('asset', function ($qa) use ($search) {
-                        $qa->where('mime_type', 'like', "%{$search}%");
-                    });
+                    ->orWhereHas('category', fn($qc) => $qc->where('name', 'like', "%{$search}%"))
+                    ->orWhereHas('asset', fn($qa) => $qa->where('mime_type', 'like', "%{$search}%"));
             });
         }
 
         $filtered = $query->count();
 
-        /* ======================
-         * ORDERING
-         * ====================== */
         $columns = ['file', 'name', 'category', 'type', 'status', 'created_at', 'updated_at', 'actions'];
         $orderColumnIndex = $request->input('order.0.column', 1);
         $orderColumn = $columns[$orderColumnIndex] ?? 'name';
-        $orderDir = $request->input('order.0.dir', 'asc');
-
-        $orderDir = $orderDir === 'asc' ? 'asc' : 'desc';
+        $orderDir = $request->input('order.0.dir', 'asc') === 'asc' ? 'asc' : 'desc';
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
 
         if ($orderColumn === 'name') {
             $query->orderBy('name', $orderDir);
         }
 
-        /* ======================
-         * PAGINATION
-         * ====================== */
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
-
         $data = $query->offset($start)->limit($length)->get();
 
-        /* ======================
-         * RESPONSE
-         * ====================== */
         return [
             'draw' => intval($request->draw),
             'recordsTotal' => $total,
             'recordsFiltered' => $filtered,
             'data' => $data->map(function ($form) {
-
                 return [
                     'file' => $form->file_url
-                        ? '<a href="' . $form->file_url . '" target="_blank">
-                           <i class="fas fa-file-alt"></i>
-                       </a>'
+                        ? '<a href="' . $form->file_url . '" target="_blank"><i class="fas fa-file-alt"></i></a>'
                         : '<span class="text-muted">—</span>',
-
                     'name' => $form->name,
-
                     'category' => $form->category->name ?? '—',
-
                     'type' => strtoupper($form->asset->mime_type ?? '—'),
-
                     'status' => $form->is_active
                         ? '<span class="badge badge-success">Active</span>'
                         : '<span class="badge badge-danger">Inactive</span>',
                     'created_at' => $form->created_at->toDateTimeString(),
                     'updated_at' => $form->updated_at->toDateTimeString(),
-
-                    'actions' => view(
-                        'admin.form.forms.partials.actions',
-                        compact('form')
-                    )->render(),
+                    'archived' => !is_null($form->deleted_at), // ✅ Pass archive state
+                    'actions' => view('admin.form.forms.partials.actions', compact('form'))->render(),
                 ];
             }),
         ];
     }
-
 
     public function create(array $data, UploadedFile $file): Form
     {
@@ -143,16 +115,70 @@ class FormService
         });
     }
 
+    /**
+     * ✅ Hard delete — must be inactive first
+     */
     public function delete(Form $form): void
     {
-        DB::transaction(function () use ($form) {
-            if ($form->asset) {
-                Storage::disk('public')->delete($form->asset->storage_path);
-                $form->asset->delete();
-            }
+        try {
+            DB::transaction(function () use ($form) {
 
-            $form->delete();
-        });
+                // ✅ Guard: must be inactive before hard deleting
+                if ($form->is_active) {
+                    throw new DomainException(
+                        "Cannot delete '{$form->name}'. Please deactivate it before deleting."
+                    );
+                }
+
+                if ($form->asset) {
+                    Storage::disk('public')->delete($form->asset->storage_path);
+                    $form->asset->delete();
+                }
+
+                $form->delete();
+            });
+        } catch (DomainException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to delete form.');
+        }
+    }
+
+    /**
+     * ✅ Archive — sets is_active = false + deleted_at = now()
+     */
+    public function archive(Form $form): Form
+    {
+        try {
+            DB::table('forms')->where('id', $form->id)->update([
+                'is_active' => false,
+                'deleted_at' => now(),
+            ]);
+
+            return $form->fresh();
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to archive form.');
+        }
+    }
+
+    /**
+     * ✅ Unarchive — sets is_active = true + deleted_at = null
+     */
+    public function unarchive(Form $form): Form
+    {
+        try {
+            DB::table('forms')->where('id', $form->id)->update([
+                'is_active' => true,
+                'deleted_at' => null,
+            ]);
+
+            return $form->fresh();
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to unarchive form.');
+        }
     }
 
     protected function storeFile(UploadedFile $file, string $name): int

@@ -3,16 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProgramRequirementCategory extends Model
 {
-    use SoftDeletes;
 
     protected $fillable = [
         'name',
         'sort_order',
         'updated_by',
+        'deleted_at',
     ];
 
     public function programRequirements()

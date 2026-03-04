@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Fee;
 use App\Models\Asset;
+use DomainException;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -15,18 +16,19 @@ class FeeService
 {
     public function list()
     {
-        return Fee::with('asset')->orderBy('sort_order')->get();
+        return Fee::with('asset')
+            ->whereNull('deleted_at') // ✅ Exclude archived
+            ->orderBy('sort_order')
+            ->get();
     }
 
     public function datatable(Request $request)
     {
+        // ✅ Show ALL records including archived
         $query = Fee::with('asset');
 
         $total = $query->count();
 
-        /* ===============================
-           SEARCH
-        =============================== */
         if ($search = $request->input('search.value')) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
@@ -37,63 +39,39 @@ class FeeService
 
         $filtered = $query->count();
 
-        /* ===============================
-           ORDERING
-        =============================== */
-        $columns = [
-            'title',
-            'caption',
-            'sort_order',
-            'created_at',
-            'updated_at',
-            'actions'
-        ];
-
+        $columns = ['title', 'caption', 'sort_order', 'created_at', 'updated_at', 'actions'];
         $orderColumnIndex = $request->input('order.0.column', 3);
         $orderColumn = $columns[$orderColumnIndex] ?? 'sort_order';
-        $orderDir = $request->input('order.0.dir', 'asc');
-
-        $orderDir = $orderDir === 'asc' ? 'asc' : 'desc';
+        $orderDir = $request->input('order.0.dir', 'asc') === 'asc' ? 'asc' : 'desc';
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
 
         if (!in_array($orderColumn, ['asset', 'actions'])) {
             $query->orderBy($orderColumn, $orderDir);
         }
 
-        /* ===============================
-           PAGINATION
-        =============================== */
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        $data = $query->offset($start)->limit($length)->get();
 
-        $data = $query
-            ->offset($start)
-            ->limit($length)
-            ->get();
-
-        /* ===============================
-           RESPONSE
-        =============================== */
         return [
             'draw' => intval($request->draw),
             'recordsTotal' => $total,
             'recordsFiltered' => $filtered,
             'data' => $data->map(function ($item) {
-
                 return [
                     'title' => e($item->title),
                     'caption' => Str::limit($item->caption, 80),
                     'sort_order' => $item->sort_order,
+                    'status' => $item->is_active
+                        ? '<span class="badge badge-success">Active</span>'
+                        : '<span class="badge badge-danger">Inactive</span>',
                     'created_at' => $item->created_at->toDateTimeString(),
                     'updated_at' => $item->updated_at->toDateTimeString(),
-                    'actions' => view(
-                        'admin.fees.partials.actions',
-                        compact('item')
-                    )->render(),
+                    'archived' => !is_null($item->deleted_at), // ✅ Pass archive state
+                    'actions' => view('admin.fees.partials.actions', compact('item'))->render(),
                 ];
             }),
         ];
     }
-
 
     public function create(array $data, ?UploadedFile $image): Fee
     {
@@ -104,6 +82,7 @@ class FeeService
                 'title' => $data['title'],
                 'caption' => $data['caption'] ?? null,
                 'sort_order' => $data['sort_order'] ?? 0,
+                'is_active' => $data['is_active'] ?? true, // ✅
                 'asset_id' => $assetId,
                 'updated_by' => Auth::id(),
             ]);
@@ -113,7 +92,6 @@ class FeeService
     public function update(Fee $fee, array $data, ?UploadedFile $image): Fee
     {
         return DB::transaction(function () use ($fee, $data, $image) {
-
             if ($image) {
                 $this->replaceImage($fee, $image);
             }
@@ -122,6 +100,7 @@ class FeeService
                 'title' => $data['title'],
                 'caption' => $data['caption'] ?? null,
                 'sort_order' => $data['sort_order'] ?? 0,
+                'is_active' => $data['is_active'] ?? $fee->is_active, // ✅
                 'updated_by' => Auth::id(),
             ]);
 
@@ -129,15 +108,68 @@ class FeeService
         });
     }
 
+    /**
+     * ✅ Hard delete — must be inactive first
+     */
     public function delete(Fee $fee): void
     {
-        DB::transaction(function () use ($fee) {
-            if ($fee->asset) {
-                Storage::disk('public')->delete($fee->asset->storage_path);
-                $fee->asset->delete();
-            }
-            $fee->delete();
-        });
+        try {
+            DB::transaction(function () use ($fee) {
+
+                // ✅ Guard: must be inactive before hard deleting
+                if ($fee->is_active) {
+                    throw new DomainException(
+                        "Cannot delete '{$fee->title}'. Please deactivate it before deleting."
+                    );
+                }
+
+                if ($fee->asset) {
+                    Storage::disk('public')->delete($fee->asset->storage_path);
+                    $fee->asset->delete();
+                }
+
+                $fee->delete();
+            });
+        } catch (DomainException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to delete fee.');
+        }
+    }
+
+
+    public function archive(Fee $fee): Fee
+    {
+        try {
+            DB::table('fees')->where('id', $fee->id)->update([
+                'is_active' => false,
+                'deleted_at' => now(),
+            ]);
+
+            return $fee->fresh();
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to archive fee.');
+        }
+    }
+
+    /**
+     * ✅ Unarchive — sets is_active = true + deleted_at = null
+     */
+    public function unarchive(Fee $fee): Fee
+    {
+        try {
+            DB::table('fees')->where('id', $fee->id)->update([
+                'is_active' => true,
+                'deleted_at' => null,
+            ]);
+
+            return $fee->fresh();
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to unarchive fee.');
+        }
     }
 
     protected function storeImage(UploadedFile $file): int

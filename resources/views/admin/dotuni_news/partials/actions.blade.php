@@ -1,4 +1,3 @@
-
 <div class="btn-group btn-group-sm" role="group" style="gap: 8px;">
 
     @if($item->status === 'submitted' && auth()->user()->hasAnyRole(['admin','publisher']))
@@ -30,7 +29,14 @@
               class="d-inline ajax-delete-dotuni-news m-0 p-0">
             @csrf
             @method('DELETE')
-            <button type="submit" class="btn btn-danger">
+            {{-- ✅ Disabled when public --}}
+            <button
+                type="submit"
+                class="btn btn-danger"
+                @if($item->visibility === 'public')
+                    disabled
+                    title="Set visibility to private or unlisted before deleting"
+                @endif>
                 Delete
             </button>
         </form>

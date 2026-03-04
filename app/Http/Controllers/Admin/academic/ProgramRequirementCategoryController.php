@@ -11,23 +11,17 @@ use DomainException;
 
 class ProgramRequirementCategoryController extends Controller
 {
-    protected ProgramRequirementCategoryService $service;
-
-    public function __construct(ProgramRequirementCategoryService $service)
-    {
-        $this->service = $service;
+    public function __construct(
+        protected ProgramRequirementCategoryService $service
+    ) {
     }
 
     public function index(Request $request)
     {
-        // Server-side DataTable AJAX request
         if ($request->ajax()) {
-            $data = $this->service->datatable($request);
-
-            return response()->json($data);
+            return response()->json($this->service->datatable($request));
         }
 
-        // Normal page load
         return view('admin.academic.program_requirement_categories.index');
     }
 
@@ -37,14 +31,13 @@ class ProgramRequirementCategoryController extends Controller
             'name' => [
                 'required',
                 'string',
-                Rule::unique('program_requirement_categories')
-                    ->whereNull('deleted_at'),
+                Rule::unique('program_requirement_categories')->whereNull('deleted_at'),
             ],
             'sort_order' => 'required|integer',
         ]);
 
         try {
-            $category = $this->service->createOrRestore($validated);
+            $category = $this->service->create($validated);
 
             return response()->json([
                 'message' => 'Category created successfully',
@@ -74,7 +67,7 @@ class ProgramRequirementCategoryController extends Controller
         ]);
 
         try {
-            $category = $this->service->updateOrRestore($program_requirement_category, $validated);
+            $category = $this->service->update($program_requirement_category, $validated);
 
             return response()->json([
                 'message' => 'Category updated successfully',
@@ -98,5 +91,34 @@ class ProgramRequirementCategoryController extends Controller
             return response()->json(['message' => $e->getMessage()], 422);
         }
     }
-}
 
+    // ✅ New
+    public function archive(ProgramRequirementCategory $program_requirement_category)
+    {
+        try {
+            $category = $this->service->archive($program_requirement_category);
+
+            return response()->json([
+                'message' => 'Category archived successfully',
+                'category' => $category,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function unarchive(ProgramRequirementCategory $program_requirement_category)
+    {
+        try {
+            $category = $this->service->unarchive($program_requirement_category);
+
+            return response()->json([
+                'message' => 'Category unarchived successfully',
+                'category' => $category,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+}

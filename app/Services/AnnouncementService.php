@@ -172,12 +172,30 @@ class AnnouncementService
     /**
      * Delete an announcement and all related assets.
      */
+    /**
+     * ✅ Hard delete — visibility must be 'private' or 'unlisted'
+     */
     public function delete(Announcement $announcement): void
     {
-        DB::transaction(function () use ($announcement) {
-            $this->deleteAllAssets($announcement);
-            $announcement->delete();
-        });
+        try {
+            DB::transaction(function () use ($announcement) {
+
+                // ✅ Guard: must not be public before deleting
+                if ($announcement->visibility === 'public') {
+                    throw new \DomainException(
+                        "Cannot delete '{$announcement->title}'. Please set visibility to private or unlisted before deleting."
+                    );
+                }
+
+                $this->deleteAllAssets($announcement);
+                $announcement->delete();
+            });
+        } catch (\DomainException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
+            throw new \DomainException('Failed to delete announcement.');
+        }
     }
 
 
@@ -457,8 +475,7 @@ class AnnouncementService
         $i = 2;
 
         while (
-            Announcement::withTrashed()
-                ->where('slug', $slug)
+            Announcement::where('slug', $slug) // ✅ Remove withTrashed()
                 ->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
                 ->exists()
         ) {

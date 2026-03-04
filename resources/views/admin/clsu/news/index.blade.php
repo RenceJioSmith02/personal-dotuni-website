@@ -148,5 +148,57 @@ $(document).on("submit", ".ajax-delete-news", function (e) {
         });
     });
 });
+
+
+$(document).on("submit", ".ajax-archive-clsu-news", function (e) {
+    e.preventDefault();
+
+    const form      = $(this);
+    const url       = form.attr("action");
+    const isArchive = url.includes("/archive") && !url.includes("/unarchive");
+    const table     = $("#clsuNewsTable").DataTable(); // ✅ update to your table ID
+
+    Swal.fire({
+        title: isArchive ? "Archive this news?" : "Unarchive this news?",
+        text: isArchive
+            ? "This will mark the news as inactive and archived."
+            : "This will restore the news and mark it as active.",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonText: isArchive ? "Yes, archive it" : "Yes, unarchive it",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: isArchive ? "#ffc107" : "#6c757d",
+        reverseButtons: true
+    }).then((result) => {
+        if (!result.value) return;
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr("content"),
+                _method: "PATCH"
+            },
+            success: function (res) {
+                Swal.fire({
+                    type: "success",
+                    title: isArchive ? "Archived" : "Unarchived",
+                    text: res.message,
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                table.ajax.reload(null, false);
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    type: "error",
+                    title: "Action failed",
+                    text: xhr.responseJSON?.message || "Something went wrong"
+                });
+            }
+        });
+    });
+});
 </script>
 @endpush

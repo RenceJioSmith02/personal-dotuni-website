@@ -21,7 +21,8 @@ class FaqAnswerController extends Controller
             return $this->service->datatable($request);
         }
 
-        $questions = FaqQuestion::where('is_active', 1)->orderBy('sort_order')->get();
+        $questions = FaqQuestion::where('is_active', 1)->whereNull('deleted_at')->orderBy('sort_order')->get();
+
         return view('admin.faqs.answers.index', compact('questions'));
     }
 
@@ -62,8 +63,36 @@ class FaqAnswerController extends Controller
 
     public function destroy(FaqAnswer $faqs_answer)
     {
-        $this->service->delete($faqs_answer);
-        return response()->json(['message' => 'FAQ answer deleted successfully', 'id' => $faqs_answer->id]);
+        try {
+            $this->service->delete($faqs_answer);
+
+            return response()->json(['message' => 'FAQ answer deleted successfully', 'id' => $faqs_answer->id]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function archive(FaqAnswer $faqs_answer)
+    {
+        try {
+            $answer = $this->service->archive($faqs_answer);
+
+            return response()->json(['message' => 'FAQ answer archived successfully', 'answer' => $answer]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function unarchive(FaqAnswer $faqs_answer)
+    {
+        try {
+            $answer = $this->service->unarchive($faqs_answer);
+
+            return response()->json(['message' => 'FAQ answer unarchived successfully', 'answer' => $answer]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
     }
 }
-

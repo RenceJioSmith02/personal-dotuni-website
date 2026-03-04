@@ -35,7 +35,7 @@
 </div>
 
 @include('admin.faqs.questions.partials.question-modal')
-@include('admin.faqs.answers.partials.answer-modal')
+@include('admin.faqs.questions.partials.answer-modal')
 
 @stop
 
@@ -118,13 +118,11 @@
             ----------------------------- */
             function renderAnswers(rowData) {
                 let html = `
-            <div class="p-2" style="display: block;">
-                <button
-                    class="btn btn-sm btn-primary mb-2 add-answer"
-                    data-faq="${rowData.id}">
-                    <i class="fas fa-plus"></i> Add Answer
-                </button>
-        `;
+                    <div class="p-2" style="display: block;">
+                        <button class="btn btn-sm btn-primary mb-2 add-answer" data-faq="${rowData.id}">
+                            <i class="fas fa-plus"></i> Add Answer
+                        </button>
+                `;
 
                 if (!rowData.answers || rowData.answers.length === 0) {
                     return html + `<div class="text-muted">No answers yet.</div></div>`;
@@ -133,42 +131,56 @@
                 html += `<ul class="list-group">`;
 
                 rowData.answers.forEach(answer => {
-                    html += `
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        ${answer.answer}
-                        <div class="mt-1">
-                            ${answer.status
-                            ? '<span class="badge badge-success">Active</span>'
-                            : '<span class="badge badge-danger">Inactive</span>'}
-                        </div>
-                    </div>
+                    const isArchived = answer.archived;
+                    const isActive   = answer.status; // boolean
 
-                    <div class="d-flex">
-                        <!-- EDIT (old modal system) -->
-                        <button
-                            class="open-modal btn btn-sm btn-info mr-1"
-                            data-action="edit"
-                            data-id="${answer.id}"
-                            data-modal="#faqAnswerModal"
-                            data-form="#faqAnswerForm"
-                            data-title="Edit FAQ Answer"
-                            data-url="{{ route('admin.faqs_answers.index') }}">
-                            Edit
-                        </button>
-
-                        <!-- DELETE (old ajax-delete form) -->
-                        <form
-                            action="/admin/faqs_answers/${answer.id}"
-                            method="POST"
-                            class="d-inline ajax-delete-faq-answer">
+                    // ✅ Archive / Unarchive button
+                    const archiveBtn = isArchived
+                        ? `<form action="/admin/faqs-answers/${answer.id}/unarchive" method="POST" class="d-inline ajax-archive-faq-answer">
                             <input type="hidden" name="_token" value="${$('meta[name="csrf-token"]').attr('content')}">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <button class="btn btn-sm btn-danger">Delete</button>
-                        </form>
-                    </div>
-                </li>
-            `;
+                            <input type="hidden" name="_method" value="PATCH">
+                            <button class="btn btn-sm btn-secondary">Unarchive</button>
+                        </form>`
+                        : `<form action="/admin/faqs-answers/${answer.id}/archive" method="POST" class="d-inline ajax-archive-faq-answer">
+                            <input type="hidden" name="_token" value="${$('meta[name="csrf-token"]').attr('content')}">
+                            <input type="hidden" name="_method" value="PATCH">
+                            <button class="btn btn-sm btn-warning">Archive</button>
+                        </form>`;
+
+                    // ✅ Delete button — disabled if active
+                    const deleteBtn = `<form action="/admin/faqs_answers/${answer.id}" method="POST" class="d-inline ajax-delete-faq-answer">
+                        <input type="hidden" name="_token" value="${$('meta[name="csrf-token"]').attr('content')}">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button class="btn btn-sm btn-danger" ${isActive ? 'disabled title="Deactivate the answer before deleting"' : ''}>Delete</button>
+                    </form>`;
+
+                    html += `
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                ${answer.answer}
+                                <div class="mt-1">
+                                    ${isActive
+                                        ? '<span class="badge badge-success">Active</span>'
+                                        : '<span class="badge badge-danger">Inactive</span>'}
+                                    ${isArchived ? '<span class="badge badge-secondary ml-1">Archived</span>' : ''}
+                                </div>
+                            </div>
+                            <div class="d-flex" style="gap: 4px;">
+                                <button
+                                    class="open-modal btn btn-sm btn-info"
+                                    data-action="edit"
+                                    data-id="${answer.id}"
+                                    data-modal="#faqAnswerModal"
+                                    data-form="#faqAnswerForm"
+                                    data-title="Edit FAQ Answer"
+                                    data-url="{{ route('admin.faqs_answers.index') }}">
+                                    Edit
+                                </button>
+                                ${archiveBtn}
+                                ${deleteBtn}
+                            </div>
+                        </li>
+                    `;
                 });
 
                 return html + `</ul></div>`;
@@ -320,6 +332,114 @@
             });
 
         });
+
+
+
+
+        // ✅ Archive / Unarchive FAQ Question
+$(document).on("submit", ".ajax-archive-faq-question", function (e) {
+    e.preventDefault();
+
+    const form      = $(this);
+    const url       = form.attr("action");
+    const isArchive = url.includes("/archive") && !url.includes("/unarchive");
+    const table     = $("#faqTable").DataTable();
+
+    Swal.fire({
+        title: isArchive ? "Archive this question?" : "Unarchive this question?",
+        text: isArchive
+            ? "This will mark the question as inactive and archived."
+            : "This will restore the question and mark it as active.",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonText: isArchive ? "Yes, archive it" : "Yes, unarchive it",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: isArchive ? "#ffc107" : "#6c757d",
+        reverseButtons: true
+    }).then((result) => {
+        if (!result.value) return;
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr("content"),
+                _method: "PATCH"
+            },
+            success: function (res) {
+                Swal.fire({
+                    type: "success",
+                    title: isArchive ? "Archived" : "Unarchived",
+                    text: res.message,
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                table.ajax.reload(null, false);
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    type: "error",
+                    title: "Action failed",
+                    text: xhr.responseJSON?.message || "Something went wrong"
+                });
+            }
+        });
+    });
+});
+
+// ✅ Archive / Unarchive FAQ Answer (child row — reload parent table)
+$(document).on("submit", ".ajax-archive-faq-answer", function (e) {
+    e.preventDefault();
+
+    const form      = $(this);
+    const url       = form.attr("action");
+    const isArchive = url.includes("/archive") && !url.includes("/unarchive");
+    const table     = $("#faqTable").DataTable();
+
+    Swal.fire({
+        title: isArchive ? "Archive this answer?" : "Unarchive this answer?",
+        text: isArchive
+            ? "This will mark the answer as inactive and archived."
+            : "This will restore the answer and mark it as active.",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonText: isArchive ? "Yes, archive it" : "Yes, unarchive it",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: isArchive ? "#ffc107" : "#6c757d",
+        reverseButtons: true
+    }).then((result) => {
+        if (!result.value) return;
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr("content"),
+                _method: "PATCH"
+            },
+            success: function (res) {
+                Swal.fire({
+                    type: "success",
+                    title: isArchive ? "Archived" : "Unarchived",
+                    text: res.message,
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                // ✅ Reload parent table so child row re-renders with updated buttons
+                table.ajax.reload(null, false);
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    type: "error",
+                    title: "Action failed",
+                    text: xhr.responseJSON?.message || "Something went wrong"
+                });
+            }
+        });
+    });
+});
 
 
     </script>

@@ -57,7 +57,18 @@ $(function () {
         $('#formCategoriesTable').DataTable().destroy();
     }
 
-    $('#formCategoriesTable').DataTable({
+
+    // ✅ Declare table outside so both handlers can access it
+let table;
+
+$(function () {
+
+    if ($.fn.DataTable.isDataTable('#formCategoriesTable')) {
+        $('#formCategoriesTable').DataTable().destroy();
+    }
+
+    // ✅ Assign to the outer variable
+    table = $('#formCategoriesTable').DataTable({
         processing: true,
         serverSide: true,
         responsive: true,
@@ -72,7 +83,6 @@ $(function () {
                 data: null,
                 searchable: false,
                 orderable: false,
-                textAlign: "center",
                 render: function (data, type, row, meta) {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
@@ -80,16 +90,8 @@ $(function () {
             { data: 'name' },
             { data: 'sort_order', className: 'text-center' },
             { data: 'status', orderable: false, searchable: false },
-            {
-                data: "created_at",
-                render: (data) =>
-                    new Date(data).toLocaleString()
-            },
-            {
-                data: "updated_at",
-                render: (data) =>
-                    new Date(data).toLocaleString()
-            },
+            { data: "created_at", render: (data) => new Date(data).toLocaleString() },
+            { data: "updated_at", render: (data) => new Date(data).toLocaleString() },
             { data: 'actions', orderable: false, searchable: false }
         ]
     });
@@ -98,7 +100,7 @@ $(function () {
         e.preventDefault();
 
         const form = $(this);
-        const row = form.closest("tr");
+        const row  = form.closest("tr");
 
         Swal.fire({
             title: "Delete this category?",
@@ -108,7 +110,6 @@ $(function () {
             confirmButtonColor: "#dc3545",
             reverseButtons: true
         }).then((result) => {
-
             if (!result.value) return;
 
             $.ajax({
@@ -127,6 +128,7 @@ $(function () {
                         showConfirmButton: false
                     });
 
+                    // ✅ Now table is accessible
                     table.row(row).remove().draw(false);
                 },
                 error: function (xhr) {
@@ -140,6 +142,109 @@ $(function () {
         });
     });
 
+    $(document).on("submit", ".ajax-archive-form-category", function (e) {
+        e.preventDefault();
+
+        const form      = $(this);
+        const url       = form.attr("action");
+        const isArchive = url.includes("/archive") && !url.includes("/unarchive");
+
+        Swal.fire({
+            title: isArchive ? "Archive this category?" : "Unarchive this category?",
+            text: isArchive
+                ? "This will mark the category as inactive and archived."
+                : "This will restore the category and mark it as active.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: isArchive ? "Yes, archive it" : "Yes, unarchive it",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: isArchive ? "#ffc107" : "#6c757d",
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.value) return;
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr("content"),
+                    _method: "PATCH"
+                },
+                success: function (res) {
+                    Swal.fire({
+                        type: "success",
+                        title: isArchive ? "Archived" : "Unarchived",
+                        text: res.message,
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                    table.ajax.reload(null, false);
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        type: "error",
+                        title: "Action failed",
+                        text: xhr.responseJSON?.message || "Something went wrong"
+                    });
+                }
+            });
+        });
+    });
+
+});
+
+});
+
+$(document).on("submit", ".ajax-archive-form-category", function (e) {
+    e.preventDefault();
+
+    const form      = $(this);
+    const url       = form.attr("action");
+    const isArchive = url.includes("/archive") && !url.includes("/unarchive");
+    const table     = $("#formCategoriesTable").DataTable(); // ✅ update to your table ID
+
+    Swal.fire({
+        title: isArchive ? "Archive this category?" : "Unarchive this category?",
+        text: isArchive
+            ? "This will mark the category as inactive and archived."
+            : "This will restore the category and mark it as active.",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonText: isArchive ? "Yes, archive it" : "Yes, unarchive it",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: isArchive ? "#ffc107" : "#6c757d",
+        reverseButtons: true
+    }).then((result) => {
+        if (!result.value) return;
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {
+                _token: $('meta[name="csrf-token"]').attr("content"),
+                _method: "PATCH"
+            },
+            success: function (res) {
+                Swal.fire({
+                    type: "success",
+                    title: isArchive ? "Archived" : "Unarchived",
+                    text: res.message,
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                table.ajax.reload(null, false);
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    type: "error",
+                    title: "Action failed",
+                    text: xhr.responseJSON?.message || "Something went wrong"
+                });
+            }
+        });
+    });
 });
 </script>
 @endpush

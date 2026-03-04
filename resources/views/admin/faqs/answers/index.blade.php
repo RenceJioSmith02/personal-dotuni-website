@@ -40,7 +40,7 @@
     </div>
 </div>
 
-@include('admin.faqs.answers.partials.answer-modal')
+{{-- @include('admin.faqs.answers.partials.answer-modal') --}}
 
 @stop
 

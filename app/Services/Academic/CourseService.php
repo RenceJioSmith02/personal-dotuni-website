@@ -10,24 +10,18 @@ use Illuminate\Http\Request;
 
 class CourseService
 {
-
     public function list()
     {
-        return Course::all();
+        return Course::whereNull('deleted_at')->get();
     }
-    /**
-     * Get all courses
-     */
 
     public function datatable(Request $request)
     {
+        // ✅ Show ALL records (active, inactive, archived)
         $query = Course::query();
 
         $total = $query->count();
 
-        /* ======================
-         * SEARCH
-         * ====================== */
         if ($search = $request->input('search.value')) {
             $query->where(function ($q) use ($search) {
                 $q->where('code', 'like', "%{$search}%")
@@ -39,9 +33,6 @@ class CourseService
 
         $filtered = $query->count();
 
-        /* ======================
-         * ORDERING
-         * ====================== */
         $columns = [
             'code',
             'title',
@@ -55,20 +46,13 @@ class CourseService
 
         $orderColumn = $columns[$request->input('order.0.column', 0)] ?? 'code';
         $orderDir = $request->input('order.0.dir', 'asc');
-
         $query->orderBy($orderColumn, $orderDir);
 
-        /* ======================
-         * PAGINATION
-         * ====================== */
         $data = $query
             ->skip($request->start)
             ->take($request->length)
             ->get();
 
-        /* ======================
-         * RESPONSE
-         * ====================== */
         return response()->json([
             'draw' => intval($request->draw),
             'recordsTotal' => $total,
@@ -82,6 +66,7 @@ class CourseService
                 'created_at' => $c->created_at->toDateTimeString(),
                 'updated_at' => $c->updated_at->toDateTimeString(),
                 'status' => $c->is_active,
+                'archived' => !is_null($c->deleted_at), // ✅ Pass archive state
                 'actions' => view(
                     'admin.academic.courses.partials.actions',
                     compact('c')
@@ -90,50 +75,37 @@ class CourseService
         ]);
     }
 
-
-    /**
-     * Create a new course or restore soft-deleted one
-     */
     public function create(array $data): Course
     {
         try {
             return DB::transaction(function () use ($data) {
-                $existing = Course::withTrashed()
-                    ->where('code', $data['code'])
-                    ->first();
+                // ✅ Check for manually archived record with same code and restore it
+                $existing = Course::where('code', $data['code'])->first();
 
-                if ($existing) {
-                    $existing->restore();
-                    $existing->update($data);
+                if ($existing && !is_null($existing->deleted_at)) {
+                    $existing->update(array_merge($data, ['deleted_at' => null]));
                     return $existing;
                 }
 
                 return Course::create($data);
             });
         } catch (Exception $e) {
-            // Log the error for debugging or monitoring
             report($e);
-
-            // Convert to domain-specific exception
             throw new DomainException('Failed to create course: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Update an existing course
-     */
     public function update(Course $course, array $data): Course
     {
         try {
             return DB::transaction(function () use ($course, $data) {
-                $conflict = Course::withTrashed()
-                    ->where('code', $data['code'])
+                $conflict = Course::where('code', $data['code'])
                     ->where('id', '!=', $course->id)
                     ->first();
 
                 if ($conflict) {
                     throw new DomainException(
-                        'A course with this code already exists (including archived records).'
+                        'A course with this code already exists.'
                     );
                 }
 
@@ -147,15 +119,20 @@ class CourseService
     }
 
     /**
-     * Soft-delete a course
+     * ✅ Hard delete — permanently removes the record
      */
-
     public function delete(Course $course): void
     {
         try {
             DB::transaction(function () use ($course) {
 
-                // Check if used in program_courses
+                // ✅ Must be inactive before deleting
+                if ($course->is_active) {
+                    throw new DomainException(
+                        "Cannot delete '{$course->code} - {$course->title}'. Please deactivate it before deleting."
+                    );
+                }
+
                 if ($course->programCourses()->exists()) {
                     throw new DomainException(
                         "Cannot delete '{$course->code} - {$course->title}'. It is already assigned to a program."
@@ -172,4 +149,41 @@ class CourseService
         }
     }
 
+    /**
+     * ✅ Archive — sets is_active = false + deleted_at = now()
+     */
+    public function archive(Course $course): Course
+    {
+        try {
+            return DB::transaction(function () use ($course) {
+                $course->update([
+                    'is_active' => false,
+                    'deleted_at' => now(),
+                ]);
+                return $course;
+            });
+        } catch (Exception $e) {
+            report($e);
+            throw new DomainException('Failed to archive course: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * ✅ Unarchive — sets is_active = true + deleted_at = null
+     */
+    public function unarchive(Course $course): Course
+    {
+        try {
+            return DB::transaction(function () use ($course) {
+                $course->update([
+                    'is_active' => true,
+                    'deleted_at' => null,
+                ]);
+                return $course;
+            });
+        } catch (Exception $e) {
+            report($e);
+            throw new DomainException('Failed to unarchive course: ' . $e->getMessage());
+        }
+    }
 }

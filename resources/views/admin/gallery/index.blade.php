@@ -30,6 +30,7 @@
                     <th>Image</th>
                     <th>File Name</th>
                     <th>Order</th>
+                    <th>Status</th>
                     <th>Created At</th>
                     <th>Updated At</th>
                     <th width="180">Actions</th>
@@ -52,91 +53,142 @@ $(function () {
         $('#galleryTable').DataTable().destroy();
     }
 
-    $('#galleryTable').DataTable({
+let table;
+
+$(function () {
+
+    if ($.fn.DataTable.isDataTable('#galleryTable')) {
+        $('#galleryTable').DataTable().destroy();
+    }
+
+    table = $('#galleryTable').DataTable({ // ✅ update to your table ID
         processing: true,
         serverSide: true,
         responsive: true,
         autoWidth: false,
         pageLength: 10,
-        ordering: true,
-        ajax: {
-            url: "{{ route('admin.gallery.index') }}",
-            type: "GET"
-        },
+        ajax: "{{ route('admin.gallery.index') }}",
         columns: [
             {
                 data: null,
                 searchable: false,
                 orderable: false,
-                textAlign: 'center',
-                render: function (data, type, row, meta) {
-                    return meta.row + meta.settings._iDisplayStart + 1;
-                }
+                render: (data, type, row, meta) =>
+                    meta.row + meta.settings._iDisplayStart + 1
             },
-            { data: 'image', orderable: false, searchable: false },
+            { data: 'image',      orderable: false, searchable: false },
             { data: 'file_name' },
             { data: 'sort_order' },
-            {
-                data: "created_at",
-                render: (data) =>
-                    new Date(data).toLocaleString()
-            },
-            {
-                data: "updated_at",
-                render: (data) =>
-                    new Date(data).toLocaleString()
-            },
-            { data: 'actions', orderable: false, searchable: false }
+            { data: 'status',     orderable: false, searchable: false }, // ✅ Add
+            { data: 'created_at', render: (data) => new Date(data).toLocaleString() },
+            { data: 'updated_at', render: (data) => new Date(data).toLocaleString() },
+            { data: 'actions',    orderable: false, searchable: false }
         ]
     });
-});
 
-/* DELETE GALLERY (AJAX) */
-$(document).on("submit", ".ajax-delete-gallery", function (e) {
-    e.preventDefault();
+    // ✅ Delete handler
+    $(document).on("submit", ".ajax-delete-gallery", function (e) {
+        e.preventDefault();
 
-    const form = $(this);
-    const row = form.closest("tr");
-    const table = $("#galleryTable").DataTable();
+        const form = $(this);
+        const row  = form.closest("tr");
 
-    Swal.fire({
-        title: "Delete this image?",
-        text: "This action cannot be undone.",
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete it",
-        confirmButtonColor: "#dc3545",
-        reverseButtons: true
-    }).then((result) => {
-        if (!result.value) return;
+        Swal.fire({
+            title: "Delete this gallery item?",
+            text: "This action cannot be undone.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, delete it",
+            confirmButtonColor: "#dc3545",
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.value) return;
 
-        $.ajax({
-            url: form.attr("action"),
-            type: "POST",
-            data: {
-                _token: $('meta[name="csrf-token"]').attr("content"),
-                _method: "DELETE"
-            },
-            success: function (res) {
-                Swal.fire({
-                    type: "success",
-                    title: "Deleted",
-                    text: res.message || "Gallery item deleted successfully",
-                    timer: 1200,
-                    showConfirmButton: false
-                });
+            $.ajax({
+                url: form.attr("action"),
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr("content"),
+                    _method: "DELETE"
+                },
+                success: function (res) {
+                    Swal.fire({
+                        type: "success",
+                        title: "Deleted",
+                        text: res.message,
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
 
-                table.row(row).remove().draw(false);
-            },
-            error: function (xhr) {
-                Swal.fire({
-                    type: "error",
-                    title: "Error",
-                    text: xhr.responseJSON?.message || "Failed to delete image."
-                });
-            }
+                    table.row(row).remove().draw(false);
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        type: "error",
+                        title: "Delete failed",
+                        text: xhr.responseJSON?.message || "Something went wrong"
+                    });
+                }
+            });
         });
     });
+
+    // ✅ Archive / Unarchive handler
+    $(document).on("submit", ".ajax-archive-gallery", function (e) {
+        e.preventDefault();
+
+        const form      = $(this);
+        const url       = form.attr("action");
+        const isArchive = url.includes("/archive") && !url.includes("/unarchive");
+
+        Swal.fire({
+            title: isArchive ? "Archive this item?" : "Unarchive this item?",
+            text: isArchive
+                ? "This will mark the item as inactive and archived."
+                : "This will restore the item and mark it as active.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: isArchive ? "Yes, archive it" : "Yes, unarchive it",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: isArchive ? "#ffc107" : "#6c757d",
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.value) return;
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr("content"),
+                    _method: "PATCH"
+                },
+                success: function (res) {
+                    Swal.fire({
+                        type: "success",
+                        title: isArchive ? "Archived" : "Unarchived",
+                        text: res.message,
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                    table.ajax.reload(null, false);
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        type: "error",
+                        title: "Action failed",
+                        text: xhr.responseJSON?.message || "Something went wrong"
+                    });
+                }
+            });
+        });
+    });
+
 });
+
+
+
+});
+
 </script>
 @endpush

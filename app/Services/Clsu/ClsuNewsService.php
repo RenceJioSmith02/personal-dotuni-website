@@ -4,6 +4,7 @@ namespace App\Services\Clsu;
 
 use App\Models\Asset;
 use App\Models\ClsuNews;
+use DomainException;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -14,20 +15,20 @@ class ClsuNewsService
 {
     public function list()
     {
-        $clsuNews = ClsuNews::with('thumbnail')->get()->map(function ($news) {
-
-            $news->imagePath = optional($news->thumbnail)->storage_path;
-
-            return $news;
-        });
-        return $clsuNews;
+        return ClsuNews::with('thumbnail')
+            ->whereNull('deleted_at') // ✅ Exclude archived
+            ->get()
+            ->map(function ($news) {
+                $news->imagePath = optional($news->thumbnail)->storage_path;
+                return $news;
+            });
     }
 
     public function query()
     {
+        // ✅ Show ALL records including archived
         return ClsuNews::with('thumbnail');
     }
-
 
     public function datatable(Request $request)
     {
@@ -35,7 +36,6 @@ class ClsuNewsService
 
         $total = $query->count();
 
-        // Search
         if ($search = $request->input('search.value')) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
@@ -46,24 +46,20 @@ class ClsuNewsService
 
         $filtered = $query->count();
 
-        // Ordering
         $columns = ['title', 'description', 'url', 'sort_order', 'status', 'created_at', 'updated_at', 'actions'];
         $orderColumnIndex = $request->input('order.0.column', 1);
         $orderColumn = $columns[$orderColumnIndex] ?? 'sort_order';
         $orderDir = $request->input('order.0.dir', 'asc');
 
-        // Only order by DB columns
         if (!in_array($orderColumn, ['status', 'url'])) {
             $query->orderBy($orderColumn, $orderDir);
         }
 
-        // Pagination: call skip() and take() **before get()**
         $data = $query
             ->skip($request->start)
             ->take($request->length)
             ->get();
 
-        // Format JSON for DataTables
         return [
             'draw' => intval($request->draw),
             'recordsTotal' => $total,
@@ -72,19 +68,21 @@ class ClsuNewsService
                 return [
                     'title' => $item->title,
                     'description' => \Str::limit($item->description, 80),
-                    'url' => $item->url ? '<a href="' . $item->url . '" target="_blank">View</a>' : '<span class="text-muted">—</span>',
+                    'url' => $item->url
+                        ? '<a href="' . $item->url . '" target="_blank">View</a>'
+                        : '<span class="text-muted">—</span>',
                     'sort_order' => $item->sort_order,
                     'status' => $item->is_active
                         ? '<span class="badge badge-success">Active</span>'
                         : '<span class="badge badge-danger">Inactive</span>',
                     'created_at' => $item->created_at->toDateTimeString(),
                     'updated_at' => $item->updated_at->toDateTimeString(),
+                    'archived' => !is_null($item->deleted_at), // ✅ Pass archive state
                     'actions' => view('admin.clsu.news.partials.actions', compact('item'))->render()
                 ];
             })
         ];
     }
-    
 
     public function create(array $data, ?UploadedFile $image): ClsuNews
     {
@@ -134,25 +132,76 @@ class ClsuNewsService
         });
     }
 
+    /**
+     * ✅ Hard delete — must be inactive first
+     */
     public function delete(ClsuNews $news): void
     {
-        DB::transaction(function () use ($news) {
-            try {
+        try {
+            DB::transaction(function () use ($news) {
+
+                // ✅ Guard: must be inactive before hard deleting
+                if ($news->is_active) {
+                    throw new DomainException(
+                        "Cannot delete '{$news->title}'. Please deactivate it before deleting."
+                    );
+                }
+
                 if ($news->thumbnail) {
                     Storage::disk('public')->delete($news->thumbnail->storage_path);
                     $news->thumbnail->delete();
                 }
 
                 $news->delete();
-            } catch (\Throwable $e) {
-                throw $e;
-            }
-        });
+            });
+        } catch (DomainException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to delete news.');
+        }
+    }
+
+    /**
+     * ✅ Archive — sets is_active = false + deleted_at = now()
+     */
+    public function archive(ClsuNews $news): ClsuNews
+    {
+        try {
+            return DB::transaction(function () use ($news) {
+                $news->update([
+                    'is_active' => false,
+                    'deleted_at' => now(),
+                ]);
+                return $news;
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to archive news.');
+        }
+    }
+
+    /**
+     * ✅ Unarchive — sets is_active = true + deleted_at = null
+     */
+    public function unarchive(ClsuNews $news): ClsuNews
+    {
+        try {
+            return DB::transaction(function () use ($news) {
+                $news->update([
+                    'is_active' => true,
+                    'deleted_at' => null,
+                ]);
+                return $news;
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to unarchive news.');
+        }
     }
 
     protected function storeImage(UploadedFile $file): int
     {
-
         $extension = $file->getClientOriginalExtension();
 
         $filename = sprintf(

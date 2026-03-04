@@ -53,10 +53,14 @@ class DotuniNewsController extends Controller
 
     public function destroy(DotuniNews $dotuniNews)
     {
-        $this->service->delete($dotuniNews);
-        return response()->json(['message' => 'DotUni News deleted successfully']);
-    }
+        try {
+            $this->service->delete($dotuniNews);
 
+            return response()->json(['message' => 'DotUni News deleted successfully']);
+        } catch (\DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
 
     public function publish(DotuniNews $dotuniNews)
     {

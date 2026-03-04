@@ -111,5 +111,34 @@ class CourseController extends Controller
     }
 
 
+    public function archive(Course $course)
+    {
+        try {
+            $course = $this->service->archive($course);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json([
+            'message' => 'Course archived successfully',
+            'course' => $course
+        ]);
+    }
+
+    public function unarchive(Course $course)
+    {
+        try {
+            $course = $this->service->unarchive($course);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json([
+            'message' => 'Course unarchived successfully',
+            'course' => $course
+        ]);
+    }
+
+
 }
 
