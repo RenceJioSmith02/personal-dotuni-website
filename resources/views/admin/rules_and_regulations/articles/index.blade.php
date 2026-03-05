@@ -32,6 +32,7 @@
                     <th>Number</th>
                     <th>Title</th>
                     <th>Sort Order</th>
+                    <th>Status</th>
                     <th>Created At</th>
                     <th>Updated At</th>
                     <th width="150">Actions</th>
@@ -47,53 +48,47 @@
 @stop
 
 @push('js')
+
 <script>
+    let table;
+
 $(function () {
+
     if ($.fn.DataTable.isDataTable('#articlesTable')) {
         $('#articlesTable').DataTable().destroy();
     }
 
-    const table = $('#articlesTable').DataTable({
+    table = $('#articlesTable').DataTable({ // ✅ update to your table ID
         processing: true,
         serverSide: true,
         responsive: true,
         autoWidth: false,
         pageLength: 10,
-        ajax: {
-            url: "{{ route('admin.rule_articles.index') }}",
-            type: "GET"
-        },
+        ajax: "{{ route('admin.rule_articles.index') }}",
         columns: [
             {
                 data: null,
                 searchable: false,
                 orderable: false,
-                textAlign: 'center',
-                render: function (data, type, row, meta) {
-                    return meta.row + meta.settings._iDisplayStart + 1;
-                }
+                render: (data, type, row, meta) =>
+                    meta.row + meta.settings._iDisplayStart + 1
             },
-            { data: 'number', name: 'number' },
-            { data: 'title', name: 'title' },
-            { data: 'sort_order', name: 'sort_order' },
-            {
-                data: "created_at",
-                render: (data) =>
-                    new Date(data).toLocaleString()
-            },
-            {
-                data: "updated_at",
-                render: (data) =>
-                    new Date(data).toLocaleString()
-            },
-            { data: 'actions', orderable: false, searchable: false }
+            { data: 'number' },
+            { data: 'title' },
+            { data: 'sort_order' },
+            { data: 'status',     orderable: false, searchable: false },
+            { data: 'created_at', render: (data) => new Date(data).toLocaleString() },
+            { data: 'updated_at', render: (data) => new Date(data).toLocaleString() },
+            { data: 'actions',    orderable: false, searchable: false }
         ]
     });
 
-    
-    $(document).on("submit", ".ajax-delete-article", function(e) {
+    // ✅ Delete handler
+    $(document).on("submit", ".ajax-delete-article", function (e) {
         e.preventDefault();
-        const form = $(this), url = form.attr("action"), row = form.closest("tr");
+
+        const form = $(this);
+        const row  = form.closest("tr");
 
         Swal.fire({
             title: "Delete this article?",
@@ -101,26 +96,92 @@ $(function () {
             type: "warning",
             showCancelButton: true,
             confirmButtonText: "Yes, delete it",
-            cancelButtonText: "Cancel",
             confirmButtonColor: "#dc3545",
             reverseButtons: true
-        }).then(result => {
+        }).then((result) => {
+            if (!result.value) return;
+
+            $.ajax({
+                url: form.attr("action"),
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr("content"),
+                    _method: "DELETE"
+                },
+                success: function (res) {
+                    Swal.fire({
+                        type: "success",
+                        title: "Deleted",
+                        text: res.message,
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                    table.row(row).remove().draw(false);
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        type: "error",
+                        title: "Delete failed",
+                        text: xhr.responseJSON?.message || "Something went wrong"
+                    });
+                }
+            });
+        });
+    });
+
+    // ✅ Archive / Unarchive handler
+    $(document).on("submit", ".ajax-archive-rule-article", function (e) {
+        e.preventDefault();
+
+        const form      = $(this);
+        const url       = form.attr("action");
+        const isArchive = url.includes("/archive") && !url.includes("/unarchive");
+
+        Swal.fire({
+            title: isArchive ? "Archive this article?" : "Unarchive this article?",
+            text: isArchive
+                ? "This will mark the article as inactive and archived."
+                : "This will restore the article and mark it as active.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: isArchive ? "Yes, archive it" : "Yes, unarchive it",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: isArchive ? "#ffc107" : "#6c757d",
+            reverseButtons: true
+        }).then((result) => {
             if (!result.value) return;
 
             $.ajax({
                 url: url,
                 type: "POST",
-                data: { _token: $('meta[name="csrf-token"]').attr("content"), _method: "DELETE" },
-                success: function(res) {
-                    Swal.fire({ type: "success", title: "Deleted", text: res.message, timer: 1200, showConfirmButton: false });
-                    table.row(row).remove().draw(false);
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr("content"),
+                    _method: "PATCH"
                 },
-                error: function(xhr) {
-                    Swal.fire({ type: "error", title: "Delete failed", text: xhr.responseJSON?.message || "Something went wrong" });
+                success: function (res) {
+                    Swal.fire({
+                        type: "success",
+                        title: isArchive ? "Archived" : "Unarchived",
+                        text: res.message,
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                    table.ajax.reload(null, false);
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        type: "error",
+                        title: "Action failed",
+                        text: xhr.responseJSON?.message || "Something went wrong"
+                    });
                 }
             });
         });
     });
+
 });
 </script>
+
 @endpush

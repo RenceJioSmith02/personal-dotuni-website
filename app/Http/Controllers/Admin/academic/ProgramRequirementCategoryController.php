@@ -31,18 +31,16 @@ class ProgramRequirementCategoryController extends Controller
             'name' => [
                 'required',
                 'string',
-                Rule::unique('program_requirement_categories')->whereNull('deleted_at'),
+                Rule::unique('program_requirement_categories')->whereNull('deleted_at')
             ],
             'sort_order' => 'required|integer',
+            'is_active' => 'sometimes|boolean', // ✅ Add
         ]);
 
         try {
             $category = $this->service->create($validated);
 
-            return response()->json([
-                'message' => 'Category created successfully',
-                'category' => $category,
-            ], 201);
+            return response()->json(['message' => 'Category created successfully', 'category' => $category], 201);
         } catch (DomainException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
@@ -61,18 +59,16 @@ class ProgramRequirementCategoryController extends Controller
                 'string',
                 Rule::unique('program_requirement_categories')
                     ->ignore($program_requirement_category->id)
-                    ->whereNull('deleted_at'),
+                    ->whereNull('deleted_at')
             ],
             'sort_order' => 'required|integer',
+            'is_active' => 'sometimes|boolean', // ✅ Add
         ]);
 
         try {
             $category = $this->service->update($program_requirement_category, $validated);
 
-            return response()->json([
-                'message' => 'Category updated successfully',
-                'category' => $category,
-            ]);
+            return response()->json(['message' => 'Category updated successfully', 'category' => $category]);
         } catch (DomainException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
@@ -83,40 +79,29 @@ class ProgramRequirementCategoryController extends Controller
         try {
             $this->service->delete($program_requirement_category);
 
-            return response()->json([
-                'message' => 'Category deleted successfully',
-                'id' => $program_requirement_category->id,
-            ]);
+            return response()->json(['message' => 'Category deleted successfully']);
         } catch (DomainException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
-    // ✅ New
     public function archive(ProgramRequirementCategory $program_requirement_category)
     {
         try {
             $category = $this->service->archive($program_requirement_category);
 
-            return response()->json([
-                'message' => 'Category archived successfully',
-                'category' => $category,
-            ]);
+            return response()->json(['message' => 'Category archived successfully', 'category' => $category]);
         } catch (DomainException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
-    // ✅ New
     public function unarchive(ProgramRequirementCategory $program_requirement_category)
     {
         try {
             $category = $this->service->unarchive($program_requirement_category);
 
-            return response()->json([
-                'message' => 'Category unarchived successfully',
-                'category' => $category,
-            ]);
+            return response()->json(['message' => 'Category unarchived successfully', 'category' => $category]);
         } catch (DomainException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }

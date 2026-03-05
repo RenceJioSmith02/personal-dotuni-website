@@ -17,9 +17,7 @@
         class="d-inline ajax-archive-category">
         @csrf
         @method('PATCH')
-        <button type="submit" class="btn btn-sm btn-warning">
-            Archive
-        </button>
+        <button type="submit" class="btn btn-sm btn-warning">Archive</button>
     </form>
 @else
     <form
@@ -28,13 +26,11 @@
         class="d-inline ajax-archive-category">
         @csrf
         @method('PATCH')
-        <button type="submit" class="btn btn-sm btn-secondary">
-            Unarchive
-        </button>
+        <button type="submit" class="btn btn-sm btn-secondary">Unarchive</button>
     </form>
 @endif
 
-{{-- ✅ Hard delete — only enabled when archived (deleted_at is set) --}}
+{{-- ✅ Hard delete — only enabled when inactive (is_active = false) --}}
 <form
     action="{{ route('admin.program_requirement_categories.destroy', $c) }}"
     method="POST"
@@ -44,9 +40,9 @@
     <button
         type="submit"
         class="btn btn-sm btn-danger"
-        @if(is_null($c->deleted_at))
+        @if($c->is_active)
             disabled
-            title="Archive the category before deleting"
+            title="Deactivate the category before deleting"
         @endif>
         Delete
     </button>

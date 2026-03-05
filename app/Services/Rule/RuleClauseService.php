@@ -3,8 +3,10 @@
 namespace App\Services\Rule;
 
 use App\Models\RuleClause;
+use DomainException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Throwable;
 use Illuminate\Http\Request;
 
@@ -13,33 +15,35 @@ class RuleClauseService
     public function list()
     {
         return RuleClause::with('subSection.section.article')
+            ->whereNull('deleted_at') // ✅ Exclude archived
             ->orderBy('sort_order')
             ->get();
     }
 
-
     public function datatable(Request $request)
     {
+        // ✅ Show ALL records including archived
         $query = RuleClause::with('subSection.section.article');
 
         $total = $query->count();
 
-        /* SEARCH */
         if ($search = $request->input('search.value')) {
             $query->where(function ($q) use ($search) {
-                // Search in article number
-                $q->whereHas('subSection.section.article', function ($q2) use ($search) {
-                    $q2->where('rule_articles.number', 'like', "%{$search}%");
-                })
-                    // Search in section number
-                    ->orWhereHas('subSection.section', function ($q2) use ($search) {
-                        $q2->where('rule_sections.number', 'like', "%{$search}%");
-                    })
-                    // Search in sub-section number
-                    ->orWhereHas('subSection', function ($q2) use ($search) {
-                        $q2->where('rule_sub_sections.number', 'like', "%{$search}%");
-                    })
-                    // Search in clause number and body
+                $q->whereHas(
+                    'subSection.section.article',
+                    fn($q2) =>
+                    $q2->where('rule_articles.number', 'like', "%{$search}%")
+                )
+                    ->orWhereHas(
+                        'subSection.section',
+                        fn($q2) =>
+                        $q2->where('rule_sections.number', 'like', "%{$search}%")
+                    )
+                    ->orWhereHas(
+                        'subSection',
+                        fn($q2) =>
+                        $q2->where('rule_sub_sections.number', 'like', "%{$search}%")
+                    )
                     ->orWhere('rule_clauses.number', 'like', "%{$search}%")
                     ->orWhere('rule_clauses.body', 'like', "%{$search}%");
             });
@@ -47,11 +51,12 @@ class RuleClauseService
 
         $filtered = $query->count();
 
-        /* ORDERING */
-        $columns = ['article', 'section', 'sub_section', 'number', 'body', 'sort_order'];
+        $columns = ['article', 'section', 'sub_section', 'number', 'body', 'sort_order', 'status', 'actions'];
         $orderColIndex = $request->input('order.0.column', 5);
-        $orderDir = $request->input('order.0.dir', 'asc');
         $orderCol = $columns[$orderColIndex] ?? 'sort_order';
+        $orderDir = $request->input('order.0.dir', 'asc') === 'asc' ? 'asc' : 'desc';
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
 
         if ($orderCol === 'article') {
             $query->join('rule_sub_sections', 'rule_sub_sections.id', '=', 'rule_clauses.sub_section_id')
@@ -68,53 +73,63 @@ class RuleClauseService
             $query->join('rule_sub_sections', 'rule_sub_sections.id', '=', 'rule_clauses.sub_section_id')
                 ->orderBy('rule_sub_sections.number', $orderDir)
                 ->select('rule_clauses.*');
-        } else {
-            // Fully qualify clause columns for safety
+        } elseif (!in_array($orderCol, ['status', 'actions'])) {
             $query->orderBy('rule_clauses.' . $orderCol, $orderDir);
         }
 
-        /* PAGINATION */
-        $clauses = $query->skip($request->start)->take($request->length)->get();
+        $clauses = $query->skip($start)->take($length)->get();
 
-        /* RESPONSE */
         return response()->json([
             'draw' => intval($request->draw),
             'recordsTotal' => $total,
             'recordsFiltered' => $filtered,
             'data' => $clauses->map(function ($clause) {
                 return [
-                    'article' => $clause->subSection->section->article->number ?? '-',
-                    'section' => $clause->subSection->section->number ?? '-',
-                    'sub_section' => $clause->subSection->number ?? '-',
-                    'number' => $clause->number,
-                    'body' => \Str::limit($clause->body, 80),
+                    'article' => $clause->subSection->section->article->number ?? '—',
+                    'section' => $clause->subSection->section->number ?? '—',
+                    'sub_section' => $clause->subSection->number ?? '—',
+                    'number' => e($clause->number),
+                    'body' => Str::limit($clause->body, 80),
                     'sort_order' => $clause->sort_order,
-                    'actions' => view('admin.rules_and_regulations.clauses.partials.actions', compact('clause'))->render()
+                    'status' => $clause->is_active
+                        ? '<span class="badge badge-success">Active</span>'
+                        : '<span class="badge badge-danger">Inactive</span>',
+                    'archived' => !is_null($clause->deleted_at), // ✅ Pass archive state
+                    'actions' => view(
+                        'admin.rules_and_regulations.clauses.partials.actions',
+                        compact('clause')
+                    )->render(),
                 ];
             })
         ]);
     }
 
-
-
-    public function storeOrRestore(array $data): RuleClause
+    public function create(array $data): RuleClause
     {
         return DB::transaction(function () use ($data) {
             try {
                 $data['updated_by'] = Auth::id();
 
-                $existing = RuleClause::withTrashed()
-                    ->where('sub_section_id', $data['sub_section_id'])
+                // ✅ Restore if same sub_section+number was archived
+                $existing = RuleClause::where('sub_section_id', $data['sub_section_id'])
                     ->where('number', $data['number'])
                     ->first();
 
-                if ($existing) {
-                    if ($existing->trashed()) {
-                        $existing->restore();
-                    }
+                if ($existing && !is_null($existing->deleted_at)) {
+                    DB::table('rule_clauses')->where('id', $existing->id)->update([
+                        'sub_section_id' => $data['sub_section_id'],
+                        'number' => $data['number'],
+                        'body' => $data['body'],
+                        'sort_order' => $data['sort_order'] ?? 0,
+                        'is_active' => true,
+                        'deleted_at' => null,
+                        'updated_by' => Auth::id(),
+                    ]);
+                    return $existing->fresh();
+                }
 
-                    $existing->update($data);
-                    return $existing;
+                if ($existing) {
+                    throw new DomainException('A clause with this number already exists in this sub-section.');
                 }
 
                 return RuleClause::create($data);
@@ -126,31 +141,24 @@ class RuleClauseService
         });
     }
 
-    public function updateOrRestore(RuleClause $current, array $data): RuleClause
+    public function update(RuleClause $clause, array $data): RuleClause
     {
-        return DB::transaction(function () use ($current, $data) {
+        return DB::transaction(function () use ($clause, $data) {
             try {
                 $data['updated_by'] = Auth::id();
 
-                $conflict = RuleClause::withTrashed()
-                    ->where('sub_section_id', $data['sub_section_id'])
+                $conflict = RuleClause::where('sub_section_id', $data['sub_section_id'])
                     ->where('number', $data['number'])
-                    ->where('id', '!=', $current->id)
+                    ->where('id', '!=', $clause->id)
+                    ->whereNull('deleted_at')
                     ->first();
 
                 if ($conflict) {
-                    if ($conflict->trashed()) {
-                        $conflict->restore();
-                    }
-
-                    $conflict->update($data);
-                    $current->delete();
-
-                    return $conflict;
+                    throw new DomainException('A clause with this number already exists in this sub-section.');
                 }
 
-                $current->update($data);
-                return $current;
+                $clause->update($data);
+                return $clause;
 
             } catch (Throwable $e) {
                 report($e);
@@ -159,8 +167,64 @@ class RuleClauseService
         });
     }
 
+    /**
+     * ✅ Hard delete — must be inactive first
+     */
     public function delete(RuleClause $clause): void
     {
-        DB::transaction(fn() => $clause->delete());
+        try {
+            DB::transaction(function () use ($clause) {
+
+                // ✅ Guard: must be inactive before hard deleting
+                if ($clause->is_active) {
+                    throw new DomainException(
+                        "Cannot delete this clause. Please deactivate it before deleting."
+                    );
+                }
+
+                $clause->delete();
+            });
+        } catch (DomainException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to delete clause.');
+        }
+    }
+
+    /**
+     * ✅ Archive — sets is_active = false + deleted_at = now()
+     */
+    public function archive(RuleClause $clause): RuleClause
+    {
+        try {
+            DB::table('rule_clauses')->where('id', $clause->id)->update([
+                'is_active' => false,
+                'deleted_at' => now(),
+            ]);
+
+            return $clause->fresh();
+        } catch (Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to archive clause.');
+        }
+    }
+
+    /**
+     * ✅ Unarchive — sets is_active = true + deleted_at = null
+     */
+    public function unarchive(RuleClause $clause): RuleClause
+    {
+        try {
+            DB::table('rule_clauses')->where('id', $clause->id)->update([
+                'is_active' => true,
+                'deleted_at' => null,
+            ]);
+
+            return $clause->fresh();
+        } catch (Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to unarchive clause.');
+        }
     }
 }

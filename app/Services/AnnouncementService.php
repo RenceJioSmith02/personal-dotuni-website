@@ -17,9 +17,11 @@ class AnnouncementService
     /**
      * List all announcements with relationships.
      */
+
     public function list()
     {
         return Announcement::with(['author:id,name', 'assets'])
+            ->where('visibility', 'public')
             ->orderByDesc('publish_start')
             ->orderByDesc('id')
             ->get();

@@ -6,15 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\RuleClause;
 use App\Models\RuleSubSection;
 use App\Services\Rule\RuleClauseService;
+use DomainException;
 use Illuminate\Http\Request;
 
 class RuleClauseController extends Controller
 {
-    protected RuleClauseService $service;
-
-    public function __construct(RuleClauseService $service)
+    public function __construct(protected RuleClauseService $service)
     {
-        $this->service = $service;
     }
 
     public function index(Request $request)
@@ -23,14 +21,14 @@ class RuleClauseController extends Controller
             return $this->service->datatable($request);
         }
 
-        $subSections = RuleSubSection::with('section.article')->orderBy('sort_order')->get();
+        // ✅ Exclude archived sub-sections from dropdown
+        $subSections = RuleSubSection::with('section.article')
+            ->whereNull('deleted_at')
+            ->orderBy('sort_order')
+            ->get();
 
-        return view(
-            'admin.rules_and_regulations.clauses.index',
-            compact('subSections')
-        );
+        return view('admin.rules_and_regulations.clauses.index', compact('subSections'));
     }
-
 
     public function store(Request $request)
     {
@@ -39,14 +37,16 @@ class RuleClauseController extends Controller
             'number' => 'required|string|max:20',
             'body' => 'required|string',
             'sort_order' => 'nullable|integer',
+            'is_active' => 'sometimes|boolean', // ✅ Add
         ]);
 
-        $clause = $this->service->storeOrRestore($validated);
+        try {
+            $clause = $this->service->create($validated);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
-        return response()->json([
-            'message' => 'Clause saved successfully',
-            'data' => $clause,
-        ], 201);
+        return response()->json(['message' => 'Clause saved successfully', 'data' => $clause], 201);
     }
 
     public function edit(RuleClause $ruleClause)
@@ -61,23 +61,56 @@ class RuleClauseController extends Controller
             'number' => 'required|string|max:20',
             'body' => 'required|string',
             'sort_order' => 'nullable|integer',
+            'is_active' => 'sometimes|boolean', // ✅ Add
         ]);
 
-        $clause = $this->service->updateOrRestore($ruleClause, $validated);
+        try {
+            $clause = $this->service->update($ruleClause, $validated);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
-        return response()->json([
-            'message' => 'Clause updated successfully',
-            'data' => $clause,
-        ]);
+        return response()->json(['message' => 'Clause updated successfully', 'data' => $clause]);
     }
 
     public function destroy(RuleClause $ruleClause)
     {
-        $this->service->delete($ruleClause);
+        try {
+            $this->service->delete($ruleClause);
 
-        return response()->json([
-            'message' => 'Clause deleted successfully',
-        ]);
+            return response()->json(['message' => 'Clause deleted successfully']);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function archive(RuleClause $ruleClause)
+    {
+        try {
+            $clause = $this->service->archive($ruleClause);
+
+            return response()->json([
+                'message' => 'Clause archived successfully',
+                'clause' => $clause,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function unarchive(RuleClause $ruleClause)
+    {
+        try {
+            $clause = $this->service->unarchive($ruleClause);
+
+            return response()->json([
+                'message' => 'Clause unarchived successfully',
+                'clause' => $clause,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
     }
 }
-

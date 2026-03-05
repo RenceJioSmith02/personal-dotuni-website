@@ -52,62 +52,45 @@
 
 @push('js')
 <script>
+
+let table;
+
 $(function () {
 
-    /* ================================
-     * DATATABLE
-     * ================================ */
     if ($.fn.DataTable.isDataTable('#categoriesTable')) {
         $('#categoriesTable').DataTable().destroy();
     }
 
-    const table = $('#categoriesTable').DataTable({
+    table = $('#categoriesTable').DataTable({ // ✅ update to your table ID
         processing: true,
         serverSide: true,
         responsive: true,
         autoWidth: false,
         pageLength: 10,
-        ajax: {
-            url: "{{ route('admin.prospective_student_categories.index') }}",
-            type: "GET"
-        },
+        ajax: "{{ route('admin.prospective_student_categories.index') }}",
         columns: [
             {
                 data: null,
                 searchable: false,
                 orderable: false,
-                textAlign: "center",
-                render: function (data, type, row, meta) {
-                    return meta.row + meta.settings._iDisplayStart + 1;
-                }
+                render: (data, type, row, meta) =>
+                    meta.row + meta.settings._iDisplayStart + 1
             },
-            { data: 'name', name: 'name' },
-            { data: 'sort_order', name: 'sort_order', className: 'text-center' },
-            { data: 'status', name: 'status', orderable: false, searchable: false },
-            {
-                data: "created_at",
-                render: (data) =>
-                    new Date(data).toLocaleString()
-            },
-            {
-                data: "updated_at",
-                render: (data) =>
-                    new Date(data).toLocaleString()
-            },
-            { data: 'actions', orderable: false, searchable: false }
+            { data: 'name' },
+            { data: 'sort_order' },
+            { data: 'status',     orderable: false, searchable: false },
+            { data: 'created_at', render: (data) => new Date(data).toLocaleString() },
+            { data: 'updated_at', render: (data) => new Date(data).toLocaleString() },
+            { data: 'actions',    orderable: false, searchable: false }
         ]
     });
 
-
-    /* ================================
-     * AJAX DELETE CATEGORY
-     * ================================ */
+    // ✅ Delete handler
     $(document).on("submit", ".ajax-delete-category", function (e) {
         e.preventDefault();
 
         const form = $(this);
-        const url = form.attr("action");
-        const row = form.closest("tr");
+        const row  = form.closest("tr");
 
         Swal.fire({
             title: "Delete this category?",
@@ -118,11 +101,10 @@ $(function () {
             confirmButtonColor: "#dc3545",
             reverseButtons: true
         }).then((result) => {
-
             if (!result.value) return;
 
             $.ajax({
-                url: url,
+                url: form.attr("action"),
                 type: "POST",
                 data: {
                     _token: $('meta[name="csrf-token"]').attr("content"),
@@ -132,7 +114,7 @@ $(function () {
                     Swal.fire({
                         type: "success",
                         title: "Deleted",
-                        text: res.message || "Category deleted successfully",
+                        text: res.message,
                         timer: 1200,
                         showConfirmButton: false
                     });
@@ -150,6 +132,58 @@ $(function () {
         });
     });
 
+    // ✅ Archive / Unarchive handler
+    $(document).on("submit", ".ajax-archive-prospective-category", function (e) {
+        e.preventDefault();
+
+        const form      = $(this);
+        const url       = form.attr("action");
+        const isArchive = url.includes("/archive") && !url.includes("/unarchive");
+
+        Swal.fire({
+            title: isArchive ? "Archive this category?" : "Unarchive this category?",
+            text: isArchive
+                ? "This will mark the category as inactive and archived."
+                : "This will restore the category and mark it as active.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: isArchive ? "Yes, archive it" : "Yes, unarchive it",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: isArchive ? "#ffc107" : "#6c757d",
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.value) return;
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr("content"),
+                    _method: "PATCH"
+                },
+                success: function (res) {
+                    Swal.fire({
+                        type: "success",
+                        title: isArchive ? "Archived" : "Unarchived",
+                        text: res.message,
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                    table.ajax.reload(null, false);
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        type: "error",
+                        title: "Action failed",
+                        text: xhr.responseJSON?.message || "Something went wrong"
+                    });
+                }
+            });
+        });
+    });
+
 });
+
 </script>
 @endpush

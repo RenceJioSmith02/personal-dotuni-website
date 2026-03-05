@@ -180,7 +180,10 @@ Route::prefix('admin')
         // ADMIN ONLY
         // ============================
         Route::middleware(['role:admin'])->group(function () {
+            Route::patch('users/{user}/archive', [UserController::class, 'archive'])->name('users.archive');
+            Route::patch('users/{user}/unarchive', [UserController::class, 'unarchive'])->name('users.unarchive');
             Route::resource('users', UserController::class);
+            
             Route::resource('roles', RoleController::class)->except(['show']);
         });
 
@@ -219,9 +222,9 @@ Route::prefix('admin')
             Route::patch('programs/{program}/archive', [ProgramController::class, 'archive'])->name('programs.archive');
             Route::patch('programs/{program}/unarchive', [ProgramController::class, 'unarchive'])->name('programs.unarchive');
 
-            Route::resource('program_requirement_categories', ProgramRequirementCategoryController::class);
             Route::patch('program_requirement_categories/{program_requirement_category}/archive', [ProgramRequirementCategoryController::class, 'archive'])->name('program_requirement_categories.archive');
             Route::patch('program_requirement_categories/{program_requirement_category}/unarchive', [ProgramRequirementCategoryController::class, 'unarchive'])->name('program_requirement_categories.unarchive');
+            Route::resource('program_requirement_categories', ProgramRequirementCategoryController::class);
 
             Route::get('programs/{program}/builder', [ProgramBuilderController::class, 'show'])
                 ->name('academic.programs.builder');
@@ -258,11 +261,28 @@ Route::prefix('admin')
             Route::patch('faqs-answers/{faqs_answer}/archive', [FaqAnswerController::class, 'archive'])->name('faqs_answers.archive');
             Route::patch('faqs-answers/{faqs_answer}/unarchive', [FaqAnswerController::class, 'unarchive'])->name('faqs_answers.unarchive');
 
+            Route::patch('prospective_student_categories/{prospectiveStudentCategory}/archive', [ProspectiveStudentCategoryController::class, 'archive'])->name('prospective_student_categories.archive');
+            Route::patch('prospective_student_categories/{prospectiveStudentCategory}/unarchive', [ProspectiveStudentCategoryController::class, 'unarchive'])->name('prospective_student_categories.unarchive');
             Route::resource('prospective_student_categories', ProspectiveStudentCategoryController::class);
+
+            Route::patch('prospective_student_items/{prospectiveStudentItem}/archive', [ProspectiveStudentItemController::class, 'archive'])->name('prospective_student_items.archive');
+            Route::patch('prospective_student_items/{prospectiveStudentItem}/unarchive', [ProspectiveStudentItemController::class, 'unarchive'])->name('prospective_student_items.unarchive');
             Route::resource('prospective_student_items', ProspectiveStudentItemController::class);
+
+            Route::patch('rule_articles/{ruleArticle}/archive', [RuleArticleController::class, 'archive'])->name('rule_articles.archive');
+            Route::patch('rule_articles/{ruleArticle}/unarchive', [RuleArticleController::class, 'unarchive'])->name('rule_articles.unarchive');
             Route::resource('rule_articles', RuleArticleController::class);
+
+            Route::patch('rule_sections/{ruleSection}/archive', [RuleSectionController::class, 'archive'])->name('rule_sections.archive');
+            Route::patch('rule_sections/{ruleSection}/unarchive', [RuleSectionController::class, 'unarchive'])->name('rule_sections.unarchive');
             Route::resource('rule_sections', RuleSectionController::class);
+
+            Route::patch('rule_sub_sections/{ruleSubSection}/archive', [RuleSubSectionController::class, 'archive'])->name('rule_sub_sections.archive');
+            Route::patch('rule_sub_sections/{ruleSubSection}/unarchive', [RuleSubSectionController::class, 'unarchive'])->name('rule_sub_sections.unarchive');
             Route::resource('rule_sub_sections', RuleSubSectionController::class);
+
+            Route::patch('rule_clauses/{ruleClause}/archive', [RuleClauseController::class, 'archive'])->name('rule_clauses.archive');
+            Route::patch('rule_clauses/{ruleClause}/unarchive', [RuleClauseController::class, 'unarchive'])->name('rule_clauses.unarchive');
             Route::resource('rule_clauses', RuleClauseController::class);
 
             Route::resource('form_categories', FormCategoryController::class);
@@ -288,4 +308,10 @@ Route::prefix('admin')
         });
 
     });
+
+
+
+
+
+
 

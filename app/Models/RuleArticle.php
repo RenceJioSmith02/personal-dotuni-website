@@ -3,13 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RuleArticle extends Model
 {
-    use SoftDeletes;
 
-    protected $fillable = ['number', 'title', 'sort_order', 'updated_by'];
+    protected $fillable = [
+        'number',
+        'title',
+        'sort_order',
+        'is_active',
+        'deleted_at', 
+        'updated_by',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'deleted_at' => 'datetime',
+    ];
 
     public function sections()
     {

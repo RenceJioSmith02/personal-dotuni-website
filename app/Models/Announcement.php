@@ -14,7 +14,6 @@ class Announcement extends Model
         'slug',
         'seo_title',
         'seo_description',
-        'status',
         'visibility',
         'layout',
         'author_id',

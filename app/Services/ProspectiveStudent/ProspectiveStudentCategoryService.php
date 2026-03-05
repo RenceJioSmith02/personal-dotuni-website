@@ -2,6 +2,7 @@
 
 namespace App\Services\ProspectiveStudent;
 
+use DomainException;
 use Throwable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,34 +13,35 @@ class ProspectiveStudentCategoryService
 {
     public function list()
     {
-        return ProspectiveStudentCategory::orderBy('sort_order')->get();
+        return ProspectiveStudentCategory::whereNull('deleted_at') // ✅ Exclude archived
+            ->orderBy('sort_order')
+            ->get();
     }
 
     public function datatable(Request $request)
     {
+        // ✅ Show ALL records including archived
         $query = ProspectiveStudentCategory::query();
 
         $total = $query->count();
 
-        /* SEARCH */
         if ($search = $request->input('search.value')) {
             $query->where('name', 'like', "%{$search}%");
         }
 
         $filtered = $query->count();
 
-        /* ORDER */
-        $columns = ['name', 'sort_order', 'created_at', 'updated_at'];
-        $orderCol = $columns[$request->input('order.0.column')] ?? 'sort_order';
-        $orderDir = $request->input('order.0.dir', 'asc');
+        $columns = ['name', 'sort_order', 'status', 'created_at', 'updated_at', 'actions'];
+        $orderCol = $columns[$request->input('order.0.column', 0)] ?? 'sort_order';
+        $orderDir = $request->input('order.0.dir', 'asc') === 'asc' ? 'asc' : 'desc';
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
 
-        $query->orderBy($orderCol, $orderDir);
+        if (!in_array($orderCol, ['status', 'actions'])) {
+            $query->orderBy($orderCol, $orderDir);
+        }
 
-        /* PAGINATION */
-        $items = $query
-            ->skip($request->start)
-            ->take($request->length)
-            ->get();
+        $items = $query->skip($start)->take($length)->get();
 
         return response()->json([
             'draw' => intval($request->draw),
@@ -54,32 +56,38 @@ class ProspectiveStudentCategoryService
                         : '<span class="badge badge-danger">Inactive</span>',
                     'created_at' => $category->created_at->toDateTimeString(),
                     'updated_at' => $category->updated_at->toDateTimeString(),
+                    'archived' => !is_null($category->deleted_at), // ✅ Pass archive state
                     'actions' => view(
                         'admin.prospective_student.categories.partials.actions',
                         compact('category')
-                    )->render()
+                    )->render(),
                 ];
             })
         ]);
     }
 
-    public function createOrRestore(array $data): ProspectiveStudentCategory
+    public function create(array $data): ProspectiveStudentCategory
     {
         return DB::transaction(function () use ($data) {
             try {
                 $data['updated_by'] = Auth::id();
 
-                $existing = ProspectiveStudentCategory::withTrashed()
-                    ->where('name', $data['name'])
-                    ->first();
+                // ✅ Restore if same name was archived
+                $existing = ProspectiveStudentCategory::where('name', $data['name'])->first();
+
+                if ($existing && !is_null($existing->deleted_at)) {
+                    DB::table('prospective_student_categories')->where('id', $existing->id)->update([
+                        'name' => $data['name'],
+                        'sort_order' => $data['sort_order'] ?? 0,
+                        'is_active' => $data['is_active'] ?? true,
+                        'deleted_at' => null,
+                        'updated_by' => Auth::id(),
+                    ]);
+                    return $existing->fresh();
+                }
 
                 if ($existing) {
-                    if ($existing->trashed()) {
-                        $existing->restore();
-                    }
-
-                    $existing->update($data);
-                    return $existing;
+                    throw new DomainException('Category already exists.');
                 }
 
                 return ProspectiveStudentCategory::create($data);
@@ -91,7 +99,7 @@ class ProspectiveStudentCategoryService
         });
     }
 
-    public function updateOrRestore(
+    public function update(
         ProspectiveStudentCategory $current,
         array $data
     ): ProspectiveStudentCategory {
@@ -99,22 +107,13 @@ class ProspectiveStudentCategoryService
             try {
                 $data['updated_by'] = Auth::id();
 
-                $existing = ProspectiveStudentCategory::withTrashed()
-                    ->where('name', $data['name'])
+                $conflict = ProspectiveStudentCategory::where('name', $data['name'])
                     ->where('id', '!=', $current->id)
+                    ->whereNull('deleted_at')
                     ->first();
 
-                if ($existing) {
-                    if ($existing->trashed()) {
-                        $existing->restore();
-                    }
-
-                    $existing->update($data);
-
-                    // remove the old one to avoid duplicates
-                    $current->delete();
-
-                    return $existing;
+                if ($conflict) {
+                    throw new DomainException('A category with this name already exists.');
                 }
 
                 $current->update($data);
@@ -127,21 +126,70 @@ class ProspectiveStudentCategoryService
         });
     }
 
-
+    /**
+     * ✅ Hard delete — must be inactive first
+     */
     public function delete(ProspectiveStudentCategory $category): void
     {
-        DB::transaction(function () use ($category) {
-            try {
+        try {
+            DB::transaction(function () use ($category) {
+
+                // ✅ Guard: must be inactive before hard deleting
+                if ($category->is_active) {
+                    throw new DomainException(
+                        "Cannot delete '{$category->name}'. Please deactivate it before deleting."
+                    );
+                }
+
                 if ($category->items()->exists()) {
-                    abort(422, 'Category has items and cannot be deleted.');
+                    throw new DomainException(
+                        "Cannot delete '{$category->name}'. It has items assigned to it."
+                    );
                 }
 
                 $category->delete();
+            });
+        } catch (DomainException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to delete category.');
+        }
+    }
 
-            } catch (Throwable $e) {
-                report($e);
-                throw $e;
-            }
-        });
+    /**
+     * ✅ Archive — sets is_active = false + deleted_at = now()
+     */
+    public function archive(ProspectiveStudentCategory $category): ProspectiveStudentCategory
+    {
+        try {
+            DB::table('prospective_student_categories')->where('id', $category->id)->update([
+                'is_active' => false,
+                'deleted_at' => now(),
+            ]);
+
+            return $category->fresh();
+        } catch (Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to archive category.');
+        }
+    }
+
+    /**
+     * ✅ Unarchive — sets is_active = true + deleted_at = null
+     */
+    public function unarchive(ProspectiveStudentCategory $category): ProspectiveStudentCategory
+    {
+        try {
+            DB::table('prospective_student_categories')->where('id', $category->id)->update([
+                'is_active' => true,
+                'deleted_at' => null,
+            ]);
+
+            return $category->fresh();
+        } catch (Throwable $e) {
+            report($e);
+            throw new DomainException('Failed to unarchive category.');
+        }
     }
 }

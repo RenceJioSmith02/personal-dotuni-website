@@ -21,7 +21,8 @@ class DotuniNewsService
     public function list()
     {
         return DotuniNews::with(['author:id,name', 'attachments.asset'])
-            ->orderByRaw("CASE status WHEN 'published' THEN 0 ELSE 1 END")
+            ->where('visibility', 'public')
+            ->where('status', 'published')
             ->orderByDesc('published_at')
             ->orderByDesc('id')
             ->get();

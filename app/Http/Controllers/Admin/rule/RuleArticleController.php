@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin\rule;
 
 use App\Models\RuleArticle;
+use DomainException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Services\Rule\RuleArticleService;
 
 class RuleArticleController extends Controller
@@ -21,9 +21,7 @@ class RuleArticleController extends Controller
             return $this->service->datatable($request);
         }
 
-        return view(
-            'admin.rules_and_regulations.articles.index'
-        );
+        return view('admin.rules_and_regulations.articles.index');
     }
 
     public function store(Request $request)
@@ -32,14 +30,16 @@ class RuleArticleController extends Controller
             'number' => 'required|string|max:20',
             'title' => 'required|string|max:250',
             'sort_order' => 'nullable|integer',
+            'is_active' => 'sometimes|boolean', // ✅ Add
         ]);
 
-        $article = $this->service->storeOrRestore($data);
+        try {
+            $article = $this->service->create($data);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
-        return response()->json([
-            'message' => 'Article saved successfully',
-            'data' => $article,
-        ], 201);
+        return response()->json(['message' => 'Article saved successfully', 'data' => $article], 201);
     }
 
     public function edit(RuleArticle $ruleArticle)
@@ -53,13 +53,16 @@ class RuleArticleController extends Controller
             'number' => 'required|string|max:20',
             'title' => 'required|string|max:250',
             'sort_order' => 'nullable|integer',
+            'is_active' => 'sometimes|boolean', // ✅ Add
         ]);
 
-        $this->service->updateOrRestore($ruleArticle, $data);
+        try {
+            $this->service->update($ruleArticle, $data);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
-        return response()->json([
-            'message' => 'Article updated successfully',
-        ]);
+        return response()->json(['message' => 'Article updated successfully']);
     }
 
     public function destroy(RuleArticle $ruleArticle)
@@ -67,15 +70,39 @@ class RuleArticleController extends Controller
         try {
             $this->service->delete($ruleArticle);
 
-            return response()->json([
-                'message' => 'Article deleted successfully',
-            ]);
-        } catch (\DomainException $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 422);
+            return response()->json(['message' => 'Article deleted successfully']);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
-}
+    // ✅ New
+    public function archive(RuleArticle $ruleArticle)
+    {
+        try {
+            $article = $this->service->archive($ruleArticle);
 
+            return response()->json([
+                'message' => 'Article archived successfully',
+                'article' => $article,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function unarchive(RuleArticle $ruleArticle)
+    {
+        try {
+            $article = $this->service->unarchive($ruleArticle);
+
+            return response()->json([
+                'message' => 'Article unarchived successfully',
+                'article' => $article,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+}

@@ -10,8 +10,14 @@ class ProgramRequirementCategory extends Model
     protected $fillable = [
         'name',
         'sort_order',
-        'updated_by',
+        'is_active',
         'deleted_at',
+        'updated_by',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'deleted_at' => 'datetime',
     ];
 
     public function programRequirements()

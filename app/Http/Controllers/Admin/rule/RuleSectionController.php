@@ -6,15 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\RuleSection;
 use App\Models\RuleArticle;
 use App\Services\Rule\RuleSectionService;
+use DomainException;
 use Illuminate\Http\Request;
 
 class RuleSectionController extends Controller
 {
-    protected RuleSectionService $service;
-
-    public function __construct(RuleSectionService $service)
+    public function __construct(protected RuleSectionService $service)
     {
-        $this->service = $service;
     }
 
     public function index(Request $request)
@@ -23,16 +21,11 @@ class RuleSectionController extends Controller
             return $this->service->datatable($request);
         }
 
-        // pass articles for the modal dropdown
-        $articles = RuleArticle::orderBy('sort_order')->get();
+        // ✅ Exclude archived articles from dropdown
+        $articles = RuleArticle::whereNull('deleted_at')->orderBy('sort_order')->get();
 
-        return view(
-            'admin.rules_and_regulations.sections.index',
-            compact('articles')
-        );
+        return view('admin.rules_and_regulations.sections.index', compact('articles'));
     }
-
-
 
     public function store(Request $request)
     {
@@ -41,14 +34,16 @@ class RuleSectionController extends Controller
             'number' => 'required|string|max:20',
             'body' => 'required|string',
             'sort_order' => 'nullable|integer',
+            'is_active' => 'sometimes|boolean', // ✅ Add
         ]);
 
-        $section = $this->service->storeOrRestore($validated);
+        try {
+            $section = $this->service->create($validated);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
-        return response()->json([
-            'message' => 'Section saved successfully',
-            'data' => $section,
-        ], 201);
+        return response()->json(['message' => 'Section saved successfully', 'data' => $section], 201);
     }
 
     public function edit(RuleSection $ruleSection)
@@ -63,14 +58,16 @@ class RuleSectionController extends Controller
             'number' => 'required|string|max:20',
             'body' => 'required|string',
             'sort_order' => 'nullable|integer',
+            'is_active' => 'sometimes|boolean', // ✅ Add
         ]);
 
-        $section = $this->service->updateOrRestore($ruleSection, $validated);
+        try {
+            $section = $this->service->update($ruleSection, $validated);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
-        return response()->json([
-            'message' => 'Section updated successfully',
-            'data' => $section,
-        ]);
+        return response()->json(['message' => 'Section updated successfully', 'data' => $section]);
     }
 
     public function destroy(RuleSection $ruleSection)
@@ -78,15 +75,39 @@ class RuleSectionController extends Controller
         try {
             $this->service->delete($ruleSection);
 
-            return response()->json([
-                'message' => 'Section deleted successfully',
-            ]);
-        } catch (\DomainException $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 422);
+            return response()->json(['message' => 'Section deleted successfully']);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
         }
     }
 
-}
+    // ✅ New
+    public function archive(RuleSection $ruleSection)
+    {
+        try {
+            $section = $this->service->archive($ruleSection);
 
+            return response()->json([
+                'message' => 'Section archived successfully',
+                'section' => $section,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function unarchive(RuleSection $ruleSection)
+    {
+        try {
+            $section = $this->service->unarchive($ruleSection);
+
+            return response()->json([
+                'message' => 'Section unarchived successfully',
+                'section' => $section,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+}

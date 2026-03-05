@@ -3,13 +3,24 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RuleClause extends Model
 {
-    use SoftDeletes;
 
-    protected $fillable = ['sub_section_id', 'number', 'body', 'sort_order', 'updated_by'];
+    protected $fillable = [
+        'sub_section_id',
+        'number',
+        'body',
+        'sort_order',
+        'is_active',
+        'deleted_at', 
+        'updated_by',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'deleted_at' => 'datetime',
+    ];
 
     public function subSection()
     {

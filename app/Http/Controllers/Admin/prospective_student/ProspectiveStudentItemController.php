@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ProspectiveStudentItem;
 use App\Models\ProspectiveStudentCategory;
 use App\Services\ProspectiveStudent\ProspectiveStudentItemService;
+use DomainException;
 use Illuminate\Http\Request;
 
 class ProspectiveStudentItemController extends Controller
@@ -21,14 +22,13 @@ class ProspectiveStudentItemController extends Controller
             return $this->service->datatable($request);
         }
 
-        $categories = ProspectiveStudentCategory::orderBy('name')->get();
+        // ✅ Exclude archived categories from dropdown
+        $categories = ProspectiveStudentCategory::whereNull('deleted_at')
+            ->orderBy('name')
+            ->get();
 
-        return view(
-            'admin.prospective_student.items.index',
-            compact('categories')
-        );
+        return view('admin.prospective_student.items.index', compact('categories'));
     }
-
 
     public function store(Request $request)
     {
@@ -41,23 +41,16 @@ class ProspectiveStudentItemController extends Controller
 
         $item = $this->service->create($validated);
 
-        return response()->json([
-            'message' => 'Item created successfully',
-            'data' => $item,
-        ], 201);
+        return response()->json(['message' => 'Item created successfully', 'data' => $item], 201);
     }
 
     public function edit(ProspectiveStudentItem $prospectiveStudentItem)
     {
-        return response()->json(
-            $prospectiveStudentItem->load('category')
-        );
+        return response()->json($prospectiveStudentItem->load('category'));
     }
 
-    public function update(
-        Request $request,
-        ProspectiveStudentItem $prospectiveStudentItem
-    ) {
+    public function update(Request $request, ProspectiveStudentItem $prospectiveStudentItem)
+    {
         $validated = $request->validate([
             'category_id' => 'required|exists:prospective_student_categories,id',
             'content' => 'required|string',
@@ -67,18 +60,47 @@ class ProspectiveStudentItemController extends Controller
 
         $this->service->update($prospectiveStudentItem, $validated);
 
-        return response()->json([
-            'message' => 'Item updated successfully',
-        ]);
+        return response()->json(['message' => 'Item updated successfully']);
     }
 
     public function destroy(ProspectiveStudentItem $prospectiveStudentItem)
     {
-        $this->service->delete($prospectiveStudentItem);
+        try {
+            $this->service->delete($prospectiveStudentItem);
 
-        return response()->json([
-            'message' => 'Item deleted successfully',
-        ]);
+            return response()->json(['message' => 'Item deleted successfully']);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function archive(ProspectiveStudentItem $prospectiveStudentItem)
+    {
+        try {
+            $item = $this->service->archive($prospectiveStudentItem);
+
+            return response()->json([
+                'message' => 'Item archived successfully',
+                'item' => $item,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    // ✅ New
+    public function unarchive(ProspectiveStudentItem $prospectiveStudentItem)
+    {
+        try {
+            $item = $this->service->unarchive($prospectiveStudentItem);
+
+            return response()->json([
+                'message' => 'Item unarchived successfully',
+                'item' => $item,
+            ]);
+        } catch (DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
     }
 }
-

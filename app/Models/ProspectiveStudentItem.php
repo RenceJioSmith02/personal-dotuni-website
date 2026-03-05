@@ -3,11 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProspectiveStudentItem extends Model
 {
-    use SoftDeletes;
 
     protected $table = 'prospective_student_items';
 
@@ -16,11 +14,13 @@ class ProspectiveStudentItem extends Model
         'content',
         'sort_order',
         'is_active',
+        'deleted_at',
         'updated_by',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'deleted_at' => 'datetime',
     ];
 
     /* ===============================

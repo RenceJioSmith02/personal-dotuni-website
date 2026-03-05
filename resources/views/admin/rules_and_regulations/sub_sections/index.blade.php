@@ -45,45 +45,142 @@
 @stop
 
 @push('js')
-<script>
-$(function () {
-    if ($.fn.DataTable.isDataTable('#subSectionsTable')) $('#subSectionsTable').DataTable().destroy();
 
-    const table = $('#subSectionsTable').DataTable({
+<script>
+
+    let table;
+
+$(function () {
+
+    if ($.fn.DataTable.isDataTable('#subSectionsTable')) {
+        $('#subSectionsTable').DataTable().destroy();
+    }
+
+    table = $('#subSectionsTable').DataTable({ // ✅ update to your table ID
+        processing: true,
+        serverSide: true,
         responsive: true,
         autoWidth: false,
         pageLength: 10,
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: '/admin/rule_sub_sections',
-            type: 'GET',
-        },
+        ajax: "{{ route('admin.rule_sub_sections.index') }}",
         columns: [
             {
                 data: null,
                 searchable: false,
                 orderable: false,
-                render: function (data, type, row, meta) {
-                    return meta.row + meta.settings._iDisplayStart + 1;
-                }
+                render: (data, type, row, meta) =>
+                    meta.row + meta.settings._iDisplayStart + 1
             },
             { data: 'article' },
             { data: 'section' },
             { data: 'number' },
-            { data: 'body' },
+            { data: 'body',       orderable: false },
             { data: 'sort_order' },
-            { data: 'actions', orderable: false, searchable: false },
+            { data: 'status',     orderable: false, searchable: false }, // ✅ Add
+            { data: 'actions',    orderable: false, searchable: false }
         ]
     });
 
-
-    $(document).on("submit", ".ajax-delete-subsection", function(e) {
+    // ✅ Delete handler
+    $(document).on("submit", ".ajax-delete-subsection", function (e) {
         e.preventDefault();
-        const form = $(this), url = form.attr("action"), row = form.closest("tr");
-        Swal.fire({ title: "Delete this sub-section?", text: "This action cannot be undone.", type: "warning", showCancelButton: true, confirmButtonText: "Yes, delete it", cancelButtonText: "Cancel", confirmButtonColor: "#dc3545", reverseButtons: true })
-            .then(result => { if (!result.value) return; $.ajax({ url, type: "POST", data: { _token: $('meta[name="csrf-token"]').attr("content"), _method: "DELETE" }, success: res => { Swal.fire({ type: "success", title: "Deleted", text: res.message, timer: 1200, showConfirmButton: false }); table.row(row).remove().draw(false); }, error: xhr => { Swal.fire({ type: "error", title: "Delete failed", text: xhr.responseJSON?.message || "Something went wrong" }); } }); });
+
+        const form = $(this);
+        const row  = form.closest("tr");
+
+        Swal.fire({
+            title: "Delete this sub-section?",
+            text: "This action cannot be undone.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, delete it",
+            confirmButtonColor: "#dc3545",
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.value) return;
+
+            $.ajax({
+                url: form.attr("action"),
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr("content"),
+                    _method: "DELETE"
+                },
+                success: function (res) {
+                    Swal.fire({
+                        type: "success",
+                        title: "Deleted",
+                        text: res.message,
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                    table.row(row).remove().draw(false);
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        type: "error",
+                        title: "Delete failed",
+                        text: xhr.responseJSON?.message || "Something went wrong"
+                    });
+                }
+            });
+        });
     });
+
+    // ✅ Archive / Unarchive handler
+    $(document).on("submit", ".ajax-archive-rule-subsection", function (e) {
+        e.preventDefault();
+
+        const form      = $(this);
+        const url       = form.attr("action");
+        const isArchive = url.includes("/archive") && !url.includes("/unarchive");
+
+        Swal.fire({
+            title: isArchive ? "Archive this sub-section?" : "Unarchive this sub-section?",
+            text: isArchive
+                ? "This will mark the sub-section as inactive and archived."
+                : "This will restore the sub-section and mark it as active.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: isArchive ? "Yes, archive it" : "Yes, unarchive it",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: isArchive ? "#ffc107" : "#6c757d",
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.value) return;
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr("content"),
+                    _method: "PATCH"
+                },
+                success: function (res) {
+                    Swal.fire({
+                        type: "success",
+                        title: isArchive ? "Archived" : "Unarchived",
+                        text: res.message,
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                    table.ajax.reload(null, false);
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        type: "error",
+                        title: "Action failed",
+                        text: xhr.responseJSON?.message || "Something went wrong"
+                    });
+                }
+            });
+        });
+    });
+
 });
+
 </script>
+
 @endpush
