@@ -40,21 +40,10 @@
 
 
 
-    {{-- SCROLL TOP BUTTON --}}
-    <button class="scroll-top-btn" onclick="scrollToTop()">
-        <i class="fa-solid fa-chevron-up"></i>  
-    </button>
-
-    {{-- AI ASSISTANT BUTTON --}}
-    <button class="ai-chat-btn">
-        <img src="{{ asset('assets/system_images/dodotgif.png') }}">
-    </button>
-
-
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+    
     {{-- Scroll to Top Script --}}
     <script>
         window.addEventListener("scroll", function() {
@@ -87,6 +76,15 @@
             requestAnimationFrame(animation);
         }
     </script>
+
+
+    {{-- SCROLL TOP BUTTON --}}
+    <button class="scroll-top-btn" onclick="scrollToTop()">
+        <i class="fa-solid fa-chevron-up"></i>  
+    </button>
+
+    {{-- DoDOT AI Chatbot --}}
+    @include('website.partials.DoDOT.dodot')
 
 
     @stack('js')

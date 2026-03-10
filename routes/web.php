@@ -58,6 +58,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 
+use App\Http\Controllers\DodotController;
+
+Route::post('/dodot/chat', [DodotController::class, 'chat'])->name('dodot.chat');
 
 // Route::get('/layout1', function () {
 //     return view('website.pages.news-and-announcements-layouts.layout1');

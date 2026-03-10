@@ -1,0 +1,162 @@
+[
+  {
+    "category": "greeting",
+    "keywords": [ "hello", "hi", "good morning", "good evening", "hey", "greetings" ],
+    "response": "Hello! I'm DoDOT, your virtual assistant at CLSU DOT-Uni. How can I assist you today?"
+  },
+  {
+    "category": "contact_info",
+    "keywords": [ "contact", "email", "hotline", "phone number", "inquiries", "reach out" ],
+    "response": "You can reach us at:<br>📍 Milbuen St, CLSU Compound, Brgy. Bantug, Science City of Muñoz, 3120 Nueva Ecija, Philippines<br>📞 (044) 604 8005<br>📧 <a href=\"mailto:dot-uni@dotclsu.edu.ph\">dot-uni@dotclsu.edu.ph</a><br>📱 <a href=\"https://www.facebook.com/clsudotuni\" target=\"_blank\">CLSU DOT-Uni Facebook Page</a>"
+  },
+  {
+    "category": "dotuni_details",
+    "keywords": [ "dotuni", "dot uni", "dot-uni", "distance education", "open university", "transnational education", "clsu dotuni", "clsu dot uni" ],
+    "response": "The Central Luzon State University Distance, Open, and Transnational University (CLSU DOT-Uni) provides equitable access to higher education through an alternative, non-residential, and ICT-mediated teaching-learning delivery system. It offers various programs including doctoral, master's, diploma, and certificate courses. For more information, visit our <a href=\"/\" target=\"_blank\">CLSU DOT-Uni Website</a>."
+  },
+  {
+    "category": "history",
+    "keywords": [ "history", "background", "founding", "established", "origin", "timeline" ],
+    "response": "The Central Luzon State University (CLSU) began as the Central Luzon Agricultural School (CLAS) on April 12, 1907, focusing on agriculture and mechanics arts. It became the Central Luzon Agricultural College (CLAC) in 1954 and was elevated to university status as CLSU in 1964. The CLSU Open University was established on August 29, 1997, and later renamed CLSU Distance, Open, and Transnational University (CLSU DOT-Uni) on February 15, 2018. Learn more on our <a href=\"/about\">About Page</a>."
+  },
+  {
+    "category": "admission",
+    "keywords": [ "enroll", "admission", "apply", "requirements", "application", "how to enroll" ],
+    "response": "To apply for admission, please visit our <a href=\"https://cais.oad.clsu2.edu.ph\" target=\"_blank\">Admission Application Page</a> and follow the outlined steps. You can also check our <a href=\"/admission-requirements\">Admission Requirements</a> page. For inquiries, email us at <a href=\"mailto:dot-uni@dotclsu.edu.ph\">dot-uni@dotclsu.edu.ph</a>."
+  },
+  {
+    "category": "tuition",
+    "keywords": [ "tuition", "fees", "payment", "scholarship", "cost", "tuition fee" ],
+    "response": "Tuition fees vary by course. Please refer to our <a href=\"/fees\">Schedule of School Fees</a> or contact the DOT-Uni Office for detailed information."
+  },
+  {
+    "category": "programs",
+    "keywords": [ "courses", "programs", "degree", "offered", "majors", "online programs", "available courses" ],
+    "response": "CLSU DOT-Uni offers a range of programs including doctoral, master's, diploma, and certificate courses. You can explore the full list on our <a href=\"/courses\">Programs Offered</a> page."
+  },
+  {
+    "category": "lms",
+    "keywords": [ "lms", "canvas", "learning portal", "online class", "classroom", "e-learning", "learning management system" ],
+    "response": "Access your courses through our LMS at <a href=\"https://clsu.instructure.com\" target=\"_blank\">CLSU Canvas</a> using your student credentials."
+  },
+  {
+    "category": "academic_calendar",
+    "keywords": [ "academic calendar", "schedule", "semester", "start date", "end date", "term dates" ],
+    "response": "The DOT-Uni academic year starts in August and ends in May, divided into two terms. For detailed schedules, please check our <a href=\"/news-and-announcement\">News & Announcements</a> page."
+  },
+  {
+    "category": "orientation",
+    "keywords": [ "orientation", "freshmen", "new student", "onboarding", "intro session" ],
+    "response": "Online orientation details are shared before each semester. Monitor your email and check our <a href=\"/news-and-announcement\">Announcements</a> page for updates."
+  },
+  {
+    "category": "student_portal",
+    "keywords": [ "student portal", "grades", "student account", "profile", "registration", "student dashboard" ],
+    "response": "Log in to the Student Portal at <a href=\"https://oad.clsu2.edu.ph/office-of-admissions/\" target=\"_blank\">CLSU Student Portal</a> to view grades, update your profile, or manage enrollment."
+  },
+  {
+    "category": "document_request",
+    "keywords": [ "tor", "transcript", "certificate", "diploma", "request document", "academic records" ],
+    "response": "Submit your document requests at <a href=\"https://oad.clsu2.edu.ph/drms\" target=\"_blank\">Document Request Management System</a>."
+  },
+  {
+    "category": "support",
+    "keywords": [ "help", "support", "technical issue", "can't login", "error", "assistance" ],
+    "response": "For technical issues, contact IT at <a href=\"mailto:support@dotclsu.edu.ph\">support@dotclsu.edu.ph</a> or visit the help section of the LMS."
+  },
+  {
+    "category": "graduation",
+    "keywords": [ "graduation", "ojt", "internship", "clearance", "requirements for graduation", "commencement" ],
+    "response": "Coordinate with your college department or CLSU DOT-Uni regarding graduation requirements and clearance procedures. You can also check our <a href=\"/downloads/forms\">Downloads</a> page for relevant forms."
+  },
+  {
+    "category": "announcement",
+    "keywords": [ "announcement", "news", "update", "notice", "memo", "latest info" ],
+    "response": "Latest announcements are posted on our <a href=\"/news-and-announcement\">News & Announcements</a> page and <a href=\"https://www.facebook.com/clsudotuni\" target=\"_blank\">Facebook page</a>. Please check regularly."
+  },
+  {
+    "category": "email_account",
+    "keywords": [ "email", "student email", "gmail", "clsu email", "email account", "official email" ],
+    "response": "If you haven't received your CLSU official student email, contact <a href=\"mailto:dot-uni@dotclsu.edu.ph\">dot-uni@dotclsu.edu.ph</a>."
+  },
+  {
+    "category": "exam",
+    "keywords": [ "exam", "midterms", "finals", "schedule", "proctor", "test", "assessment" ],
+    "response": "Exam details are shared via LMS or your instructors. Be sure to check your course pages regularly on <a href=\"https://clsu.instructure.com\" target=\"_blank\">CLSU Canvas</a>."
+  },
+  {
+    "category": "assignment",
+    "keywords": [ "assignment", "project", "submission", "deadline", "task", "homework" ],
+    "response": "Assignments must be submitted through the <a href=\"https://clsu.instructure.com\" target=\"_blank\">CANVAS LMS</a> before the deadline. Check your course for specific instructions."
+  },
+  {
+    "category": "enrollment_issues",
+    "keywords": [ "can't enroll", "enrollment error", "subject not available", "prerequisite issue", "registration problem" ],
+    "response": "If you're having trouble enrolling, please contact the Registrar's Office or email <a href=\"mailto:dot-uni@dotclsu.edu.ph\">dot-uni@dotclsu.edu.ph</a> for assistance. You may also check our <a href=\"/faqs\">FAQs</a> for common enrollment issues."
+  },
+  {
+    "category": "study_load",
+    "keywords": [ "unit load", "maximum units", "overload", "subjects per semester", "credit limit" ],
+    "response": "Maximum load is 9 units per semester. Please consult the DOT-Uni Record in Charge or check our <a href=\"/faqs\">FAQs</a> for more details."
+  },
+  {
+    "category": "evaluation",
+    "keywords": [ "evaluation", "faculty evaluation", "course evaluation", "feedback", "survey" ],
+    "response": "End-of-semester evaluations are required before final grades are released. Check your email for communications from the CLSU Testing and Evaluation Center (CTEC)."
+  },
+  {
+    "category": "library",
+    "keywords": [ "library", "ebook", "online resources", "journal", "book borrowing", "digital library" ],
+    "response": "Access learning materials through our <a href=\"/e-resources\">E-Resources</a> page, or visit <a href=\"https://elibrary.dotclsu.edu.ph\" target=\"_blank\">DOT-Uni eLibrary</a> and <a href=\"https://ulis.clsu.edu.ph/\" target=\"_blank\">CLSU ULIS</a>."
+  },
+  {
+    "category": "registration",
+    "keywords": [ "registration", "pre-enlistment", "enlist", "register subject", "course registration" ],
+    "response": "Register for subjects via the <a href=\"https://oad.clsu2.edu.ph/office-of-admissions\" target=\"_blank\">CLSU Student Portal</a> based on the Registrar's schedule."
+  },
+  {
+    "category": "thesis",
+    "keywords": [ "thesis", "capstone", "proposal", "manuscript", "defense", "research project" ],
+    "response": "For thesis or capstone concerns, coordinate with your adviser and follow your department's guidelines and schedule. You may also download related forms on our <a href=\"/downloads/forms\">Downloads</a> page."
+  },
+  {
+    "category": "deadline",
+    "keywords": [ "deadline", "last day", "submission date", "due", "cutoff", "due date" ],
+    "response": "Deadlines are posted in your LMS or announced by instructors. Always check your <a href=\"https://clsu.instructure.com\" target=\"_blank\">Canvas dashboard</a> and our <a href=\"/news-and-announcement\">Announcements</a> page."
+  },
+  {
+    "category": "alumni",
+    "keywords": [ "alumni", "graduate", "tracer", "records", "reconnect", "alumni network" ],
+    "response": "CLSU DOT-Uni alumni may connect via the CLSU Alumni Office or join our <a href=\"https://www.facebook.com/groups/clsudotunialumni\" target=\"_blank\">Facebook Group</a>."
+  },
+  {
+    "category": "faq",
+    "keywords": [ "faq", "frequently asked questions", "common questions", "help center" ],
+    "response": "You can find answers to common questions on our <a href=\"/faqs\">FAQ page</a>."
+  },
+  {
+    "category": "events",
+    "keywords": [ "events", "webinars", "seminars", "workshops", "upcoming events" ],
+    "response": "Stay updated on upcoming events by visiting our <a href=\"/news-and-announcement\">News & Announcements</a> page or our <a href=\"https://www.facebook.com/clsudotuni\" target=\"_blank\">Facebook Page</a>."
+  },
+  {
+    "category": "feedback",
+    "keywords": [ "feedback", "suggestion", "complaint", "comment", "input" ],
+    "response": "We value your feedback. Please share your thoughts by contacting us at <a href=\"mailto:dot-uni@dotclsu.edu.ph\">dot-uni@dotclsu.edu.ph</a> or messaging our <a href=\"https://www.facebook.com/clsudotuni\" target=\"_blank\">Facebook page</a>."
+  },
+  {
+    "category": "downloads",
+    "keywords": [ "download", "forms", "files", "documents", "downloadable" ],
+    "response": "You can download forms and other documents from our <a href=\"/downloads/forms\">Downloads</a> page."
+  },
+  {
+    "category": "gallery",
+    "keywords": [ "gallery", "photos", "pictures", "images", "events photos" ],
+    "response": "View our photo gallery at our <a href=\"/gallery\">Gallery</a> page."
+  },
+  {
+    "category": "online_payment",
+    "keywords": [ "online payment", "pay online", "gcash", "bank transfer", "payment method" ],
+    "response": "For online payment options, please visit our <a href=\"/online-payment\">Online Payment</a> page."
+  }
+]
