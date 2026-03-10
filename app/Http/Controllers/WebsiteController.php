@@ -116,7 +116,7 @@ class WebsiteController extends Controller
 
         // SECTION 7
         $faqs = $this->faqQuestionService->list()
-            ->load(['answers:id,faq_id,answer'])
+            ->load(['answers' => fn($q) => $q->where('is_active', true)->whereNull('deleted_at')])
             ->take(5);
 
         // $faqs = $this->faqQuestionService->list()
@@ -207,11 +207,14 @@ class WebsiteController extends Controller
     {
         $categories = $this->prospectiveStudentCategoryService
             ->list()
-            ->load('items'); // eager load items for each category
+            ->load([
+                    ->where('is_active', true)
+                    ->whereNull('deleted_at')
+                    ->orderBy('sort_order')
+            ]);
 
         return view('website.pages.admission.requirements', compact('categories'));
     }
-
 
     // Student Services Pages
     public function rulesAndRegulations()
@@ -220,6 +223,7 @@ class WebsiteController extends Controller
 
         return view('website.pages.student-services.rules-and-regulations', compact('articles'));
     }
+
 
     public function eResources()
     {
@@ -498,101 +502,6 @@ public function showNews(string $type, int $id)
             abort(404);
     }
 }
-
-    // public function showNews(string $type, int $id)
-    // {
-    //     switch ($type) {
-
-    //         // ── ANNOUNCEMENT ──────────────────────────────────────────
-    //         case 'announcement':
-    //             $item = $this->announcementService
-    //                 ->list()
-    //                 ->where('visibility', 'public')
-    //                 ->firstWhere('id', $id);
-
-    //             if (!$item)
-    //                 abort(404);
-
-    //             // $item->assets = Collection<Asset> with pivot (id, caption, is_thumbnail, is_cover, sort_order)
-    //             $normalizedAssets = $item->assets->map(function ($asset) {
-    //                 return (object) [
-    //                     'storage_path' => $asset->storage_path,
-    //                     'kind' => $asset->kind,
-    //                     'caption' => $asset->pivot->caption,
-    //                     'is_thumbnail' => (bool) $asset->pivot->is_thumbnail,
-    //                     'is_cover' => (bool) $asset->pivot->is_cover,
-    //                     'sort_order' => $asset->pivot->sort_order,
-    //                 ];
-    //             });
-
-    //             $thumbnail = $normalizedAssets->firstWhere('is_thumbnail', true);
-
-    //             $layoutKey = str_replace('_', '', $item->layout ?? 'layout_1');
-    //             $layoutView = "website.pages.news-and-announcements-layouts.{$layoutKey}";
-
-    //             return view($layoutView, [
-    //                 'item' => [
-    //                     'id' => $item->id,
-    //                     'title' => $item->title,
-    //                     'description' => $item->seo_description,
-    //                     'body' => $item->article_body,
-    //                     'image' => $thumbnail?->storage_path,
-    //                     'assets' => $normalizedAssets,   // normalized
-    //                     'date' => $item->publish_start ?? $item->created_at,
-    //                     'type' => 'announcement',
-    //                     'tags' => [],
-    //                 ],
-    //             ]);
-
-
-    //         // ── DOTUNI ────────────────────────────────────────────────
-    //         case 'dotuni':
-    //             $item = $this->dotuniNewsService
-    //                 ->list()
-    //                 ->where('status', 'published')
-    //                 ->firstWhere('id', $id);
-
-    //             if (!$item)
-    //                 abort(404);
-
-    //             // $item->attachments = Collection<DotuniNewsAsset> pivot rows
-    //             // each has: ->asset (Asset model), ->caption, ->is_thumbnail, ->is_cover, ->sort_order
-    //             $normalizedAssets = $item->attachments->map(function ($attachment) {
-    //                 $asset = $attachment->asset; // the actual Asset model
-    //                 return (object) [
-    //                     'storage_path' => $asset?->storage_path,
-    //                     'kind' => $asset?->kind,
-    //                     'caption' => $attachment->caption,
-    //                     'is_thumbnail' => (bool) $attachment->is_thumbnail,
-    //                     'is_cover' => (bool) $attachment->is_cover,
-    //                     'sort_order' => $attachment->sort_order,
-    //                 ];
-    //             });
-
-    //             $thumbnail = $normalizedAssets->firstWhere('is_thumbnail', true);
-
-    //             $layoutKey = str_replace('_', '', $item->layout ?? 'layout_1');
-    //             $layoutView = "website.pages.news-and-announcements-layouts.{$layoutKey}";
-
-    //             return view($layoutView, [
-    //                 'item' => [
-    //                     'id' => $item->id,
-    //                     'title' => $item->title,
-    //                     'description' => $item->seo_description,
-    //                     'body' => $item->article_body,
-    //                     'image' => $thumbnail?->storage_path,
-    //                     'assets' => $normalizedAssets,   // normalized
-    //                     'date' => $item->published_at ?? $item->created_at,
-    //                     'type' => 'dotuni',
-    //                     'tags' => [],
-    //                 ],
-    //             ]);
-
-
-    //         default:
-    //             abort(404);
-    //     }
-    // }
 
     
 

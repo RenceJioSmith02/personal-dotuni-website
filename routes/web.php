@@ -59,21 +59,21 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('/layout1', function () {
-    return view('website.pages.news-and-announcements-layouts.layout1');
-});
-Route::get('/layout2', function () {
-    return view('website.pages.news-and-announcements-layouts.layout2');
-});
-Route::get('/layout3', function () {
-    return view('website.pages.news-and-announcements-layouts.layout3');
-});
-Route::get('/layout4', function () {
-    return view('website.pages.news-and-announcements-layouts.layout4');
-});
-Route::get('/layout5', function () {
-    return view('website.pages.news-and-announcements-layouts.layout5');
-});
+// Route::get('/layout1', function () {
+//     return view('website.pages.news-and-announcements-layouts.layout1');
+// });
+// Route::get('/layout2', function () {
+//     return view('website.pages.news-and-announcements-layouts.layout2');
+// });
+// Route::get('/layout3', function () {
+//     return view('website.pages.news-and-announcements-layouts.layout3');
+// });
+// Route::get('/layout4', function () {
+//     return view('website.pages.news-and-announcements-layouts.layout4');
+// });
+// Route::get('/layout5', function () {
+//     return view('website.pages.news-and-announcements-layouts.layout5');
+// });
 
 
 

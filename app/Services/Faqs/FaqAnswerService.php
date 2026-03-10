@@ -13,7 +13,8 @@ class FaqAnswerService
     public function list()
     {
         return FaqAnswer::with('question')
-            ->whereNull('deleted_at') // ✅ Exclude archived
+            ->whereNull('deleted_at')
+            ->where('is_active', true) // ✅ Also exclude inactive
             ->get();
     }
 
@@ -147,19 +148,19 @@ class FaqAnswerService
         }
     }
 
+
     /**
-     * ✅ Archive — sets is_active = false + deleted_at = now()
+     * ✅ Archive — use DB::table() to bypass Eloquent/SoftDeletes guards
      */
     public function archive(FaqAnswer $answer): FaqAnswer
     {
         try {
-            return DB::transaction(function () use ($answer) {
-                $answer->update([
-                    'is_active' => false,
-                    'deleted_at' => now(),
-                ]);
-                return $answer;
-            });
+            DB::table('faqs_answers')->where('id', $answer->id)->update([
+                'is_active' => false,
+                'deleted_at' => now(),
+            ]);
+
+            return $answer->fresh();
         } catch (\Throwable $e) {
             report($e);
             throw new DomainException('Failed to archive FAQ answer.');
@@ -167,18 +168,17 @@ class FaqAnswerService
     }
 
     /**
-     * ✅ Unarchive — sets is_active = true + deleted_at = null
+     * ✅ Unarchive — use DB::table() to bypass Eloquent/SoftDeletes guards
      */
     public function unarchive(FaqAnswer $answer): FaqAnswer
     {
         try {
-            return DB::transaction(function () use ($answer) {
-                $answer->update([
-                    'is_active' => true,
-                    'deleted_at' => null,
-                ]);
-                return $answer;
-            });
+            DB::table('faqs_answers')->where('id', $answer->id)->update([
+                'is_active' => true,
+                'deleted_at' => null,
+            ]);
+
+            return $answer->fresh();
         } catch (\Throwable $e) {
             report($e);
             throw new DomainException('Failed to unarchive FAQ answer.');

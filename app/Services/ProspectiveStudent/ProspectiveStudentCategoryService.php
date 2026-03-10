@@ -13,7 +13,8 @@ class ProspectiveStudentCategoryService
 {
     public function list()
     {
-        return ProspectiveStudentCategory::whereNull('deleted_at') // ✅ Exclude archived
+        return ProspectiveStudentCategory::whereNull('deleted_at')
+            ->where('is_active', true) // ✅ Add
             ->orderBy('sort_order')
             ->get();
     }

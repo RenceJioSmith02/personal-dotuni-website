@@ -36,7 +36,7 @@
             class="navbar-header-logo-container"
             id="navbar-header-logo-container"
           >
-            <a href="index.html">
+            <a href="{{ route('website.home') }}">
               <img
                 src="{{ asset('assets/system_images/logo.png') }}"
                 alt="DOTUNI Logo"
@@ -183,25 +183,12 @@
                 <ul class="dropdown-menu">
                   <li>
                     <a
-                      class="dropdown-item"
-                      href="{{ route('website.rules-and-regulations') }}"
+                      class="nav-link {{ request()->routeIs('website.rules-and-regulations') ? 'active' : '' }}" href="{{ route('website.rules-and-regulations') }}"
                       >Rules and Regulation</a
                     >
                   </li>
                   <li>
-                    <a class="dropdown-item" href="#"
-                      >Academic Calendar</a
-                    >
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="#"
-                      >Student Handbook</a
-                    >
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="{{ route('website.eresources') }}"
-                      >eResources</a
-                    >
+                    <a class="nav-link {{ request()->routeIs('website.eresources') ? 'active' : '' }}" href="{{ route('website.eresources') }}">eResources</a>
                   </li>
                 </ul>
               </li>

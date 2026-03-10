@@ -43,12 +43,12 @@
     <div class="container">
         <div class="divider"></div>
         <h2 class="section-title">
-            INFORMATION for PROSPECTIVE STUDENTS
+            INFORMATION FOR PROSPECTIVE STUDENTS
         </h2>
 
         <div class="content">
             @forelse($categories as $category)
-                <div class="requirement-category">
+                <div class="requirement-category" id="{{ $category->name }}">
                     <h4>{{ $category->name ?? 'No Category Name' }}</h4>
 
                     @if($category->items->count())

@@ -621,7 +621,13 @@ span .a-link:hover a {
   min-width:16px;
 }
 
-
+.footer-links-container {
+  display: flex;
+  flex-direction: col;
+  align-items: start;
+  justify-content: start;
+  gap: 30px;
+}
 
 @media (max-width: 1000px) {
 

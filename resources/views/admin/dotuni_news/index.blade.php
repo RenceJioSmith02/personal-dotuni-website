@@ -29,7 +29,7 @@
                     <th width="10">#</th>
                     <th>Title</th>
                     <th>SEO Description</th>
-                    <th>Layout</th>
+                    <th>Layout Type</th>
                     <th>Status</th>
                     <th>Visibility</th>
                     <th>Published</th>
@@ -93,8 +93,19 @@ $(function () {
             { data: 'visibility', name: 'visibility' },
             {
                 data: "published_at",
-                render: (data) =>
-                    new Date(data).toLocaleString()
+                render: function (data) {
+                    if (!data) {
+                        return "Not yet published";
+                    }
+
+                    const date = new Date(data);
+
+                    if (isNaN(date.getTime())) {
+                        return "Not yet published";
+                    }
+
+                    return date.toLocaleString();
+                }
             },
             {
                 data: "updated_at",

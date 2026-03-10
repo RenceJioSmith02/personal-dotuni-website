@@ -27,16 +27,30 @@
         </div>
 
         <!-- CENTER -->
-        <div class="footer-col">
+        <div class="footer-col" style="flex: 1.2">
           <h4>Quick Links</h4>
-          <ul class="footer-links">
-            <li><a href="#">link 1</a></li>
-            <li><a href="#">link 1</a></li>
-            <li><a href="#">link 1</a></li>
-            <li><a href="#">link 1</a></li>
-            <li><a href="#">link 1</a></li>
-            <li><a href="#">link 1</a></li>
+          <div class="footer-links-container">
+            <ul class="footer-links">
+            <li><a href="{{ route('website.faqs') }}">FAQs</a></li>
+            <li><a href="{{ route('website.pages.about') }}">About</a></li>
+            <li><a href="{{ route('website.downloads', 'forms') }}">Forms</a></li>
+            <li><a href="#">Academic Calendar</a></li>
+            <li><a href="{{ route('website.gallery') }}">Gallery</a></li>
+            <li><a href="#">Facts and Figures</a></li>
+            <li><a href="#">linkages</a></li>
+            <li><a href="{{ route('website.admissionRequirements') }}">Info for Prospective Students</a></li>
           </ul>
+          <ul class="footer-links">
+            <li><a href="{{ route('website.courses') }}">Courses</a></li>
+            <li><a href="{{ route('website.downloads', 'course-prospectus') }}">Course Prospectus</a></li>
+            <li><a href="{{ route('website.news') }}">News and Announcement</a></li>
+            <li><a href="https://cais.oad.clsu2.edu.ph/login">Online Application</a></li>
+            <li><a href="{{ route('website.rules-and-regulations') }}">Rules and Regulations</a></li>
+            <li><a href="{{ route('website.fees') }}">Schedule of School Fees </a></li>
+            <li><a href="{{ route('website.admissionRequirements') }}#Addmission Requirements">Addmission Requirements</a></li>
+            <li><a href="{{ route('website.pages.online-payment') }}">Online Payment of School Fees</a></li>
+          </ul>
+          </div>
         </div>
 
         <!-- RIGHT -->

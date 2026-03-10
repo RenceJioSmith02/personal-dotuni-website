@@ -15,7 +15,7 @@ class ProspectiveStudentItemService
     public function list()
     {
         return ProspectiveStudentItem::with('category')
-            ->whereNull('deleted_at') // ✅ Exclude archived
+            ->whereNull('deleted_at')
             ->orderBy('sort_order')
             ->get();
     }

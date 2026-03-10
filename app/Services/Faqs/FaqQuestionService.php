@@ -16,14 +16,18 @@ class FaqQuestionService
             'answers' => fn($q) => $q->where('is_active', 1)->whereNull('deleted_at')
         ])
             ->whereNull('deleted_at') // ✅ Exclude archived
+            ->where('is_active', true)
             ->orderBy('sort_order')
             ->get();
     }
 
     public function listPaginated($page = 1, $perPage = 5)
     {
-        $query = FaqQuestion::with('answers')
-            ->whereNull('deleted_at') // ✅ Exclude archived
+        $query = FaqQuestion::with([
+            'answers' => fn($q) => $q->where('is_active', true)->whereNull('deleted_at') // ✅ Add
+        ])
+            ->whereNull('deleted_at')
+            ->where('is_active', true)
             ->orderBy('created_at', 'desc');
 
         $total = $query->count();
