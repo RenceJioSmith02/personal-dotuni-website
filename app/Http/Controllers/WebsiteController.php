@@ -208,6 +208,7 @@ class WebsiteController extends Controller
         $categories = $this->prospectiveStudentCategoryService
             ->list()
             ->load([
+                'items' => fn($q) => $q
                     ->where('is_active', true)
                     ->whereNull('deleted_at')
                     ->orderBy('sort_order')
