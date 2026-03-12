@@ -1,15 +1,18 @@
+{{-- Edit --}}
 <button
-    class="open-modal btn btn-sm btn-info"
+    class="open-modal btn-icon btn-icon-edit"
     data-action="edit"
+    data-id="{{ $c->id }}"
     data-modal="#categoryModal"
     data-form="#categoryForm"
     data-title="Edit Category"
     data-url="/admin/linkage_categories"
-    data-id="{{ $c->id }}">
-    Edit
+    data-label="Edit"
+    aria-label="Edit linkage category">
+    <i class="fas fa-pencil-alt" aria-hidden="true"></i>
 </button>
 
-{{-- ✅ Archive / Unarchive toggle — deleted_at only, no is_active change --}}
+{{-- Archive / Unarchive toggle --}}
 @if(is_null($c->deleted_at))
     <form
         action="{{ route('admin.linkage_categories.archive', $c) }}"
@@ -17,8 +20,12 @@
         class="d-inline ajax-archive-linkage-category">
         @csrf
         @method('PATCH')
-        <button type="submit" class="btn btn-sm btn-warning">
-            Archive
+        <button
+            type="submit"
+            class="btn-icon btn-icon-archive"
+            data-label="Archive"
+            aria-label="Archive linkage category">
+            <i class="fas fa-archive" aria-hidden="true"></i>
         </button>
     </form>
 @else
@@ -28,26 +35,42 @@
         class="d-inline ajax-archive-linkage-category">
         @csrf
         @method('PATCH')
-        <button type="submit" class="btn btn-sm btn-secondary">
-            Unarchive
+        <button
+            type="submit"
+            class="btn-icon btn-icon-unarchive"
+            data-label="Unarchive"
+            aria-label="Unarchive linkage category">
+            <i class="fas fa-box-open" aria-hidden="true"></i>
         </button>
     </form>
 @endif
 
-{{-- ✅ Hard delete — only enabled when inactive --}}
+{{-- Hard delete — only when inactive --}}
 <form
     action="{{ route('admin.linkage_categories.destroy', $c) }}"
     method="POST"
     class="d-inline ajax-delete-category">
     @csrf
     @method('DELETE')
-    <button
-        type="submit"
-        class="btn btn-sm btn-danger"
-        @if($c->is_active)
-            disabled
-            title="Deactivate the category before deleting"
-        @endif>
-        Delete
-    </button>
+    @if($c->is_active)
+        <button
+            type="button"
+            class="btn-icon btn-icon-delete"
+            style="opacity:0.38; cursor:not-allowed;"
+            data-label="Archive before deleting"
+            aria-label="Cannot delete — archive the category first"
+            aria-disabled="true"
+            tabindex="-1"
+            disabled>
+            <i class="fas fa-trash" aria-hidden="true"></i>
+        </button>
+    @else
+        <button
+            type="submit"
+            class="btn-icon btn-icon-delete"
+            data-label="Delete"
+            aria-label="Delete linkage category">
+            <i class="fas fa-trash" aria-hidden="true"></i>
+        </button>
+    @endif
 </form>

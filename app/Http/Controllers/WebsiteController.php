@@ -105,10 +105,16 @@ class WebsiteController extends Controller
         $mainNews = $news->take(2);
         $sideNews = $news->skip(2)->take(3);
 
-        // SECTION 4
-        $clsuNews = $this->clsuNewsService->list()->take(3); 
+        // SECTION 4 — ClsuNews: eager load thumbnail asset
+        $clsuNews = $this->clsuNewsService->list()
+            ->where('is_active', true)
+            ->load('thumbnail')   // loads the BelongsTo Asset relation
+            ->take(3);
 
+        // SECTION 4 — Announcements: kept as raw models, assets already eager loaded by service
         $announcements = $this->announcementService->list()
+            ->where('visibility', 'public')
+            ->sortByDesc('publish_start')
             ->take(3);
 
         // SECTION 6
@@ -118,9 +124,6 @@ class WebsiteController extends Controller
         $faqs = $this->faqQuestionService->list()
             ->load(['answers' => fn($q) => $q->where('is_active', true)->whereNull('deleted_at')])
             ->take(5);
-
-        // $faqs = $this->faqQuestionService->list()
-        //     ->take(5);
 
         return view('website.pages.home', compact(
             'linkages',

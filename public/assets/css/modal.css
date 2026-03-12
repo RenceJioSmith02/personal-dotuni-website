@@ -73,7 +73,7 @@
 }
 
 /* Close button animation */
-.modern-modal .close {
+/* .modern-modal .close {
     font-size: 1.5rem;
     opacity: 0.6;
     transition: all 0.25s ease;
@@ -82,7 +82,7 @@
 .modern-modal .close:hover {
     opacity: 1;
     transform: rotate(90deg);
-}
+} */
 
 /* Body */
 .modern-modal .modal-body {

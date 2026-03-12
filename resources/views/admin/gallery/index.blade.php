@@ -4,23 +4,26 @@
 @section('title', 'Gallery')
 
 @section('content_header')
-<h1>Gallery</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">Gallery</h3>
+        <div class="card-header-actions">
+            <button
+                class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#galleryModal"
+                data-form="#galleryForm"
+                data-title="Add Gallery Item"
+                data-url="{{ route('admin.gallery.store') }}">
+                <i class="fas fa-plus mr-1"></i> Add Image
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 
 <div class="card">
-    <div class="card-header">
-        <button
-            class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#galleryModal"
-            data-form="#galleryForm"
-            data-title="Add Gallery Item"
-            data-url="{{ route('admin.gallery.store') }}">
-            <i class="fas fa-plus"></i> Add Image
-        </button>
-    </div>
+
 
     <div class="card-body">
         <table id="galleryTable" class="table table-bordered table-hover">
@@ -33,10 +36,9 @@
                     <th>Status</th>
                     <th>Created At</th>
                     <th>Updated At</th>
-                    <th width="180">Actions</th>
+                    <th width="100px">Actions</th>
                 </tr>
             </thead>
-
         </table>
     </div>
 </div>
@@ -49,24 +51,20 @@
 <script>
 $(function () {
 
-    if ($.fn.DataTable.isDataTable('#galleryTable')) {
-        $('#galleryTable').DataTable().destroy();
-    }
-
-let table;
-
-$(function () {
+    let table;
 
     if ($.fn.DataTable.isDataTable('#galleryTable')) {
         $('#galleryTable').DataTable().destroy();
     }
 
-    table = $('#galleryTable').DataTable({ // ✅ update to your table ID
+    table = $('#galleryTable').DataTable({
         processing: true,
         serverSide: true,
         responsive: true,
-        autoWidth: false,
         pageLength: 10,
+        autoWidth: true,
+        scrollCollapse: true,
+        scrollX: true,
         ajax: "{{ route('admin.gallery.index') }}",
         columns: [
             {
@@ -79,14 +77,14 @@ $(function () {
             { data: 'image',      orderable: false, searchable: false },
             { data: 'file_name' },
             { data: 'sort_order' },
-            { data: 'status',     orderable: false, searchable: false }, // ✅ Add
+            { data: 'status',     orderable: false, searchable: false },
             { data: 'created_at', render: (data) => new Date(data).toLocaleString() },
             { data: 'updated_at', render: (data) => new Date(data).toLocaleString() },
             { data: 'actions',    orderable: false, searchable: false }
         ]
     });
 
-    // ✅ Delete handler
+    // Delete handler
     $(document).on("submit", ".ajax-delete-gallery", function (e) {
         e.preventDefault();
 
@@ -112,28 +110,17 @@ $(function () {
                     _method: "DELETE"
                 },
                 success: function (res) {
-                    Swal.fire({
-                        type: "success",
-                        title: "Deleted",
-                        text: res.message,
-                        timer: 1200,
-                        showConfirmButton: false
-                    });
-
+                    Swal.fire({ type: "success", title: "Deleted", text: res.message, timer: 1200, showConfirmButton: false });
                     table.row(row).remove().draw(false);
                 },
                 error: function (xhr) {
-                    Swal.fire({
-                        type: "error",
-                        title: "Delete failed",
-                        text: xhr.responseJSON?.message || "Something went wrong"
-                    });
+                    Swal.fire({ type: "error", title: "Delete failed", text: xhr.responseJSON?.message || "Something went wrong" });
                 }
             });
         });
     });
 
-    // ✅ Archive / Unarchive handler
+    // Archive / Unarchive handler
     $(document).on("submit", ".ajax-archive-gallery", function (e) {
         e.preventDefault();
 
@@ -163,32 +150,16 @@ $(function () {
                     _method: "PATCH"
                 },
                 success: function (res) {
-                    Swal.fire({
-                        type: "success",
-                        title: isArchive ? "Archived" : "Unarchived",
-                        text: res.message,
-                        timer: 1200,
-                        showConfirmButton: false
-                    });
-
+                    Swal.fire({ type: "success", title: isArchive ? "Archived" : "Unarchived", text: res.message, timer: 1200, showConfirmButton: false });
                     table.ajax.reload(null, false);
                 },
                 error: function (xhr) {
-                    Swal.fire({
-                        type: "error",
-                        title: "Action failed",
-                        text: xhr.responseJSON?.message || "Something went wrong"
-                    });
+                    Swal.fire({ type: "error", title: "Action failed", text: xhr.responseJSON?.message || "Something went wrong" });
                 }
             });
         });
     });
 
 });
-
-
-
-});
-
 </script>
 @endpush

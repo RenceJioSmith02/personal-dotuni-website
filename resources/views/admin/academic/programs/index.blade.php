@@ -4,24 +4,25 @@
 @section('title', 'Programs')
 
 @section('content_header')
-<h1>Programs</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">Programs</h3>
+        <div class="card-header-actions">
+            <button
+                class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#programModal"
+                data-form="#programForm"
+                data-title="Add Program"
+                data-url="{{ route('admin.programs.store') }}">
+                <i class="fas fa-plus"></i> Add Program
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 
 <div class="card">
-    <div class="card-header">
-        <button
-            class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#programModal"
-            data-form="#programForm"
-            data-title="Add Program"
-            data-url="{{ route('admin.programs.store') }}">
-            <i class="fas fa-plus"></i> Add Program
-        </button>
-    </div>
-
     <div class="card-body">
         <table id="programsTable" class="table table-bordered table-hover">
             <thead>
@@ -34,7 +35,7 @@
                     <th>Status</th>
                     <th>Created At</th>
                     <th>Updated At</th>
-                    <th width="180">Actions</th>
+                    <th width="100">Actions</th>
                 </tr>
             </thead>
 
@@ -60,6 +61,9 @@ $(function () {
         serverSide: true,
         responsive: true,
         pageLength: 10,
+        autoWidth: true,
+        scrollCollapse: true,
+        scrollX: true,
         lengthMenu: [10, 20, 50, 100],
         columnDefs: [
             { orderable: false, targets: [0, 6] }
@@ -86,7 +90,7 @@ $(function () {
             { data: 'description' },
             { data: 'type' },
             { data: 'total_units' },
-            { data: 'status', searchable: false },
+            { data: 'status', searchable: false, orderable: false },
             {
                 data: "created_at",
                 render: (data) =>

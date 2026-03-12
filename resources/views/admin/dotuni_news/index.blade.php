@@ -4,23 +4,25 @@
 @section('title', 'DotUni News')
 
 @section('content_header')
-<h1>DotUni News</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">DotUni News</h3>
+        <div class="card-header-actions">
+            <button
+                class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#dotuniNewsModal"
+                data-form="#dotuniNewsForm"
+                data-title="Add DotUni News"
+                data-url="{{ route('admin.dotuni_news.store') }}">
+                <i class="fas fa-plus"></i> Add News
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 
 <div class="card">
-    <div class="card-header">
-        <button
-            class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#dotuniNewsModal"
-            data-form="#dotuniNewsForm"
-            data-title="Add DotUni News"
-            data-url="{{ route('admin.dotuni_news.store') }}">
-            <i class="fas fa-plus"></i> Add News
-        </button>
-    </div>
 
     <div class="card-body">
         <table id="dotuniNewsTable" class="table table-bordered table-hover">
@@ -34,7 +36,7 @@
                     <th>Visibility</th>
                     <th>Published</th>
                     <th>Updated at</th>
-                    <th width="180">Actions</th>
+                    <th width="100">Actions</th>
                 </tr>
             </thead>
 
@@ -60,7 +62,9 @@ $(function () {
         processing: true,
         serverSide: true,
         responsive: true,
-        autoWidth: false,
+        autoWidth: true,
+        scrollCollapse: true,
+        scrollX: true,
         // ajax: {
         //     url: "{{ route('admin.dotuni_news.index') }}",
         //     type: "GET",

@@ -4,23 +4,23 @@
 @section('title', 'Rule Clauses')
 
 @section('content_header')
-    <h1>Rule Clauses</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">Rule Clauses</h3>
+        <div class="card-header-actions">
+            <button class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#clauseModal"
+                data-form="#clauseForm"
+                data-title="Add Clause"
+                data-url="/admin/rule_clauses">
+                <i class="fas fa-plus mr-1"></i> Add Clause
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 <div class="card">
-    <div class="card-header">
-
-        <button class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#clauseModal"
-            data-form="#clauseForm"
-            data-title="Add Clause"
-            data-url="/admin/rule_clauses">
-            <i class="fas fa-plus mr-1"></i> Add Clause
-        </button>
-
-    </div>
 
     <div class="card-body">
         <table id="clausesTable" class="table table-bordered table-hover">
@@ -33,7 +33,8 @@
                     <th>Number</th>
                     <th>Body</th>
                     <th>Sort Order</th>
-                    <th width="150">Actions</th>
+                    <th>Status</th>
+                    <th width="100">Actions</th>
                 </tr>
             </thead>
 
@@ -60,7 +61,9 @@ $(function () {
         processing: true,
         serverSide: true,
         responsive: true,
-        autoWidth: false,
+        autoWidth: true,
+        scrollCollapse: true,
+        scrollX: true,
         pageLength: 10,
         ajax: "{{ route('admin.rule_clauses.index') }}",
         columns: [

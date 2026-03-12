@@ -4,26 +4,24 @@
 @section('title', 'Prospective Student Items')
 
 @section('content_header')
-    <h1>Prospective Student Items</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">Prospective Student Items</h3>
+        <div class="card-header-actions">
+            <button
+                class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#prospectiveStudentItemModal"
+                data-form="#prospectiveStudentItemForm"
+                data-title="Add Item"
+                data-url="{{ route('admin.prospective_student_items.store') }}">
+                <i class="fas fa-plus mr-1"></i> Add Item
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 <div class="card">
-    <div class="card-header">
-
-        <!-- Add Item -->
-        <button
-            class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#prospectiveStudentItemModal"
-            data-form="#prospectiveStudentItemForm"
-            data-title="Add Item"
-            data-url="{{ route('admin.prospective_student_items.store') }}">
-            <i class="fas fa-plus mr-1"></i> Add Item
-        </button>
-
-    </div>
-
     <div class="card-body">
 
         <table id="prospectiveStudentItemsTable"
@@ -37,7 +35,7 @@
                     <th>Status</th>
                     <th>Created At</th>
                     <th>Updated At</th>
-                    <th width="150">Actions</th>
+                    <th width="100">Actions</th>
                 </tr>
             </thead>
 
@@ -67,7 +65,9 @@ $(function () {
         processing: true,
         serverSide: true,
         responsive: true,
-        autoWidth: false,
+        autoWidth: true,
+        scrollCollapse: true,
+        scrollX: true,
         pageLength: 10,
         ajax: "{{ route('admin.prospective_student_items.index') }}",
         columns: [

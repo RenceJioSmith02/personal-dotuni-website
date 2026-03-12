@@ -4,24 +4,24 @@
 @section('title', 'Courses')
 
 @section('content_header')
-    <h1>Courses</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">Courses</h3>
+        <div class="card-header-actions">
+            <button
+                class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#courseModal"
+                data-form="#courseForm"
+                data-title="Add Course"
+                data-url="/admin/courses">
+                Add Course
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 <div class="card">
-    <div class="card-header">
-        <!-- Add Course -->
-        <button
-        class="open-modal btn btn-primary"
-        data-action="add"
-        data-modal="#courseModal"
-        data-form="#courseForm"
-        data-title="Add Course"
-        data-url="/admin/courses">
-        Add Course
-        </button>
-
-    </div>
 
     <div class="card-body">
         @if(session('success'))
@@ -40,7 +40,7 @@
                     <th>Created At</th>
                     <th>Updated At</th>    
                     <th>Status</th>
-                    <th width="150">Actions</th>
+                    <th width="100">Actions</th>
                 </tr>
             </thead>
         </table>
@@ -64,6 +64,9 @@
             serverSide: true,
             responsive: true,
             pageLength: 10,
+            autoWidth: true,
+            scrollCollapse: true,
+            scrollX: true,
             lengthMenu: [10, 20, 50, 100],
 
             ajax: {
@@ -100,6 +103,8 @@
                         new Date(data).toLocaleString()
                 },
                 {
+                    orderable: false,
+                    searchable: false,
                     data: "status",
                     render: (data) =>
                         data

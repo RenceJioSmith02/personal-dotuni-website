@@ -4,23 +4,23 @@
 @section('title', 'Rule Sub-Sections')
 
 @section('content_header')
-    <h1>Rule Sub-Sections</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">Rule Sub-Sections</h3>
+        <div class="card-header-actions">
+            <button class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#subSectionModal"
+                data-form="#subSectionForm"
+                data-title="Add Sub-Section"
+                data-url="/admin/rule_sub_sections">
+                <i class="fas fa-plus mr-1"></i> Add Sub-Section
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 <div class="card">
-    <div class="card-header">
-
-        <button class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#subSectionModal"
-            data-form="#subSectionForm"
-            data-title="Add Sub-Section"
-            data-url="/admin/rule_sub_sections">
-            <i class="fas fa-plus mr-1"></i> Add Sub-Section
-        </button>
-
-    </div>
 
     <div class="card-body">
         <table id="subSectionsTable" class="table table-bordered table-hover">
@@ -32,7 +32,8 @@
                     <th>Number</th>
                     <th>Body</th>
                     <th>Sort Order</th>
-                    <th width="150">Actions</th>
+                    <th>Status</th>
+                    <th width="100">Actions</th>
                 </tr>
             </thead>
 
@@ -60,7 +61,9 @@ $(function () {
         processing: true,
         serverSide: true,
         responsive: true,
-        autoWidth: false,
+        autoWidth: true,
+        scrollCollapse: true,
+        scrollX: true,
         pageLength: 10,
         ajax: "{{ route('admin.rule_sub_sections.index') }}",
         columns: [

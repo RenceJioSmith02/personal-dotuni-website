@@ -4,25 +4,24 @@
 @section('title', 'Forms')
 
 @section('content_header')
-    <h1>Forms</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">Forms</h3>
+        <div class="card-header-actions">
+            <button
+                class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#formModal"
+                data-form="#formForm"
+                data-title="Add Form"
+                data-url="/admin/forms">
+                <i class="fas fa-plus mr-1"></i> Add Form
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 <div class="card">
-    <div class="card-header">
-
-        <!-- Add Form -->
-        <button
-            class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#formModal"
-            data-form="#formForm"
-            data-title="Add Form"
-            data-url="/admin/forms">
-            <i class="fas fa-plus mr-1"></i> Add Form
-        </button>
-
-    </div>
 
     <div class="card-body">
 
@@ -37,7 +36,7 @@
                     <th>Status</th>
                     <th>Created At</th>
                     <th>Updated At</th>
-                    <th width="150">Actions</th>
+                    <th width="100">Actions</th>
                 </tr>
             </thead>
         </table>
@@ -71,7 +70,9 @@ $(function () {
         processing: true,
         serverSide: true,
         responsive: true,
-        autoWidth: false,
+        autoWidth: true,
+        scrollCollapse: true,
+        scrollX: true,
         pageLength: 10,
         ajax: {
             url: "{{ route('admin.forms.index') }}",

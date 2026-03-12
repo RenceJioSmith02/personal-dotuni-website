@@ -4,24 +4,24 @@
 @section('title', 'Roles')
 
 @section('content_header')
-    <h1>Role Management</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">Role Management</h3>
+        <div class="card-header-actions">
+            <button
+                class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#roleModal"
+                data-form="#roleForm"
+                data-title="Add Role"
+                data-url="/admin/roles">
+                <i class="fas fa-plus mr-1"></i> Add Role
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 <div class="card">
-    <div class="card-header">
-        <!-- Add Role -->
-        <button
-            class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#roleModal"
-            data-form="#roleForm"
-            data-title="Add Role"
-            data-url="/admin/roles">
-            <i class="fas fa-plus mr-1"></i> Add Role
-        </button>
-    </div>
-
     <div class="card-body">
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -35,7 +35,7 @@
                 <tr>
                     <th width="10">#</th>
                     <th>Name</th>
-                    <th width="150">Actions</th>
+                    <th width="70">Actions</th>
                 </tr>
             </thead>
 
@@ -61,6 +61,11 @@ $(function () {
     const table = $('#rolesTable').DataTable({
         processing: true,
         serverSide: true,
+        responsive: true,
+        pageLength: 10,
+        autoWidth: true,
+        scrollCollapse: true,
+        scrollX: true,
         ajax: '{{ route("admin.roles.index") }}',
         columns: [
             {

@@ -53,7 +53,174 @@
         </div>
     </section>
 
+    
     <!-- SECTION 3: LATEST NEWS -->
+    <section class="latest-news-section">
+        <div class="container">
+            <div class="divider"></div>
+            <h2 class="section-title">LATEST NEWS</h2>
+
+            <div class="news-grid">
+
+                <!-- Main News Carousel -->
+                <div class="main-news swiper-container">
+                    <div class="swiper-wrapper">
+                        @foreach($mainNews as $news)
+                        <a href="{{ route('news.show', ['type' => 'dotuni', 'id' => $news->id]) }}"
+                           class="swiper-slide">
+                            <img
+                            src="{{ optional(optional($news->attachments->first())->asset)->storage_path
+                                    ? asset('storage/'.optional(optional($news->attachments->first())->asset)->storage_path)
+                                    : asset('assets/system_images/placeholder.jpg') }}">
+                            <div class="news-caption">
+                                <span class="news-category">NEWS</span>
+                                <h3>{{ $news->title }}</h3>
+                                <p>{{ $news->seo_description }}</p>
+
+                                <div class="seo-tags">
+                                    @if(!empty($news->seo_title))
+                                        @foreach(preg_split('/#/', $news->seo_title, -1, PREG_SPLIT_NO_EMPTY) as $tag)
+                                            <span>#{{ trim($tag) }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
+
+                                <div class="card-footer">
+                                    <span class="news-date">
+                                        {{ \Carbon\Carbon::parse($news->published_at)->format('F d, Y') }}
+                                    </span>
+                                    <span class="read-more">Read More</span>
+                                </div>
+                            </div>
+                        </a>
+                        @endforeach
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="carousel-btn next"></div>
+                    <div class="carousel-btn prev"></div>
+                </div>
+
+
+                <!-- Side News Cards -->
+                <div class="side-news">
+                    @foreach($sideNews as $news)
+                    <a href="{{ route('news.show', ['type' => 'dotuni', 'id' => $news->id]) }}"
+                       class="news-card">
+                        @php
+                            $attachment = $news->attachments->first();
+                            $imagePath  = optional($attachment?->asset)->storage_path;
+                        @endphp
+
+                        <img
+                        src="{{ $imagePath
+                                ? asset('storage/'.$imagePath)
+                                : asset('assets/system_images/placeholder.jpg') }}">
+
+                        <div class="card-content">
+                            <h4>{{ $news->title }}</h4>
+                            <p>{{ $news->seo_description }}</p>
+                            <div class="card-footer">
+                                <span class="news-date">
+                                    {{ \Carbon\Carbon::parse($news->published_at)->format('F d, Y') }}
+                                </span>
+                                <span class="read-more">Read More</span>
+                            </div>
+                        </div>
+                    </a>
+                    @endforeach
+
+                    <a href="{{ route('website.news') }}">
+                        <button class="btn btn-success view-all-btn mt-3">
+                            View All News
+                        </button>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- SECTION 4: CLSU NEWS AND UPDATES -->
+    <section class="clsu-updates-section">
+        <div class="container">
+            <div class="divider"></div>
+            <h2 class="section-title">CLSU NEWS AND UPDATES</h2>
+
+            <div class="updates-grid">
+
+                <!-- NEWS COLUMN (ClsuNews → external URL) -->
+                <div class="updates-col">
+                    <div class="updates-header">
+                        <span>News</span>
+                        <a href="{{ route('website.news') }}">View More</a>
+                    </div>
+
+                    <div class="side-news">
+                        @foreach($clsuNews as $news)
+                        <a href="{{ $news->url ?: '#' }}"
+                           target="{{ $news->url ? '_blank' : '_self' }}"
+                           class="news-card">
+                            <img
+                            src="{{ optional($news->thumbnail)->storage_path
+                                    ? asset('storage/'.optional($news->thumbnail)->storage_path)
+                                    : asset('assets/system_images/placeholder.jpg') }}">
+                            <div class="card-content">
+                                <h4>{{ $news->title }}</h4>
+                                <p>{{ $news->description }}</p>
+                                <div class="card-footer">
+                                    <span class="news-date">
+                                        {{ \Carbon\Carbon::parse($news->created_at)->format('F d, Y') }}
+                                    </span>
+                                    <span class="read-more">Read More</span>
+                                </div>
+                            </div>
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+
+
+                <!-- ANNOUNCEMENTS COLUMN -->
+                <div class="updates-col">
+                    <div class="updates-header">
+                        <span>Announcements</span>
+                        <a href="{{ route('website.news') }}">View more</a>
+                    </div>
+
+                    <div class="side-news">
+                        @foreach($announcements as $announcement)
+                        <a href="{{ route('news.show', ['type' => 'announcement', 'id' => $announcement->id]) }}"
+                           class="news-card">
+                            @php
+                                $thumb = $announcement->thumbnail();
+                            @endphp
+                            <img
+                            src="{{ optional($thumb)->storage_path
+                                    ? asset('storage/'.optional($thumb)->storage_path)
+                                    : asset('assets/system_images/placeholder.jpg') }}">
+                            <div class="card-content">
+                                <h4>{{ $announcement->title }}</h4>
+                                <p>{{ Str::limit($announcement->seo_description, 100) }}</p>
+                                <div class="card-footer">
+                                    <span class="news-date">
+                                        {{ \Carbon\Carbon::parse($announcement->publish_start)->format('F d, Y') }}
+                                    </span>
+                                    <span class="read-more">Read More</span>
+                                </div>
+                            </div>
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    
+    {{-- <!-- SECTION 3: LATEST NEWS -->
     <section class="latest-news-section">
         <div class="container">
             <div class="divider"></div>
@@ -128,7 +295,7 @@
                     </a>
                     @endforeach
 
-                    <a href="#">
+                    <a href="{{ route('website.news') }}">
                         <button class="btn btn-success view-all-btn mt-3">
                             View All News
                         </button>
@@ -151,7 +318,7 @@
                 <div class="updates-col">
                     <div class="updates-header">
                         <span>News</span>
-                        <a href="#">View More</a>
+                        <a href="{{ route('website.news') }}">View More</a>
                     </div>
 
                     <div class="side-news">
@@ -181,7 +348,7 @@
                 <div class="updates-col">
                     <div class="updates-header">
                         <span>Announcements</span>
-                        <a href="#">View more</a>
+                        <a href="{{ route('website.news') }}">View more</a>
                     </div>
 
                     <div class="side-news">
@@ -210,7 +377,7 @@
 
             </div>
         </div>
-    </section>
+    </section> --}}
 
     <!-- SECTION 5: DOT-UNI FEATURES -->
     <section class="dotuni-features">
@@ -232,7 +399,7 @@
                         aligned to the country's goal of developing quality human resources by
                         democratization of access to quality education.
                     </p>
-                    <a href="#" class="btn btn-success mt-3">Learn More</a>
+                    <a href="{{ route('website.pages.about') }}" class="btn btn-success mt-3">Learn More</a>
                 </div>
             </div>
 
@@ -246,7 +413,7 @@
                         instructional materials or self-learning modules which they study on their
                         own most of the time.
                     </p>
-                    <a href="#" class="btn btn-success mt-3">Learn More</a>
+                    <a href="{{ route('website.pages.about') }}" class="btn btn-success mt-3">Learn More</a>
                 </div>
             </div>
 

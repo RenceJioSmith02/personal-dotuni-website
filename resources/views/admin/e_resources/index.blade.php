@@ -4,23 +4,25 @@
 @section('title', 'E-Resources')
 
 @section('content_header')
-<h1>E-Resources</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">E-Resources</h3>
+        <div class="card-header-actions">
+            <button
+                class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#eResourceModal"
+                data-form="#eResourceForm"
+                data-title="Add E-Resource"
+                data-url="{{ route('admin.e_resources.store') }}">
+                <i class="fas fa-plus"></i> Add E-Resource
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 
 <div class="card">
-    <div class="card-header">
-        <button
-            class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#eResourceModal"
-            data-form="#eResourceForm"
-            data-title="Add E-Resource"
-            data-url="{{ route('admin.e_resources.store') }}">
-            <i class="fas fa-plus"></i> Add E-Resource
-        </button>
-    </div>
 
     <div class="card-body">
         <table id="eResourcesTable" class="table table-bordered table-hover">
@@ -34,7 +36,7 @@
                     <th>Status</th>
                     <th>Created At</th>
                     <th>Updated At</th>
-                    <th width="180">Actions</th>
+                    <th width="100">Actions</th>
                 </tr>
             </thead>
 
@@ -57,9 +59,10 @@ $(function () {
     const table = $('#eResourcesTable').DataTable({
         processing: true,
         serverSide: true,
-        responsive: true,
-        autoWidth: false,
+        autoWidth: true,       
         pageLength: 10,
+        scrollX: true,
+        scrollCollapse: true,  
         ajax: {
             url: "{{ route('admin.e_resources.index') }}",
             type: "GET",

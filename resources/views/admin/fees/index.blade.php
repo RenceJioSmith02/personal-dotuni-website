@@ -4,23 +4,25 @@
 @section('title', 'Fees')
 
 @section('content_header')
-<h1>Fees</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">Fees</h3>
+        <div class="card-header-actions">
+            <button
+                class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#feeModal"
+                data-form="#feeForm"
+                data-title="Add Fee"
+                data-url="{{ route('admin.fees.store') }}">
+                <i class="fas fa-plus"></i> Add Fee
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 
 <div class="card">
-    <div class="card-header">
-        <button
-            class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#feeModal"
-            data-form="#feeForm"
-            data-title="Add Fee"
-            data-url="{{ route('admin.fees.store') }}">
-            <i class="fas fa-plus"></i> Add Fee
-        </button>
-    </div>
 
     <div class="card-body">
         <table id="feeTable" class="table table-bordered table-hover">
@@ -33,7 +35,7 @@
                     <th>Created At</th>
                     <th>Updated At</th>
                     <th>Status</th>
-                    <th width="180">Actions</th>
+                    <th width="100">Actions</th>
                 </tr>
             </thead>
 
@@ -58,7 +60,9 @@ $(function () {
         processing: true,
         serverSide: true,
         responsive: true,
-        autoWidth: false,
+        autoWidth: true,
+        scrollCollapse: true,
+        scrollX: true,
         pageLength: 10,
         ajax: "{{ route('admin.fees.index') }}",
 

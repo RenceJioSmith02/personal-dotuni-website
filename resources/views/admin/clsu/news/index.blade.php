@@ -4,23 +4,25 @@
 @section('title', 'CLSU News')
 
 @section('content_header')
-<h1>CLSU News</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">CLSU News</h3>
+        <div class="card-header-actions">
+            <button
+                class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#clsuNewsModal"
+                data-form="#clsuNewsForm"
+                data-title="Add News"
+                data-url="{{ route('admin.clsu_news.store') }}">
+                <i class="fas fa-plus"></i> Add News
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 
 <div class="card">
-    <div class="card-header">
-        <button
-            class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#clsuNewsModal"
-            data-form="#clsuNewsForm"
-            data-title="Add News"
-            data-url="{{ route('admin.clsu_news.store') }}">
-            <i class="fas fa-plus"></i> Add News
-        </button>
-    </div>
 
     <div class="card-body">
         <table id="clsuNewsTable" class="table table-bordered table-hover">
@@ -34,7 +36,7 @@
                     <th>Status</th>
                     <th>Created At</th>
                     <th>Updated At</th>
-                    <th width="180">Actions</th>
+                    <th width="100">Actions</th>
                 </tr>
             </thead>
 
@@ -60,6 +62,9 @@ $(function () {
         serverSide: true,
         responsive: true,
         pageLength: 10,
+        autoWidth: true,
+        scrollCollapse: true,
+        scrollX: true,
         lengthMenu: [10, 20, 50, 100],
         ajax: {
             url: "{{ route('admin.clsu_news.index') }}",
@@ -83,7 +88,7 @@ $(function () {
             { data: 'description' },
             { data: 'url', orderable: false, searchable: false },
             { data: 'sort_order' },
-            { data: 'status' },
+            { data: 'status', orderable: false, searchable: false },
             {
                 data: "created_at",
                 render: (data) =>

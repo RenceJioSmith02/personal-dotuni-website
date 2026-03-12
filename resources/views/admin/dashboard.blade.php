@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+@extends('layouts.admin')
 
 @section('title', 'Dashboard')
 
@@ -490,7 +490,7 @@
 
 @stop
 
-@section('css')
+@push('css')
 <style>
     .info-box { border-radius: 6px; margin-bottom: 1rem; }
     .info-box-icon { border-radius: 6px 0 0 6px; }
@@ -502,7 +502,4 @@
     .btn-outline-primary:hover, .btn-outline-success:hover,
     .btn-outline-warning:hover, .btn-outline-danger:hover { color: #fff; }
 </style>
-@stop
-
-@section('js')
-@stop
+@endpush

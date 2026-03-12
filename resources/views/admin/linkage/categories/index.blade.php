@@ -4,25 +4,24 @@
 @section('title', 'Linkage Categories')
 
 @section('content_header')
-    <h1>Linkage Categories</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">Linkage Categories</h3>
+        <div class="card-header-actions">
+            <button
+                class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#categoryModal"
+                data-form="#categoryForm"
+                data-title="Add Category"
+                data-url="/admin/linkage_categories">
+                <i class="fas fa-plus mr-1"></i> Add Category
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 <div class="card">
-    <div class="card-header">
-
-        <!-- Add Category -->
-        <button
-            class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#categoryModal"
-            data-form="#categoryForm"
-            data-title="Add Category"
-            data-url="/admin/linkage_categories">
-            <i class="fas fa-plus mr-1"></i> Add Category
-        </button>
-
-    </div>
 
     <div class="card-body">
 
@@ -35,7 +34,7 @@
                     <th>Status</th>
                     <th>Created At</th>
                     <th>Updated At</th>
-                    <th width="150">Actions</th>
+                    <th width="100">Actions</th>
                 </tr>
             </thead>
         </table>
@@ -66,6 +65,9 @@ $(function () {
         serverSide: true,
         responsive: true,
         pageLength: 10,
+        autoWidth: true,
+        scrollCollapse: true,
+        scrollX: true,
         lengthMenu: [10, 20, 50, 100],
         ajax: {
             url: "{{ route('admin.linkage_categories.index') }}",

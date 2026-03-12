@@ -4,23 +4,25 @@
 @section('title', 'Announcements')
 
 @section('content_header')
-<h1>Announcements</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">Announcements</h3>
+        <div class="card-header-actions">
+            <button
+                class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#announcementModal"
+                data-form="#announcementForm"
+                data-title="Add Announcement"
+                data-url="{{ route('admin.announcements.store') }}">
+                <i class="fas fa-plus"></i> Add Announcement
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 
 <div class="card">
-    <div class="card-header">
-        <button
-            class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#announcementModal"
-            data-form="#announcementForm"
-            data-title="Add Announcement"
-            data-url="{{ route('admin.announcements.store') }}">
-            <i class="fas fa-plus"></i> Add Announcement
-        </button>
-    </div>
 
     <div class="card-body">
         <table id="announcementsTable" class="table table-bordered table-hover">
@@ -35,7 +37,7 @@
                     <th>Publish Window</th>
                     <th>Created At</th>
                     <th>Updated At</th>
-                    <th width="180">Actions</th>
+                    <th width="70">Actions</th>
                 </tr>
             </thead>
 
@@ -61,6 +63,9 @@ $(function () {
         serverSide: true,
         responsive: true,
         pageLength: 10,
+        autoWidth: true,
+        scrollCollapse: true,
+        scrollX: true,
         lengthMenu: [10, 20, 50, 100],
         ajax: {
             url: "{{ route('admin.announcements.index') }}",

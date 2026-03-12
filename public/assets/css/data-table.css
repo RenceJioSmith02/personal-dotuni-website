@@ -1,61 +1,332 @@
-/* ===============================
-   MODERN DATATABLE (SaaS STYLE)
-================================ */
+/* =============================================================
+   data-table.css
+   Clean, accessible DataTable design
+   WCAG 2.1 AA Compliant — Icon buttons with visible labels on hover
+   ============================================================= */
 
+
+/* ========================
+   WRAPPER
+======================== */
 .dataTables_wrapper {
     font-size: 14px;
     width: 100%;
-    overflow-x: auto; /* mobile scroll */
+    -webkit-overflow-scrolling: touch;
 }
 
-/* Table base */
+
+/* ========================
+   CARD HEADER
+   Left:  <h3 class="card-title-dt">Gallery</h3>
+   Right: <div class="card-header-actions"><button …></div>
+======================== */
+.card-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    gap: 12px;
+    padding: 14px 20px !important;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 10px;
+}
+
+/* Kill AdminLTE floats on card-header children */
+.card-header > * {
+    float: none !important;
+}
+
+.card-title-dt {
+    font-size: 25px !important;
+    font-weight: 700 !important;
+    color: #1a2b1a !important;
+    margin: 0 !important;
+    line-height: 1.3;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.card-title-dt::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 25px;
+    background: #038303;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.card-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-left: auto !important;
+    flex-shrink: 0;
+}
+
+
+/* ========================
+   TOP CONTROLS BAR
+   [Show X entries] ————————————————— [Search input]
+======================== */
+
+/* The Bootstrap row DataTables wraps controls in */
+.dataTables_wrapper > .row:first-child {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    gap: 12px;
+    padding: 12px 4px 14px;
+    border-bottom: 1px solid #eef5ee;
+    margin: 0 !important;
+}
+
+/* Strip Bootstrap col behaviour from the two children */
+.dataTables_wrapper > .row:first-child > [class*="col-"] {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    padding: 0 !important;
+    float: none !important;
+}
+
+/* Length — stays LEFT naturally */
+.dataTables_wrapper .dataTables_length {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 !important;
+    float: none !important;
+}
+
+/* Filter — pushed to RIGHT via margin-left auto */
+.dataTables_wrapper .dataTables_filter {
+    display: inline-flex;
+    align-items: center;
+    margin: 0 !important;
+    margin-left: auto !important;
+    float: none !important;
+}
+
+/* Shared label base */
+.dataTables_wrapper .dataTables_length label,
+.dataTables_wrapper .dataTables_filter label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #5c7a5c;
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* Length <select> */
+.dataTables_wrapper .dataTables_length select {
+    border: 1.5px solid #d8e8d8;
+    border-radius: 6px;
+    padding: 0 28px 0 10px;
+    height: 34px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a2b1a;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%235c7a5c' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.16s, box-shadow 0.16s;
+}
+
+.dataTables_wrapper .dataTables_length select:hover { border-color: #038303; }
+.dataTables_wrapper .dataTables_length select:focus {
+    border-color: #038303;
+    box-shadow: 0 0 0 3px rgba(3,131,3,.15);
+    outline: none;
+}
+
+
+/* ========================
+   SEARCH INPUT
+   Hide "Search:" label text visually, keep for screen readers.
+   Icon injected via ::before on the label (acts as a wrapper).
+======================== */
+
+/* Label becomes the positioned wrapper for the icon */
+.dataTables_filter label {
+    font-size: 0 !important;      /* hide "Search:" text */
+    gap: 0 !important;
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+/* Search icon via FontAwesome unicode + pseudo-element */
+.dataTables_filter label::before {
+    font-family: "Font Awesome 5 Free", "Font Awesome 6 Free", FontAwesome;
+    font-weight: 900;
+    content: "\f002";             /* fa-search */
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #5c7a5c;
+    pointer-events: none;
+    z-index: 2;
+    line-height: 1;
+}
+
+.dataTables_filter label input[type="search"] {
+    font-size: 13px !important;
+    font-weight: 500;
+    border: 1.5px solid #d8e8d8;
+    border-radius: 8px;
+    padding: 0 13px 0 34px !important; /* left padding makes room for icon */
+    height: 34px;
+    color: #1a2b1a;
+    background: #fff !important;       /* no bg image — icon handled by ::before */
+    min-width: 220px;
+    transition: border-color 0.16s, box-shadow 0.16s;
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+.dataTables_filter label input[type="search"]:hover  { border-color: #038303; }
+.dataTables_filter label input[type="search"]:focus  {
+    border-color: #038303;
+    box-shadow: 0 0 0 3px rgba(3,131,3,.15);
+    outline: none;
+}
+.dataTables_filter label input[type="search"]::placeholder { color: #9aaa9a; }
+
+/* Icon colour shifts on input focus */
+.dataTables_filter label:focus-within::before {
+    color: #038303;
+}
+
+
+/* ========================
+   BOTTOM ROW — Info LEFT + Pagination RIGHT
+======================== */
+.dataTables_wrapper > .row:last-child {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 4px 4px;
+    margin: 0 !important;
+}
+
+.dataTables_wrapper > .row:last-child > [class*="col-"] {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    padding: 0 !important;
+    float: none !important;
+}
+
+.dataTables_wrapper .dataTables_info {
+    color: #5c7a5c;
+    font-size: 13px;
+}
+
+
+/* ========================
+   TABLE BASE
+======================== */
 table.dataTable {
     width: 100% !important;
-    table-layout: fixed; 
     border-collapse: separate !important;
     border-spacing: 0;
     background: #ffffff;
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
-    min-width: 720px; /* keeps structure on mobile */
+    border: 1px solid #d8e8d8;
+    min-width: 640px;
 }
 
-/* Header */
+.dataTables_scroll,
+.dataTables_scrollBody { overflow-x: auto !important; }
+
+
+/* ========================
+   TABLE HEADER
+======================== */
+table.dataTable thead tr { background: #f4f8f4; }
+
 table.dataTable thead th {
-    background: #f7fafc;
-    color: #1f2937;
-    font-weight: 600;
-    border-bottom: 1px solid #e5e7eb !important;
-    padding: 14px 16px;
+    background: #f4f8f4 !important;
+    color: #1a2b1a !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 2px solid #c6ddc6 !important;
+    border-right: 1px solid #e2ede2 !important;
+    padding: 13px 16px !important;
     vertical-align: middle;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    user-select: none;
 }
 
-/* Sorting icons */
+table.dataTable thead th:last-child { border-right: none !important; }
+
+table.dataTable thead th.sorting,
+table.dataTable thead th.sorting_asc,
+table.dataTable thead th.sorting_desc { cursor: pointer; }
+
+table.dataTable thead th.sorting:hover {
+    background: #eaf3ea !important;
+    color: #038303 !important;
+}
+
 table.dataTable thead th.sorting:after,
 table.dataTable thead th.sorting_asc:after,
 table.dataTable thead th.sorting_desc:after {
-    color: #3b82f6;
-    opacity: 1;
+    color: #038303 !important;
+    opacity: 0.7;
 }
 
-/* Body cells */
+table.dataTable thead th.sorting_asc:after,
+table.dataTable thead th.sorting_desc:after { opacity: 1 !important; }
+
+table.dataTable thead th:focus-visible {
+    outline: 2px solid #92d12c;
+    outline-offset: -2px;
+    background: #eaf3ea !important;
+}
+
+
+/* ========================
+   TABLE BODY
+======================== */
 table.dataTable tbody td,
 table.dataTable tbody th {
-    padding: 14px 16px;
-    border-bottom: 1px solid #f1f5f9;
+    padding: 12px 16px !important;
+    border-bottom: 1px solid #eef5ee !important;
     vertical-align: middle;
-    color: #111827;
-
-    max-width: 240px;
+    color: #1a2b1a;
+    font-size: 14px;
+    max-width: 220px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Make ellipsis reliable */
 table.dataTable tbody td > *,
 table.dataTable tbody th > * {
     display: block;
@@ -64,7 +335,14 @@ table.dataTable tbody th > * {
     white-space: nowrap;
 }
 
+table.dataTable tbody tr:nth-child(even) { background: #fafcfa; }
+table.dataTable tbody tr:hover { background: #f0f8f0 !important; transition: background 0.12s; }
+table.dataTable tbody tr:last-child td { border-bottom: none !important; }
 
+
+/* ========================
+   ACTIONS COLUMN
+======================== */
 table.dataTable thead th:last-child,
 table.dataTable tbody td:last-child {
     white-space: nowrap !important;
@@ -73,16 +351,21 @@ table.dataTable tbody td:last-child {
     max-width: none !important;
 }
 
-/* Keep buttons inline */
 table.dataTable tbody td:last-child > * {
-    display: inline-flex;
-    gap: 6px;
+    display: inline-flex !important;
+    align-items: center;
+    gap: 4px;
     white-space: nowrap !important;
     overflow: visible !important;
+    flex-wrap: nowrap;
 }
 
+/* Form wrappers inside action cells must not break the flex row */
+table.dataTable tbody td:last-child form.d-inline {
+    display: contents !important;
+}
 
-/* Expanded cell */
+/* Expanded child rows */
 table.dataTable tbody td.expanded,
 table.dataTable tbody th.expanded {
     white-space: normal !important;
@@ -90,9 +373,9 @@ table.dataTable tbody th.expanded {
     text-overflow: unset !important;
 }
 
-/* Expanded inner content */
 table.dataTable tbody td.expanded > *,
 table.dataTable tbody th.expanded > * {
+    display: block;
     white-space: normal !important;
     overflow: visible !important;
     text-overflow: unset !important;
@@ -100,172 +383,281 @@ table.dataTable tbody th.expanded > * {
     hyphens: auto;
 }
 
-/* Row hover */
-table.dataTable tbody tr:hover {
-    background-color: #f9fafb;
-}
 
-/* Remove last row border */
-table.dataTable tbody tr:last-child td {
-    border-bottom: none;
-}
-
-/* ===============================
-   MOBILE FRIENDLY
-================================ */
-
-@media (max-width: 768px) {
-
-    .dataTables_wrapper {
-        font-size: 13px;
-    }
-
-    table.dataTable {
-        min-width: 600px;
-    }
-
-    table.dataTable thead th,
-    table.dataTable tbody td {
-        padding: 10px 12px;
-    }
-
-}
-
-
-/* ===============================
-   SEARCH INPUT
-================================ */
-.dataTables_filter input {
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    padding: 8px 12px;
-    margin-left: 8px;
-    outline: none;
-}
-
-.dataTables_filter input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59,130,246,.15);
-}
-
-/* ===============================
-   PAGINATION
-================================ */
-.dataTables_paginate .paginate_button {
-    border-radius: 6px !important;
-    margin: 0 2px;
-    padding: 6px 10px;
+/* ========================
+   ACTION ICON BUTTONS
+   <button class="btn-icon btn-icon-edit"
+           data-label="Edit"
+           aria-label="Edit record">
+     <i class="fas fa-pen"></i>
+   </button>
+======================== */
+.btn-icon {
+    position: relative;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0 !important;
+    border-radius: 7px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
     border: none !important;
-    background: transparent !important;
+    cursor: pointer;
+    transition: background 0.14s, transform 0.1s, box-shadow 0.14s;
+    text-decoration: none;
+    --tooltip-bg:    #1a2b1a;
+    --tooltip-color: #ffffff;
 }
 
-.dataTables_paginate .paginate_button.current {
-    background: #3b82f6 !important;
-    color: #fff !important;
+.btn-icon::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: calc(100% + 7px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.85);
+    background: var(--tooltip-bg);
+    color: var(--tooltip-color);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 4px 9px;
+    border-radius: 5px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.14s, transform 0.14s;
+    z-index: 1050;
+    letter-spacing: 0.02em;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+
+.btn-icon::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 3px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.85);
+    border: 5px solid transparent;
+    border-top-color: var(--tooltip-bg);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.14s, transform 0.14s;
+    z-index: 1050;
+}
+
+.btn-icon:hover::after,  .btn-icon:focus-visible::after  { opacity: 1; transform: translateX(-90%) scale(1); }
+.btn-icon:hover::before, .btn-icon:focus-visible::before { opacity: 1; transform: translateX(-90%) scale(1); }
+.btn-icon:active { transform: scale(0.93); }
+
+.btn-icon:focus-visible {
+    outline: 3px solid #92d12c !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 3px rgba(146,209,44,0.45) !important;
+}
+
+/* ---- Variants ---- */
+/* ---- Form wrapper inside action cell — must not break flex row ---- */
+table.dataTable tbody td:last-child form.d-inline {
+    display: contents !important; /* removes the form box from layout entirely */
+}
+
+/* ---- Variants — solid enough for WCAG 3:1 non-text contrast ---- */
+
+/* View — blue */
+.btn-icon-view        { background: #dbeafe; color: #1e40af; --tooltip-bg: #1e40af; }
+.btn-icon-view:hover  { background: #bfdbfe; box-shadow: 0 2px 8px rgba(30,64,175,.25); }
+
+/* Edit — blue (distinct from view, darker) */
+.btn-icon-edit        { background: #dbeafe; color: #1d4ed8; --tooltip-bg: #1d4ed8; }
+.btn-icon-edit:hover  { background: #93c5fd; box-shadow: 0 2px 8px rgba(29,78,216,.3); }
+
+/* Delete — red */
+.btn-icon-delete       { background: #fee2e2; color: #991b1b; --tooltip-bg: #991b1b; }
+.btn-icon-delete:hover { background: #fca5a5; box-shadow: 0 2px 8px rgba(153,27,27,.3); }
+
+/* Archive — amber/orange — signals "put away" */
+.btn-icon-archive       { background: #ffedd5; color: #9a3412; --tooltip-bg: #9a3412; }
+.btn-icon-archive:hover { background: #fed7aa; box-shadow: 0 2px 8px rgba(154,52,18,.3); }
+
+/* Unarchive — teal — signals "restore/bring back" */
+.btn-icon-unarchive       { background: #ccfbf1; color: #0f766e; --tooltip-bg: #0f766e; }
+.btn-icon-unarchive:hover { background: #99f6e4; box-shadow: 0 2px 8px rgba(15,118,110,.3); }
+
+.btn-icon-publish       { background: #e6f4ea; color: #145228; --tooltip-bg: #145228; }
+.btn-icon-publish:hover { background: #c6ead0; box-shadow: 0 2px 8px rgba(3,131,3,.2); }
+
+.btn-icon-unpublish       { background: #f1f5f1; color: #3d4f3d; --tooltip-bg: #3d4f3d; }
+.btn-icon-unpublish:hover { background: #e0e8e0; box-shadow: 0 2px 8px rgba(61,79,61,.15); }
+
+.btn-icon-approve       { background: #e6f4ea; color: #145228; --tooltip-bg: #145228; }
+.btn-icon-approve:hover { background: #c6ead0; box-shadow: 0 2px 8px rgba(20,82,40,.2); }
+
+.btn-icon-reject       { background: #fdecec; color: #b42318; --tooltip-bg: #b42318; }
+.btn-icon-reject:hover { background: #fcd8d8; box-shadow: 0 2px 8px rgba(180,35,24,.2); }
+
+.btn-icon-download       { background: #e8f1fd; color: #1d4ed8; --tooltip-bg: #1d4ed8; }
+.btn-icon-download:hover { background: #d0e4fc; box-shadow: 0 2px 8px rgba(29,78,216,.2); }
+
+.btn-icon-settings       { background: #f1f5f1; color: #3d4f3d; --tooltip-bg: #3d4f3d; }
+.btn-icon-settings:hover { background: #e0e8e0; box-shadow: 0 2px 8px rgba(61,79,61,.15); }
+
+
+/* ========================
+   STATUS BADGES
+======================== */
+.badge {
+    border-radius: 999px;
+    padding: 4px 11px;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.badge-active    { background: #e6f4ea; color: #145228; }
+.badge-inactive  { background: #f1f5f1; color: #3d4f3d; }
+.badge-archived  { background: #fef3e2; color: #7a3a06; }
+.badge-draft     { background: #e8f1fd; color: #153396; }
+.badge-published { background: #e6f4ea; color: #145228; }
+.badge-pending   { background: #fef9e8; color: #856404; }
+.badge-rejected  { background: #fdecec; color: #7a1910; }
+.badge-approved  { background: #e6f4ea; color: #145228; }
+
+
+/* ========================
+   PAGINATION
+======================== */
+.dataTables_paginate {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-wrap: wrap;
+    padding: 4px 0;
+}
+
+.dataTables_paginate .paginate_button {
+    border-radius: 7px !important;
+    padding: 3px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border: 1px solid transparent !important;
+    background: transparent !important;
+    color: #4a614a !important;
+    cursor: pointer;
+    transition: background 0.13s, color 0.13s;
+    line-height: 1.4;
 }
 
 .dataTables_paginate .paginate_button:hover {
-    background: #e0e7ff !important;
-    color: #1e3a8a !important;
+    background: #e6f4ea !important;
+    color: #038303 !important;
+    border-color: #c6ddc6 !important;
 }
 
-/* ===============================
-   STATUS BADGES (PILLS)
-================================ */
-.badge {
-    border-radius: 999px;
-    padding: 6px 12px;
-    font-weight: 500;
-    font-size: 12px;
+.dataTables_paginate .paginate_button.current {
+    background: #038303 !important;
+    color: #ffffff !important;
+    border-color: #038303 !important;
 }
 
-.badge-success {
-    background-color: #e6f4ea;
-    color: #1e7f3f;
+.dataTables_paginate .paginate_button.current:hover {
+    background: #0f7c2e !important;
+    border-color: #0f7c2e !important;
 }
 
-.badge-danger {
-    background-color: #fdecec;
-    color: #b42318;
+.dataTables_paginate .paginate_button.disabled {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
 }
 
-.badge-info {
-    background-color: #e8f1fd;
-    color: #1d4ed8;
-}
-
-/* ===============================
-   ACTION BUTTONS
-================================ */
-table td .btn {
-    padding: 6px 10px;
-    font-size: 12px;
-    border-radius: 6px;
-}
-
-table td .btn-info {
-    background: #e8f1fd;
-    color: #1d4ed8;
-    border: none;
-}
-
-table td .btn-danger {
-    background: #fdecec;
-    color: #b42318;
-    border: none;
-}
-
-table td .btn:hover {
-    opacity: 0.85;
-}
-
-/* ===============================
-   CHECKBOX ALIGNMENT (if added later)
-================================ */
-table.dataTable input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
+.dataTables_paginate .paginate_button:focus-visible {
+    outline: 3px solid #92d12c !important;
+    outline-offset: 2px !important;
 }
 
 
+/* ========================
+   PROCESSING OVERLAY
+======================== */
+.dataTables_processing {
+    background: rgba(255,255,255,0.9) !important;
+    border: 1px solid #d8e8d8 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 16px rgba(3,131,3,.12) !important;
+    color: #038303 !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    padding: 14px 28px !important;
+}
 
 
+/* ========================
+   MOBILE
+======================== */
+@media (max-width: 768px) {
+    .dataTables_wrapper { font-size: 13px; }
+    table.dataTable { min-width: 560px; }
+    table.dataTable thead th,
+    table.dataTable tbody td { padding: 10px 12px !important; }
+    .btn-icon { width: 30px; height: 30px; font-size: 12px !important; }
+
+    .dataTables_wrapper > .row:first-child {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        flex-wrap: wrap !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
+    .dataTables_filter label input[type="search"] {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+}
 
 
-/* ==================================
-   FAQ ANSWERS CHILD ROW DESIGN
-================================== */
-
+/* ========================
+   FAQ CHILD ROW DESIGN
+======================== */
 .answers-wrapper {
-    background: #f9fafb;
+    background: #f4f8f4;
     padding: 16px;
-    border-radius: 12px;
+    border-radius: 10px;
 }
 
 .answer-card {
     background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 12px;
-    transition: all 0.2s ease;
+    border: 1px solid #d8e8d8;
+    border-radius: 9px;
+    padding: 13px 16px;
+    margin-bottom: 10px;
+    transition: box-shadow 0.15s, border-color 0.15s;
 }
 
-.answer-card:last-child {
-    margin-bottom: 0;
-}
+.answer-card:last-child { margin-bottom: 0; }
 
 .answer-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    border-color: #dbeafe;
+    box-shadow: 0 3px 10px rgba(3,131,3,.08);
+    border-color: #b6d9b6;
 }
 
 .answer-content {
     font-size: 14px;
-    color: #111827;
+    color: #1a2b1a;
     margin-bottom: 8px;
     white-space: normal;
     word-break: break-word;
+    line-height: 1.55;
 }
 
 .answer-meta {

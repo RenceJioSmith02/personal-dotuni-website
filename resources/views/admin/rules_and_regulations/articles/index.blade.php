@@ -4,25 +4,24 @@
 @section('title', 'Rule Articles')
 
 @section('content_header')
-    <h1>Rule Articles</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">Rule Articles</h3>
+        <div class="card-header-actions">
+            <button
+                class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#articleModal"
+                data-form="#articleForm"
+                data-title="Add Article"
+                data-url="/admin/rule_articles">
+                <i class="fas fa-plus mr-1"></i> Add Article
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 <div class="card">
-    <div class="card-header">
-
-        <!-- Add Article -->
-        <button
-            class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#articleModal"
-            data-form="#articleForm"
-            data-title="Add Article"
-            data-url="/admin/rule_articles">
-            <i class="fas fa-plus mr-1"></i> Add Article
-        </button>
-
-    </div>
 
     <div class="card-body">
         <table id="articlesTable" class="table table-bordered table-hover">
@@ -35,7 +34,7 @@
                     <th>Status</th>
                     <th>Created At</th>
                     <th>Updated At</th>
-                    <th width="150">Actions</th>
+                    <th width="100">Actions</th>
                 </tr>
             </thead>
 
@@ -62,7 +61,9 @@ $(function () {
         processing: true,
         serverSide: true,
         responsive: true,
-        autoWidth: false,
+        autoWidth: true,
+        scrollCollapse: true,
+        scrollX: true,
         pageLength: 10,
         ajax: "{{ route('admin.rule_articles.index') }}",
         columns: [

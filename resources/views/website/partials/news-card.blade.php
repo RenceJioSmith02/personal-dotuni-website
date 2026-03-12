@@ -1,36 +1,4 @@
-{{-- <a href="#" class="content-card">
 
-<img
-src="{{ $content['image']
-? asset('storage/'.$content['image'])
-: asset('assets/system_images/placeholder.jpg') }}">
-
-<div class="card-content">
-
-<span class="card-category">
-{{ strtoupper($content['type']) }}
-</span>
-
-<h4>{{ $content['title'] }}</h4>
-
-<p>{{ $content['description'] }}</p>
-
-<div class="card-footer" style="color: #777">
-<span class="news-date">
-    {{ \Carbon\Carbon::parse($content['date'])->format('M d, Y') }}
-</span>
-<span class="read-more">Read More</span>
-</div>
-
-</div>
-
-</a> --}}
-
-
-{{--
-    Expects $content array with keys:
-    id, title, description, image, date, type, url (clsu only)
---}}
 
 @php
     $href = match($content['type']) {

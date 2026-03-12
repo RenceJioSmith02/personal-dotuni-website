@@ -4,23 +4,24 @@
 @section('title', 'Requirement Categories')
 
 @section('content_header')
-    <h1>Requirement Categories</h1>
+    <div class="card-header">
+        <h3 class="card-title-dt">Requirement Categories</h3>
+        <div class="card-header-actions">
+            <button
+                class="open-modal btn btn-primary"
+                data-action="add"
+                data-modal="#categoryModal"
+                data-form="#categoryForm"
+                data-title="Add Requirement Category"
+                data-url="{{ route('admin.program_requirement_categories.store') }}">
+                <i class="fas fa-plus"></i> Add Category
+            </button>
+        </div>
+    </div>
 @stop
 
 @section('content')
 <div class="card">
-    <div class="card-header">
-        <button
-            class="open-modal btn btn-primary"
-            data-action="add"
-            data-modal="#categoryModal"
-            data-form="#categoryForm"
-            data-title="Add Requirement Category"
-            data-url="{{ route('admin.program_requirement_categories.store') }}">
-            <i class="fas fa-plus"></i> Add Category
-        </button>
-    </div>
-
     <div class="card-body">
         <table id="categoriesTable" class="table table-bordered table-hover">
             <thead>
@@ -31,7 +32,7 @@
                     <th>Status</th>
                     <th>Created At</th>
                     <th>Updated At</th>
-                    <th width="150">Actions</th>
+                    <th width="100">Actions</th>
                 </tr>
             </thead>
 
@@ -56,8 +57,10 @@ $(function () {
         processing: true,
         serverSide: true,
         responsive: true,
-        autoWidth: false,
         pageLength: 10,
+        autoWidth: true,
+        scrollCollapse: true,
+        scrollX: true,
         ajax: "{{ route('admin.program_requirement_categories.index') }}",
         columns: [
             {
@@ -69,7 +72,7 @@ $(function () {
             },
             { data: 'name' },
             { data: 'sort_order' },
-            { data: 'status',     orderable: false, searchable: false }, // ✅ Add
+            { data: 'status',     orderable: false, searchable: false },
             { data: 'created_at', render: (data) => new Date(data).toLocaleString() },
             { data: 'updated_at', render: (data) => new Date(data).toLocaleString() },
             { data: 'actions',    orderable: false, searchable: false }
