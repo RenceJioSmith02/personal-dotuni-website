@@ -12,26 +12,20 @@ use App\Models\Form;
 use App\Models\Gallery;
 use App\Models\Linkage;
 use App\Models\Program;
+use App\Models\RuleArticle;
+use App\Models\RuleSection;
+use App\Models\RuleSubSection;
+use App\Models\RuleClause;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function dashboard()
     {
         $user = Auth::user();
@@ -66,6 +60,12 @@ class AdminController extends Controller
             $stats['fees'] = Fee::whereNull('deleted_at')->count();
             $stats['fees_archived'] = Fee::whereNotNull('deleted_at')->count();
 
+            // Rules & Regulations
+            $stats['rule_articles'] = RuleArticle::whereNull('deleted_at')->count();
+            $stats['rule_sections'] = RuleSection::whereNull('deleted_at')->count();
+            $stats['rule_sub_sections'] = RuleSubSection::whereNull('deleted_at')->count();
+            $stats['rule_clauses'] = RuleClause::whereNull('deleted_at')->count();
+
             // Recent records
             $recentCourses = Course::whereNull('deleted_at')->latest()->take(6)->get();
             $recentAnnouncements = Announcement::latest()->take(5)->get();
@@ -98,13 +98,19 @@ class AdminController extends Controller
             $stats['users_active'] = User::whereNull('deleted_at')->where('is_active', true)->count();
             $stats['users_inactive'] = User::whereNull('deleted_at')->where('is_active', false)->count();
             $stats['users_archived'] = User::whereNotNull('deleted_at')->count();
+
+            // For the user summary table
+            $recentUsers = User::with('roles')->whereNull('deleted_at')->latest()->take(8)->get();
+        } else {
+            $recentUsers = collect();
         }
 
         return view('admin.dashboard', compact(
             'stats',
             'recentCourses',
             'recentAnnouncements',
-            'recentDotuniNews'
+            'recentDotuniNews',
+            'recentUsers'     
         ));
     }
 }

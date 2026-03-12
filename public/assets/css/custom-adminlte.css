@@ -1,8 +1,5 @@
 /* =============================================================
    custom-adminlte.css
-   CMS Theme — Green Forest Palette
-   Base: #038303 | #0f7c2e | #92d12c | #ffffff
-   WCAG 2.1 AA Compliant
    ============================================================= */
 
 /* ========================
@@ -59,7 +56,7 @@ body,
 .wrapper {
     background-color: var(--clr-bg) !important;
     color: var(--clr-text) !important;
-    font-family: 'Segoe UI', 'Noto Sans', Arial, sans-serif;
+    font-family: 'Lato', 'Noto Sans', Arial, sans-serif !important;
     font-size: 15px;
     line-height: 1.6;
 }

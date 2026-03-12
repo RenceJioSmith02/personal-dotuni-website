@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\academic\CourseController;
 
+use App\Http\Controllers\Admin\SettingsController;
+
 // gallery
 use App\Http\Controllers\Admin\academic\ProgramBuilderController;
 
@@ -178,6 +180,9 @@ Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth'])
     ->group(function () {
+
+        Route::get('settings', [SettingsController::class, 'index'])->name('admin.settings.index');
+        Route::post('settings/change-password', [SettingsController::class, 'changePassword'])->name('settings.changePassword');
 
         // ============================
         // ADMIN ONLY
