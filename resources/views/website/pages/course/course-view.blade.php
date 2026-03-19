@@ -162,6 +162,8 @@
                             <tr>
                                 <th></th>
                                 <th>Required Units</th>
+                                <th>MS</th>
+                                <th>MPS</th>
                             </tr>
                         <tbody>
 
@@ -174,6 +176,8 @@
                         <tr>
                             <td>{{ $req->category->name }}</td>
                             <td>{{ $req->required_units }}</td>
+                            <td>{{ $req->ms ?: 0 }}</td>
+                            <td>{{ $req->mps ?: 0 }}</td>
                         </tr>
 
                         @php

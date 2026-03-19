@@ -283,8 +283,8 @@
                 <tr id="req-{{ $req->id }}">
                     <td class="td-bold">{{ $req->category->name }}</td>
                     <td><span class="pb-pill-blue">{{ $req->required_units }} units</span></td>
-                    <td class="td-muted">{{ $req->ms }}</td>
-                    <td class="td-muted">{{ $req->mps }}</td>
+                    <td class="td-muted">{{ $req->ms ?: 0}}</td>
+                    <td class="td-muted">{{ $req->mps ?: 0}}</td>
                     <td class="td-center">
                         <button
                             class="btn-icon btn-icon-delete delete-requirement"

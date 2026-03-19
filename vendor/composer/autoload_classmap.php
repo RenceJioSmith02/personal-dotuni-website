@@ -12,6 +12,7 @@ return array(
     'App\\Http\\Controllers\\Admin\\EResourceController' => $baseDir . '/app/Http/Controllers/Admin/EResourceController.php',
     'App\\Http\\Controllers\\Admin\\FeeController' => $baseDir . '/app/Http/Controllers/Admin/FeeController.php',
     'App\\Http\\Controllers\\Admin\\GalleryController' => $baseDir . '/app/Http/Controllers/Admin/GalleryController.php',
+    'App\\Http\\Controllers\\Admin\\SettingsController' => $baseDir . '/app/Http/Controllers/Admin/SettingsController.php',
     'App\\Http\\Controllers\\Admin\\academic\\ProgramBuilderController' => $baseDir . '/app/Http/Controllers/Admin/academic/ProgramBuilderController.php',
     'App\\Http\\Controllers\\Admin\\faqs\\FaqAnswerController' => $baseDir . '/app/Http/Controllers/Admin/faqs/FaqAnswerController.php',
     'App\\Http\\Controllers\\Admin\\faqs\\FaqQuestionController' => $baseDir . '/app/Http/Controllers/Admin/faqs/FaqQuestionController.php',

@@ -13,7 +13,8 @@ class CourseController extends Controller
 {
     public function __construct(
         protected CourseService $service
-    ) {}
+    ) {
+    }
 
 
     public function index(Request $request)
@@ -32,12 +33,12 @@ class CourseController extends Controller
             'title' => [
                 'required',
                 'string',
-                Rule::unique('courses', 'title')->whereNull('deleted_at'),
+                // Rule::unique('courses', 'title')->whereNull('deleted_at'),
             ],
             'code' => [
                 'required',
                 'string',
-                Rule::unique('courses', 'code')->whereNull('deleted_at'),
+                // Rule::unique('courses', 'code')->whereNull('deleted_at'),
             ],
             'description' => 'required|string',
             'units' => 'required|integer|min:0',
@@ -65,16 +66,16 @@ class CourseController extends Controller
             'title' => [
                 'required',
                 'string',
-                Rule::unique('courses', 'title')
-                    ->ignore($course->id)
-                    ->whereNull('deleted_at'),
+                // Rule::unique('courses', 'title')
+                //     ->ignore($course->id)
+                //     ->whereNull('deleted_at'),
             ],
             'code' => [
                 'required',
                 'string',
-                Rule::unique('courses', 'code')
-                    ->ignore($course->id)
-                    ->whereNull('deleted_at'),
+                // Rule::unique('courses', 'code')
+                //     ->ignore($course->id)
+                //     ->whereNull('deleted_at'),
             ],
             'description' => 'required|string',
             'units' => 'required|integer|min:0',

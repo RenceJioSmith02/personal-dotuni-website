@@ -492,8 +492,8 @@ class AnnouncementService
     {
         return $request->validate([
             'title' => 'required|string|max:250',
-            'seo_title' => 'required|string|max:250',
-            'seo_description' => 'required|string|max:300',
+            'seo_title' => 'string|max:250',
+            'seo_description' => 'string|max:300',
             'visibility' => 'required|in:public,private,unlisted',
             'layout' => 'required|string|max:50',
             'publish_start' => 'nullable|date',

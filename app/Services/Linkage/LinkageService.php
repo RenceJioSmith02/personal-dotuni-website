@@ -58,7 +58,9 @@ class LinkageService
             'data' => $data->map(fn($l) => [
                 'title' => $l->title,
                 'category' => $l->category->name ?? '—',
-                'url' => $l->url,
+                'url' => $l->url
+                    ? '<a href="' . $l->url . '" target="_blank">' . $l->url . '</a>'
+                    : '<span class="text-muted">—</span>',
                 'status' => $l->is_active
                     ? '<span class="badge badge-success">Active</span>'
                     : '<span class="badge badge-danger">Inactive</span>',

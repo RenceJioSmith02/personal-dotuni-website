@@ -59,7 +59,7 @@ class EResourceService
                     'name' => $item->name,
                     'description' => \Str::limit($item->description, 80),
                     'link_url' => $item->link_url
-                        ? '<a href="' . $item->link_url . '" target="_blank">View</a>'
+                        ? '<a href="' . $item->link_url . '" target="_blank">'. $item->link_url .'</a>'
                         : '<span class="text-muted">—</span>',
                     'sort_order' => $item->sort_order,
                     'status' => $item->is_active

@@ -10,9 +10,10 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function ($middleware) {
+    ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'not.archived' => \App\Http\Middleware\EnsureUserIsNotArchived::class, 
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

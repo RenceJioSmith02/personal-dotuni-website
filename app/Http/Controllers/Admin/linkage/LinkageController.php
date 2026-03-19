@@ -35,13 +35,13 @@ class LinkageController extends Controller
                 'required',
                 'string',
                 'max:150',
-                Rule::unique('linkages', 'title')->whereNull('deleted_at')
+                // Rule::unique('linkages', 'title')->whereNull('deleted_at')
             ],
             'url' => [
                 'required',
                 'url',
                 'max:1000',
-                Rule::unique('linkages', 'url')->whereNull('deleted_at')
+                // Rule::unique('linkages', 'url')->whereNull('deleted_at')
             ],
             'description' => 'nullable|string|max:500',
             'sort_order' => 'nullable|integer',
@@ -67,13 +67,13 @@ class LinkageController extends Controller
                 'required',
                 'string',
                 'max:150',
-                Rule::unique('linkages', 'title')->ignore($linkage->id)->whereNull('deleted_at')
+                // Rule::unique('linkages', 'title')->ignore($linkage->id)->whereNull('deleted_at')
             ],
             'url' => [
                 'required',
                 'url',
                 'max:1000',
-                Rule::unique('linkages', 'url')->ignore($linkage->id)->whereNull('deleted_at')
+                // Rule::unique('linkages', 'url')->ignore($linkage->id)->whereNull('deleted_at')
             ],
             'description' => 'nullable|string|max:500',
             'sort_order' => 'nullable|integer',

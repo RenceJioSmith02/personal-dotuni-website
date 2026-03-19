@@ -174,11 +174,13 @@ Route::get(
 Auth::routes();
 
 // Admin Routes
-Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
+    ->middleware(['auth', 'not.archived']) 
+    ->name('dashboard');
 
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth'])
+    ->middleware(['auth', 'not.archived'])
     ->group(function () {
 
         Route::get('settings', [SettingsController::class, 'index'])->name('admin.settings.index');

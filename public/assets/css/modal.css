@@ -486,8 +486,8 @@
 }
 
 .layout-card.active {
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+    border-color: #007bff !important;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15) !important;
 }
 
 .layout-card.active {

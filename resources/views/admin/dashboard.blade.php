@@ -85,7 +85,7 @@
             <div class="info-box shadow-sm">
                 <span class="info-box-icon bg-gradient-danger"><i class="fas fa-question-circle"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text">FAQ Questions</span>
+                    <span class="info-box-text">FAQS</span>
                     <span class="info-box-number">{{ $stats['faq_questions'] }}</span>
                     <span class="info-box-text text-sm text-warning">{{ $stats['faq_questions_archived'] }} archived</span>
                 </div>

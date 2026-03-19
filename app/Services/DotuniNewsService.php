@@ -474,10 +474,10 @@ class DotuniNewsService
         return $request->validate([
             'title' => 'required|string|max:250',
             'headline' => 'nullable|string|max:250',
-            'seo_title' => 'required|string|max:250',
-            'seo_description' => 'required|string|max:300',
+            'seo_title' => 'string|max:250',
+            'seo_description' => 'string|max:300',
             'status' => 'nullable|in:submitted,published,archived',
-            'visibility' => 'nullable|in:public,private,unlisted,',
+            'visibility' => 'required|in:public,private,unlisted,',
             'layout' => 'required|string|max:50',
             'published_at' => 'nullable|date',
             'article_body' => 'nullable|string',

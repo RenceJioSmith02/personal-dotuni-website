@@ -579,6 +579,7 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         'App\\Http\\Controllers\\Admin\\EResourceController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/EResourceController.php',
         'App\\Http\\Controllers\\Admin\\FeeController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/FeeController.php',
         'App\\Http\\Controllers\\Admin\\GalleryController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/GalleryController.php',
+        'App\\Http\\Controllers\\Admin\\SettingsController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/SettingsController.php',
         'App\\Http\\Controllers\\Admin\\academic\\ProgramBuilderController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/academic/ProgramBuilderController.php',
         'App\\Http\\Controllers\\Admin\\faqs\\FaqAnswerController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/faqs/FaqAnswerController.php',
         'App\\Http\\Controllers\\Admin\\faqs\\FaqQuestionController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/faqs/FaqQuestionController.php',

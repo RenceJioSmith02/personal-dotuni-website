@@ -50,7 +50,7 @@
 
                             <div class="form-group col-md-6">
                                 <label>SEO Description</label>
-                                <input type="text" name="seo_description" class="form-control" maxlength="300" required>
+                                <input type="text" name="seo_description" class="form-control" maxlength="300">
                             </div>
 
                         @if(auth()->user()->hasRole('admin'))

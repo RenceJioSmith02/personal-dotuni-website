@@ -31,7 +31,7 @@
 
             <div class="form-group col-md-12">
               <label>Description</label>
-              <input type="text" name="description" class="form-control" required>
+              <textarea name="description" class="form-control" rows="3" required></textarea>
             </div>
 
             <div class="form-group col-md-4">

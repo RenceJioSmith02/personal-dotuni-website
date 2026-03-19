@@ -414,7 +414,6 @@ $(document).on("change", ".media-input", function (e) {
                 name="media[${index}][caption]"
                 class="form-control"
                 rows="6"
-                maxlength="500"
                 placeholder="Write a caption (optional)...">${caption}</textarea>
 
 
@@ -1107,7 +1106,6 @@ $(document).on("change", ".media-input", function (e) {
                 name="media[${index}][caption]"
                 class="form-control"
                 rows="6"
-                maxlength="500"
                 placeholder="Write a caption (optional)...">${caption}</textarea>
 
             <input type="hidden" name="media[${index}][is_thumbnail]" value="${hiddenThumbnail}">
