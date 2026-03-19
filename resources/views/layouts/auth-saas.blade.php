@@ -40,8 +40,8 @@
                 
                 </div>
 
-                <h2>Content Management System</h2>
-                <p>Manage users, data, and content effortlessly — all in one place.</p>
+                <h2>Distance, Open, and Transnational </br> University</h2>
+                <p>Content Management System</p>
 
                 <div class="brand-features">
                     <div class="feature-pill">

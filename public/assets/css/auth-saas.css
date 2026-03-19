@@ -16,7 +16,6 @@
 html, body {
   height: 100%;
   min-height: 100vh;
-  overflow: hidden;
 }
 
 /* Strip page wrapper styles */
@@ -204,7 +203,7 @@ body.register-page {
 
 .brand h2 {
   font-family: 'Sora', sans-serif;
-  font-size: clamp(2rem, 3vw, 2.5rem);
+  font-size: clamp(1.5rem, 2vw, 1.5rem);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -1px;
@@ -213,7 +212,7 @@ body.register-page {
 }
 
 .brand p {
-  font-size: 1.05rem;
+  font-size: 1.20rem;
   font-weight: 300;
   line-height: 1.65;
   color: rgba(255,255,255,0.78);
@@ -490,16 +489,16 @@ body.register-page {
 }
 
 
-.navbar-header-logo-container {
-  background-color: var(--bg);
-  width: 95px;
-  height: 95px;
-  border-radius: 50%;
-  padding: 14px;
-  z-index: 4;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 12px 12px 25px rgba(0, 0, 0, 0.10);
+.navbar-header-logo {
+  width: 80px;
+
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.3))
+          drop-shadow(0 0 12px rgba(255, 255, 255, 0.3));
+
   transition: 0.3s ease;
+}
+
+.navbar-header-logo:hover {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5))
+          drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
 }
