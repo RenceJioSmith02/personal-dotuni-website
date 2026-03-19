@@ -70,6 +70,7 @@ $(function () {
         autoWidth: true,
         scrollCollapse: true,
         scrollX: true,
+        order: [[4, 'asc']],
         ajax: "{{ route('admin.faqs_questions.index') }}",
         columns: [
             {
@@ -86,7 +87,7 @@ $(function () {
                 render: (data, type, row, meta) =>
                     meta.row + meta.settings._iDisplayStart + 1
             },
-            { data: 'question' },
+            { data: 'question', orderable: false, searchable: false },
             { data: 'status', orderable: false, searchable: false },
             { data: 'created_at', render: data => new Date(data).toLocaleString() },
             { data: 'actions', orderable: false, searchable: false }

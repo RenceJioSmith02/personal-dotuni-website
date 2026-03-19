@@ -63,6 +63,7 @@ $(function () {
         autoWidth: true,
         scrollCollapse: true,
         scrollX: true,
+        order: [[1, 'asc']],
         pageLength: 10,
         ajax: "{{ route('admin.rule_sections.index') }}",
         columns: [

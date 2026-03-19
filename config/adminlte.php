@@ -508,7 +508,7 @@ return [
                 [
                     'text' => 'Forms',
                     'url' => 'admin/forms',
-                    'icon' => 'fas fa-wpforms',
+                    'icon' => 'fas fa-clipboard-list',
                     'can' => 'manage-content',
                 ],
             ],

@@ -98,8 +98,8 @@ class GalleryService
             try {
                 $validated = $request->validate([
                     'sort_order' => 'nullable|integer',
-                    'is_active' => 'nullable|boolean', // ✅ Add
-                    'image' => 'required|image|max:2048',
+                    'is_active' => 'nullable|boolean',
+                    'image' => 'required|image',
                 ]);
 
                 $asset = $this->storeImageAsset($request->file('image'));
@@ -125,8 +125,8 @@ class GalleryService
             try {
                 $validated = $request->validate([
                     'sort_order' => 'nullable|integer',
-                    'is_active' => 'nullable|boolean', // ✅ Add
-                    'image' => 'nullable|image|max:2048',
+                    'is_active' => 'nullable|boolean',
+                    'image' => 'nullable|image',
                 ]);
 
                 if ($request->hasFile('image')) {
@@ -141,7 +141,7 @@ class GalleryService
 
                 $gallery->update([
                     'sort_order' => $validated['sort_order'] ?? $gallery->sort_order,
-                    'is_active' => $validated['is_active'] ?? $gallery->is_active, // ✅ Add
+                    'is_active' => $validated['is_active'] ?? $gallery->is_active,
                     'updated_by' => Auth::id(),
                 ]);
 

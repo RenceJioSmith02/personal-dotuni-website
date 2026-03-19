@@ -61,6 +61,7 @@ $(function () {
         autoWidth: true,
         scrollCollapse: true,
         scrollX: true,
+        order: [[1, 'asc']],
         ajax: "{{ route('admin.program_requirement_categories.index') }}",
         columns: [
             {

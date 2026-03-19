@@ -69,6 +69,7 @@ $(function () {
         autoWidth: true,
         scrollCollapse: true,
         scrollX: true,
+        order: [[1, 'asc']],
         pageLength: 10,
         ajax: "{{ route('admin.linkages.index') }}",
         columns: [

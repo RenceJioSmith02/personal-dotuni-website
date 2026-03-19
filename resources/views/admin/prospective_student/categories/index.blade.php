@@ -67,6 +67,7 @@ $(function () {
         autoWidth: true,
         scrollCollapse: true,
         scrollX: true,
+        order: [[1, 'asc']],
         pageLength: 10,
         ajax: "{{ route('admin.prospective_student_categories.index') }}",
         columns: [

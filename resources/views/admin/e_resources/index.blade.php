@@ -63,6 +63,7 @@ $(function () {
         pageLength: 10,
         scrollX: true,
         scrollCollapse: true,  
+        order: [[1, 'asc']],
         ajax: {
             url: "{{ route('admin.e_resources.index') }}",
             type: "GET",

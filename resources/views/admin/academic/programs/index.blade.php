@@ -64,6 +64,7 @@ $(function () {
         autoWidth: true,
         scrollCollapse: true,
         scrollX: true,
+        order: [[1, 'asc']],
         lengthMenu: [10, 20, 50, 100],
         columnDefs: [
             { orderable: false, targets: [0, 6] }

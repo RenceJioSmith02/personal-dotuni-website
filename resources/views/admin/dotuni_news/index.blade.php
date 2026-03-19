@@ -65,6 +65,7 @@ $(function () {
         autoWidth: true,
         scrollCollapse: true,
         scrollX: true,
+        order: [[1, 'asc']],
         // ajax: {
         //     url: "{{ route('admin.dotuni_news.index') }}",
         //     type: "GET",

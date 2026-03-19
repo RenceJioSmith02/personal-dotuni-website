@@ -73,6 +73,7 @@ $(function () {
         autoWidth: true,
         scrollCollapse: true,
         scrollX: true,
+        order: [[2, 'asc']],
         pageLength: 10,
         ajax: {
             url: "{{ route('admin.forms.index') }}",

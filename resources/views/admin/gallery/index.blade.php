@@ -65,6 +65,7 @@ $(function () {
         autoWidth: true,
         scrollCollapse: true,
         scrollX: true,
+        order: [[3, 'asc']],
         ajax: "{{ route('admin.gallery.index') }}",
         columns: [
             {
