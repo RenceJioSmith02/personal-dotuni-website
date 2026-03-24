@@ -13,7 +13,7 @@
           </div>
           <br>
           <h5>Central Luzon State University</h5>
-          <h5>Institue of Graduate Studies</h5>
+          <h5>Institute of Graduate Studies</h5>
           <h3>Distance, Open, And Transnational University (DOT-Uni)</h3>
           <br>
           <p class="follow-label">Follow us</p>

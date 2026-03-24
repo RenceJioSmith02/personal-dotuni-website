@@ -191,7 +191,7 @@ class WebsiteController extends Controller
     public function faqData(Request $request)
     {
         $page = $request->input('page', 1);
-        $perPage = 2; // you can adjust
+        $perPage = 10;
 
         $faqs = $this->faqQuestionService
             ->listPaginated($page, $perPage);

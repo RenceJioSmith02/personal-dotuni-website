@@ -48,7 +48,7 @@
           <div class="nav-header-left align-items-center">
             <div class="row nav-header-address">
               <h6 style="margin-bottom: 0;">
-                Institue of Graduate Studies
+                Institute of Graduate Studies
               </h6>
             </div>
            <div class="row nav-header-college">

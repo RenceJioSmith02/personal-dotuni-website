@@ -18,14 +18,7 @@
   </div>
 
   <div class="gallery-grid" id="gallery-grid">
-    <!-- AJAX content will be loaded here -->
-{{-- 
-    <div class="gallery-item">
-      <img src="{{ asset('storage/gallery/gallery-2026-02-09-5a64df5a.jpg') }}">
-        <div class="gallery-overlay">
-            <span class="gallery-date">Apr. 12, 2024</span>
-        </div>
-    </div> --}}
+
 
   </div>
 
@@ -34,14 +27,6 @@
       <!-- AJAX pagination buttons -->
   </div>
 
-  <!-- PAGINATION -->
-  {{-- <div class="gallery-pagination">
-    <button class="page-btn disabled">Prev</button>
-    <button class="page-btn active">1</button>
-    <button class="page-btn">2</button>
-    <button class="page-btn">3</button>
-    <button class="page-btn">Next</button>
-  </div> --}}
 
 </section>
 
