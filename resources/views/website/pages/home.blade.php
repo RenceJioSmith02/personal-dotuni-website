@@ -31,7 +31,7 @@
     </section>
 
     <!-- SECTION 2 -->
-    <section class="partners-section">
+    <section class="partners-section" id="partners-section">
         <div class="container">
             <div class="divider"></div>
             <h2 class="section-title">PARTNER INSTITUTIONS AND SERVICES</h2>

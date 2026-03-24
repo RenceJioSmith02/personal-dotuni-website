@@ -1027,3 +1027,62 @@ hr { border-color: var(--clr-border) !important; opacity: 1 !important; }
     border-color: var(--clr-primary) !important;
     color: #ffffff !important;
 }
+
+
+/* ========================
+   BRAND LINK / LOGO
+======================== */
+
+.brand-link {
+    padding: 12px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+/* Logo image */
+.brand-link .brand-image {
+    width: 36px !important;
+    height: 36px !important;
+    max-height: 36px !important;
+    object-fit: contain !important;
+    border-radius: 8px !important;
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.35),
+        0 0 0 2px rgba(146, 209, 44, 0.25) !important;
+    opacity: 1 !important;
+    margin: 0 !important;
+    flex-shrink: 0;
+}
+
+/* Brand text */
+.brand-link .brand-text {
+    font-family: 'Lato', 'Noto Sans', Arial, sans-serif !important;
+    font-size: 20px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    color: var(--clr-white) !important;
+    line-height: 1.2 !important;
+
+    /* Two-tone effect: main word white, suffix accented */
+    background: linear-gradient(
+        to right,
+        #ffffff 0%,
+        #ffffff 60%,
+        var(--clr-accent) 60%,
+        var(--clr-accent) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Collapsed sidebar — hide text, keep image centered */
+.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .brand-text {
+    display: none !important;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .brand-link {
+    justify-content: center !important;
+}

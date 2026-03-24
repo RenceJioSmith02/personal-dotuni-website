@@ -12,9 +12,9 @@
             <img src="{{ asset('assets/system_images/logo.png') }}" alt="DOTUNI Logo">
           </div>
           <br>
-          <h5>Central Luzon State University</h5>
-          <h5>Institute of Graduate Studies</h5>
-          <h3>Distance, Open, And Transnational University (DOT-Uni)</h3>
+          <h5 style="margin-bottom: 0.15rem !important;">Central Luzon State University</h5>
+          <h5 style="margin-bottom: 0.15rem !important;">Institute of Graduate Studies</h5>
+          <h3 style="margin-bottom: 0.15rem !important;">Distance, Open, And Transnational University (DOT-Uni)</h3>
           <br>
           <p class="follow-label">Follow us</p>
           <div class="footer-social">
@@ -34,14 +34,12 @@
             <li><a href="{{ route('website.faqs') }}">FAQs</a></li>
             <li><a href="{{ route('website.pages.about') }}">About</a></li>
             <li><a href="{{ route('website.downloads', 'forms') }}">Forms</a></li>
-            <li><a href="#">Academic Calendar</a></li>
             <li><a href="{{ route('website.gallery') }}">Gallery</a></li>
-            <li><a href="#">Facts and Figures</a></li>
-            <li><a href="#">linkages</a></li>
+            <li><a href="{{ route('website.home') }}#partners-section">Linkages</a></li>
             <li><a href="{{ route('website.admissionRequirements') }}">Info for Prospective Students</a></li>
+            <li><a href="{{ route('website.courses') }}">Courses</a></li>
           </ul>
           <ul class="footer-links">
-            <li><a href="{{ route('website.courses') }}">Courses</a></li>
             <li><a href="{{ route('website.downloads', 'course-prospectus') }}">Course Prospectus</a></li>
             <li><a href="{{ route('website.news') }}">News and Announcement</a></li>
             <li><a href="https://cais.oad.clsu2.edu.ph/login">Online Application</a></li>
