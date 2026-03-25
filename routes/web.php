@@ -64,108 +64,85 @@ use App\Http\Controllers\DodotController;
 
 Route::post('/dodot/chat', [DodotController::class, 'chat'])->name('dodot.chat');
 
-// Route::get('/layout1', function () {
-//     return view('website.pages.news-and-announcements-layouts.layout1');
-// });
-// Route::get('/layout2', function () {
-//     return view('website.pages.news-and-announcements-layouts.layout2');
-// });
-// Route::get('/layout3', function () {
-//     return view('website.pages.news-and-announcements-layouts.layout3');
-// });
-// Route::get('/layout4', function () {
-//     return view('website.pages.news-and-announcements-layouts.layout4');
-// });
-// Route::get('/layout5', function () {
-//     return view('website.pages.news-and-announcements-layouts.layout5');
-// });
+Route::middleware(['trackvisitor'])->group(function () {
+
+    Route::get('/', [WebsiteController::class, 'home'])
+        ->name('website.home');
+
+    Route::get('/about', function () {
+        return view('website.pages.about');
+    })->name('website.pages.about');
+
+    Route::get('/online-payment', function () {
+        return view('website.pages.admission.online-payment');
+    })->name('website.pages.online-payment');
 
 
+    Route::get('/gallery', [WebsiteController::class, 'gallery'])->name('website.gallery');
+    Route::get('/gallery/data', [WebsiteController::class, 'galleryData'])->name('website.galleryData');
 
 
-Route::get('/', [WebsiteController::class, 'home'])
-    ->name('website.home');
+    // Academic Pages
+    Route::get('/courses', [WebsiteController::class, 'courses'])
+        ->name('website.courses');
 
-Route::get('/about', function () {
-    return view('website.pages.about');
-})->name('website.pages.about');
+    Route::get('/courses/data', [WebsiteController::class, 'coursesData'])
+        ->name('website.coursesData');
 
-Route::get('/online-payment', function () {
-    return view('website.pages.admission.online-payment');
-})->name('website.pages.online-payment');
-
+    Route::get('/courses/{program}', [WebsiteController::class, 'courseView'])
+        ->name('website.course.view');
 
 
-Route::get('/gallery', [WebsiteController::class, 'gallery'])->name('website.gallery');
-Route::get('/gallery/data', [WebsiteController::class, 'galleryData'])->name('website.galleryData');
+    // Admission Pages
+    Route::get('/faqs', function () {
+        return view('website.pages.admission.faqs');
+    })->name('website.faqs');
+
+    Route::get('/faqs/data', [WebsiteController::class, 'faqData'])
+        ->name('website.faqData');
+
+    Route::get('/fees', [WebsiteController::class, 'fees'])
+        ->name('website.fees');
+
+    Route::get('/admission-requirements', [WebsiteController::class, 'admissionRequirements'])
+        ->name('website.admissionRequirements');
 
 
-// Academic Pages
-Route::get('/courses', [WebsiteController::class, 'courses'])
-    ->name('website.courses');
+    // Student Services Pages
+    Route::get('/rules-and-regulations', [WebsiteController::class, 'rulesAndRegulations'])
+        ->name('website.rules-and-regulations');
 
-Route::get('/courses/data', [WebsiteController::class, 'coursesData'])
-    ->name('website.coursesData');
-
-Route::get('/courses/{program}', [WebsiteController::class, 'courseView'])
-    ->name('website.course.view');
+    Route::get('/e-resources', [WebsiteController::class, 'eResources'])
+        ->name('website.eresources');
 
 
+    // Downlaods
+    Route::get('/downloads/{type}', [WebsiteController::class, 'downloads'])
+        ->name('website.downloads');
 
 
-// Admission Pages
-Route::get('/faqs', function () {
-    return view('website.pages.admission.faqs');
-})->name('website.faqs');
+    // News and Announcement
+    Route::get(
+        '/news-and-announcement',
+        [WebsiteController::class, 'newsAndAnnouncement']
+    )
+        ->name('website.news');
 
-Route::get('/faqs/data', [WebsiteController::class, 'faqData'])
-    ->name('website.faqData');
+    Route::get(
+        '/news/load-more/{type}',
+        [WebsiteController::class, 'loadMoreNews']
+    )
+        ->name('news.load.more');
 
-Route::get('/fees', [WebsiteController::class, 'fees'])
-    ->name('website.fees');
+    Route::get(
+        '/news/{type}/{id}',
+        [WebsiteController::class, 'showNews']
+    )
+        ->where('type', 'announcement|dotuni') 
+        ->where('id', '[0-9]+')
+        ->name('news.show');
 
-Route::get('/admission-requirements', [WebsiteController::class, 'admissionRequirements'])
-    ->name('website.admissionRequirements');
-
-
-// Student Services Pages
-Route::get('/rules-and-regulations', [WebsiteController::class, 'rulesAndRegulations'])
-    ->name('website.rules-and-regulations');
-
-Route::get('/e-resources', [WebsiteController::class, 'eResources'])
-    ->name('website.eresources');
-
-
-// Downlaods
-Route::get('/downloads/{type}', [WebsiteController::class, 'downloads'])
-    ->name('website.downloads');
-
-
-// News and Announcement
-Route::get(
-    '/news-and-announcement',
-    [WebsiteController::class, 'newsAndAnnouncement']
-)
-    ->name('website.news');
-
-Route::get(
-    '/news/load-more/{type}',
-    [WebsiteController::class, 'loadMoreNews']
-)
-    ->name('news.load.more');
-
-Route::get(
-    '/news/{type}/{id}',
-    [WebsiteController::class, 'showNews']
-)
-    ->where('type', 'announcement|dotuni') 
-    ->where('id', '[0-9]+')
-    ->name('news.show');
-
-
-
-
-
+});
 
 
 
@@ -195,6 +172,8 @@ Route::prefix('admin')
             Route::resource('users', UserController::class);
             
             Route::resource('roles', RoleController::class)->except(['show']);
+            Route::get('analytics/visitors', [AdminController::class, 'visitorsDataTable'])
+                ->name('analytics.visitors');
         });
 
         // ============================
@@ -310,6 +289,9 @@ Route::prefix('admin')
             Route::resource('gallery', GalleryController::class);
             Route::patch('gallery/{gallery}/archive', [GalleryController::class, 'archive'])->name('gallery.archive');
             Route::patch('gallery/{gallery}/unarchive', [GalleryController::class, 'unarchive'])->name('gallery.unarchive');
+
+            Route::patch('gallery/{gallery}/toggle-banner', [GalleryController::class, 'toggleBanner'])
+                ->name('gallery.toggleBanner');
 
             Route::resource('fees', FeeController::class);
             Route::patch('fees/{fee}/archive', [FeeController::class, 'archive'])->name('fees.archive');

@@ -59,6 +59,11 @@ body,
     font-family: 'Lato', 'Noto Sans', Arial, sans-serif !important;
     font-size: 15px;
     line-height: 1.6;
+    overflow-y: hidden !important;
+}
+
+.sidebar {
+  height: calc(100% - 100px) !important;
 }
 
 /* WCAG: skip link */
@@ -1085,4 +1090,10 @@ hr { border-color: var(--clr-border) !important; opacity: 1 !important; }
 
 .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover):not(.sidebar-focused) .brand-link {
     justify-content: center !important;
+}
+
+.content-wrapper > .content {
+  padding: 0 .5rem;
+  height: 75vh !important;
+  overflow: scroll !important;
 }

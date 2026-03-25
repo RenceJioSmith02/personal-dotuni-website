@@ -16,7 +16,17 @@ class GalleryService
     public function list()
     {
         return Gallery::with('asset')
-            ->whereNull('deleted_at') // ✅ Exclude archived
+            ->whereNull('deleted_at') 
+            ->orderBy('sort_order')
+            ->get();
+    }
+
+    public function listBanners()
+    {
+        return Gallery::with('asset')
+            ->whereNull('deleted_at')
+            ->where('is_active', true)
+            ->where('is_homepage_banner', true)
             ->orderBy('sort_order')
             ->get();
     }
@@ -83,6 +93,9 @@ class GalleryService
                     'status' => $item->is_active
                         ? '<span class="badge badge-success">Active</span>'
                         : '<span class="badge badge-danger">Inactive</span>',
+                    'is_homepage_banner' => $item->is_homepage_banner
+                        ? '<span class="badge badge-info"><i class="fas fa-home mr-1"></i>Banner</span>'
+                        : '<span class="badge badge-secondary">No</span>',
                     'created_at' => $item->created_at->toDateTimeString(),
                     'updated_at' => $item->updated_at->toDateTimeString(),
                     'archived' => !is_null($item->deleted_at), // ✅ Pass archive state
@@ -99,6 +112,7 @@ class GalleryService
                 $validated = $request->validate([
                     'sort_order' => 'nullable|integer',
                     'is_active' => 'nullable|boolean',
+                    'is_homepage_banner' => 'nullable|boolean', 
                     'image' => 'required|image',
                 ]);
 
@@ -109,7 +123,8 @@ class GalleryService
                     'asset_id' => $asset->id,
                     'thumbnail_path' => $thumbnailPath,
                     'sort_order' => $validated['sort_order'] ?? 0,
-                    'is_active' => $validated['is_active'] ?? true, // ✅ Add
+                    'is_active' => $validated['is_active'] ?? true, 
+                    'is_homepage_banner' => $validated['is_homepage_banner'] ?? false, 
                     'updated_by' => Auth::id(),
                 ]);
             } catch (Throwable $e) {
@@ -126,6 +141,7 @@ class GalleryService
                 $validated = $request->validate([
                     'sort_order' => 'nullable|integer',
                     'is_active' => 'nullable|boolean',
+                    'is_homepage_banner' => 'nullable|boolean', 
                     'image' => 'nullable|image',
                 ]);
 
@@ -142,6 +158,7 @@ class GalleryService
                 $gallery->update([
                     'sort_order' => $validated['sort_order'] ?? $gallery->sort_order,
                     'is_active' => $validated['is_active'] ?? $gallery->is_active,
+                    'is_homepage_banner' => $validated['is_homepage_banner'] ?? $gallery->is_homepage_banner,
                     'updated_by' => Auth::id(),
                 ]);
 

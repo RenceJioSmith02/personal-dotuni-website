@@ -58,6 +58,15 @@
                                 value="0">
                         </div>
 
+                        <!-- IS HOMEPAGE BANNER -->
+                        <div class="form-group col-md-6">
+                            <label>Homepage Banner</label>
+                            <select name="is_homepage_banner" class="form-control">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+
                     </div>
                 </div>
 

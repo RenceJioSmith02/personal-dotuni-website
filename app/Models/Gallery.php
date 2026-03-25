@@ -14,12 +14,14 @@ class Gallery extends Model
         'thumbnail_path',
         'sort_order',
         'is_active',
+        'is_homepage_banner',
         'deleted_at', 
         'updated_by',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_homepage_banner',
         'deleted_at' => 'datetime',
     ];
 

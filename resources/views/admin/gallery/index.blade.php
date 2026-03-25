@@ -34,6 +34,7 @@
                     <th>File Name</th>
                     <th>Order</th>
                     <th>Status</th>
+                    <th>Homepage Banner</th>
                     <th>Created At</th>
                     <th>Updated At</th>
                     <th width="100px">Actions</th>
@@ -79,6 +80,7 @@ $(function () {
             { data: 'file_name' },
             { data: 'sort_order' },
             { data: 'status',     orderable: false, searchable: false },
+            { data: 'is_homepage_banner', orderable: false, searchable: false }, 
             { data: 'created_at', render: (data) => new Date(data).toLocaleString() },
             { data: 'updated_at', render: (data) => new Date(data).toLocaleString() },
             { data: 'actions',    orderable: false, searchable: false }

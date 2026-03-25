@@ -23,6 +23,18 @@ class GalleryController extends Controller
         return view('admin.gallery.index');
     }
 
+    public function toggleBanner(Gallery $gallery)
+    {
+        $gallery->update([
+            'is_homepage_banner' => !$gallery->is_homepage_banner,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'is_homepage_banner' => $gallery->is_homepage_banner,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $this->service->create($request);

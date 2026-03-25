@@ -9,26 +9,51 @@
 
 @section('content')
 
-    <!-- SECTION 1 -->
-    <section class="hero-section">
-        <div class="hero-overlay"></div>
+<!-- SECTION 1: HERO CAROUSEL -->
+<section class="hero-section">
 
-        <div class="container hero-content">
-            <div class="row align-items-center">
+    <div class="hero-swiper swiper-container">
+        <div class="swiper-wrapper">
+            @foreach($banners as $banner)
+            <div class="swiper-slide hero-slide"
+                 style="background-image: url('{{ $banner->image_url ?? asset('assets/system_images/banner-bg.png') }}')">
+            </div>
+            @endforeach
 
-                <div class="col-lg-6">
-                    <h1 class="hero-title">
-                        CLSU Distance, Open and Transnational University <br> (DOT-Uni)
-                    </h1>
+            {{-- Fallback slide if no banners --}}
+            @if($banners->isEmpty())
+            <div class="swiper-slide hero-slide"
+                 style="background-image: url('{{ asset('assets/system_images/banner-bg.png') }}')">
+            </div>
+            @endif
+        </div>
 
-                    <a href="https://cais.oad.clsu2.edu.ph/login" class="btn btn-success hero-btn mt-4">
-                        Apply Now
-                    </a>
-                </div>
+        {{-- Arrows --}}
+        <div class="hero-carousel-btn hero-next">&#10095;</div>
+        <div class="hero-carousel-btn hero-prev">&#10094;</div>
 
+        {{-- Dots --}}
+        <div class="swiper-pagination hero-pagination"></div>
+    </div>
+
+    {{-- Overlay --}}
+    <div class="hero-overlay"></div>
+
+    {{-- Static content on top --}}
+    <div class="container hero-content" style="padding: 20px 20px 20px 100px">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="hero-title">
+                    CLSU Distance, Open and Transnational University <br> (DOT-Uni)
+                </h1>
+                <a href="https://cais.oad.clsu2.edu.ph/login" class="btn btn-success hero-btn mt-4">
+                    Apply Now
+                </a>
             </div>
         </div>
-    </section>
+    </div>
+
+</section>
 
     <!-- SECTION 2 -->
     <section class="partners-section" id="partners-section">
@@ -65,7 +90,7 @@
             <div class="news-grid">
 
                 <!-- Main News Carousel -->
-                <div class="main-news swiper-container">
+                <div class="main-news news-swiper">
                     <div class="swiper-wrapper">
                         @foreach($mainNews as $news)
                         <a href="{{ route('news.show', ['type' => 'dotuni', 'id' => $news->id]) }}"
@@ -351,7 +376,28 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 
     <script>
-        const swiper = new Swiper('.swiper-container', {
+
+const heroSwiper = new Swiper('.hero-swiper', {
+    loop: true,
+    speed: 800,
+    autoplay: {
+        delay: 5000,
+        disableOnInteraction: false,
+    },
+    navigation: {
+        nextEl: '.hero-next',
+        prevEl: '.hero-prev',
+    },
+    pagination: {
+        el: '.hero-pagination',   // ← must match your blade div class
+        clickable: true,
+    },
+    effect: 'fade',
+    fadeEffect: { crossFade: true },
+});
+
+        // section 3
+        const swiper = new Swiper('.news-swiper', {
             loop: true,
             navigation: {
                 nextEl: '.carousel-btn.next',
@@ -363,7 +409,6 @@
             },
             slidesPerView: 1,
         });
-
 
 
 // SECTION 6 JS - CAROUSEL

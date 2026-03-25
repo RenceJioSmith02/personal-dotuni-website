@@ -94,6 +94,9 @@ class WebsiteController extends Controller
     // Home page
     public function home()
     {
+        // SECTION 1 — Homepage banners from gallery
+        $banners = $this->galleryService->listBanners();
+
         // SECTION 2
         $linkages = $this->linkageService->list();
 
@@ -126,6 +129,7 @@ class WebsiteController extends Controller
             ->take(5);
 
         return view('website.pages.home', compact(
+            'banners',
             'linkages',
             'mainNews',
             'sideNews',

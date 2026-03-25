@@ -13,7 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
-            'not.archived' => \App\Http\Middleware\EnsureUserIsNotArchived::class, 
+            'not.archived' => \App\Http\Middleware\EnsureUserIsNotArchived::class,
+            'trackvisitor' => \App\Http\Middleware\TrackVisitor::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
