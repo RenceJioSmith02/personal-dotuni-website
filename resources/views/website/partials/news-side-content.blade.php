@@ -62,7 +62,7 @@
             @endphp
 
             <a class="content-card" href="{{ $side['url'] }}">
-                <img src="{{ $sideImg }}" alt="{{ $side['title'] }}" loading="lazy">
+                {{-- <img src="{{ $sideImg }}" alt="{{ $side['title'] }}" loading="lazy"> --}}
                 <div class="card-body">
                     <h4>{{ $side['title'] }}</h4>
                     <div class="card-footer">

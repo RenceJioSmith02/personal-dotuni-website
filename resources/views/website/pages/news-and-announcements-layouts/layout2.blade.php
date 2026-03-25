@@ -25,7 +25,6 @@
     <div class="content-grid">
 
       <div class="main-content">
-        @include('website.partials.announcement-download-btn', ['item' => $item])
 
         @php
           // Use the cover asset; fallback to thumbnail; fallback to placeholder
@@ -43,7 +42,10 @@
         @endphp
 
         <div class="content-image-wrapper">
-          <h2 class="content-title">{{ $item['title'] }}</h2>
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <h2 class="content-title">{{ $item['title'] }}</h2>
+            @include('website.partials.announcement-download-btn', ['item' => $item])
+          </div>
           <img src="{{ $imageSrc }}" alt="{{ $item['title'] }}">
           <span class="content-badge">{{ strtoupper($item['type']) }}</span>
         </div>

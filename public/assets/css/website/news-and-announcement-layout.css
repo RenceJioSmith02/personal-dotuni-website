@@ -38,11 +38,11 @@
   .content-card {
     display: flex;
     gap: 15px;
-    border: 2px solid #0f7c2e;
     border-radius: 5px;
     overflow: hidden;
     background: #fff;
     transition: transform 0.3s ease, background 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     cursor: pointer;
     text-decoration: none;
     color: inherit;
@@ -194,7 +194,7 @@
     align-items: center;
     font-weight: 600;
     margin-bottom: 15px;
-    border-radius: 5px;
+    border-radius: 3px;
   }
 
   .other-content-header span {

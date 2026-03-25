@@ -29,11 +29,15 @@
     <div class="content-grid">
 
       <div class="main-content">
-        @include('website.partials.announcement-download-btn', ['item' => $item])
 
         <div class="main-content-body">
           <span class="content-badge-inline">{{ strtoupper($item['type']) }}</span>
-          <h2 class="content-title">{{ $item['title'] }}</h2>
+          
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <h2 class="content-title">{{ $item['title'] }}</h2>
+            @include('website.partials.announcement-download-btn', ['item' => $item])
+          </div>
+
           <span class="content-date">{{ \Carbon\Carbon::parse($item['date'])->format('F d, Y') }}</span>
 
           {{-- Layout 4 uses article_body as the main content --}}

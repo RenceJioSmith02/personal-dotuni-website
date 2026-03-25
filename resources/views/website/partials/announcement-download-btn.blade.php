@@ -12,12 +12,6 @@
 @if($isAnnouncement && $downloadables->isNotEmpty())
 
     <style>
-        .floating-download-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            z-index: 20;
-        }
 
         .floating-download-btn .download-trigger {
             display: flex;

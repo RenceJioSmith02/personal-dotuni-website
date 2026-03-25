@@ -35,7 +35,6 @@
     <div class="content-grid">
 
       <div class="main-content">
-        @include('website.partials.announcement-download-btn', ['item' => $item])
 
         <div class="main-content-body">
 
@@ -60,7 +59,11 @@
             </div>
 
             <div class="meta-row">{{ \Carbon\Carbon::parse($item['date'])->format('F d, Y') }}</div>
-            <h2 class="content-title">{{ $item['title'] }}</h2>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <h2 class="content-title">{{ $item['title'] }}</h2>
+              @include('website.partials.announcement-download-btn', ['item' => $item])
+            </div>
+
 
             @if($caption)
               <p class="content-description">{{ $caption }}</p>

@@ -34,26 +34,24 @@
     <section class="partners-section" id="partners-section">
         <div class="container">
             <div class="divider"></div>
-            <h2 class="section-title">PARTNER INSTITUTIONS AND SERVICES</h2>
+            <h2 class="section-title">
+                PARTNER INSTITUTIONS AND SERVICES
+            </h2>
 
             <div class="partners-grid">
             @foreach($linkages as $linkage)
                 <a href="{{ $linkage->url }}" class="partner-card">
-
-                    <div class="partner-card-image">
-                        <img src="{{ asset('storage/'.optional($linkage->logo)->storage_path) 
-                                ?? asset('assets/system_images/placeholder.jpg') }}"
-                            alt="{{ $linkage->title }}">
-                    </div>
-
-                    <div class="partner-card-overlay">
-                        <h3>{{ $linkage->title }}</h3>
-                        <p>{{ $linkage->description }}</p>
-                    </div>
-
+                        <img 
+                        src="{{ asset('storage/'.optional($linkage->logo)->storage_path) 
+                                ?? asset('assets/system_images/placeholder.jpg') }}">
+                        <div>
+                            <h3>{{ $linkage->title }}</h3>
+                            <p>{{ $linkage->description }}</p>
+                        </div>
                 </a>
             @endforeach
             </div>
+
         </div>
     </section>
 
@@ -116,10 +114,10 @@
                             $imagePath  = optional($attachment?->asset)->storage_path;
                         @endphp
 
-                        <img
+                        {{-- <img
                         src="{{ $imagePath
                                 ? asset('storage/'.$imagePath)
-                                : asset('assets/system_images/placeholder.jpg') }}">
+                                : asset('assets/system_images/placeholder.jpg') }}"> --}}
 
                         <div class="card-content">
                             <h4>{{ $news->title }}</h4>
