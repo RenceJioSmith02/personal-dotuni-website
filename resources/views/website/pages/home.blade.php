@@ -94,7 +94,7 @@
                     <div class="swiper-wrapper">
                         @foreach($mainNews as $news)
                         <a href="{{ route('news.show', ['type' => 'dotuni', 'id' => $news->id]) }}"
-                           class="swiper-slide">
+                        class="swiper-slide">
                             <img
                             src="{{ optional(optional($news->attachments->first())->asset)->storage_path
                                     ? asset('storage/'.optional(optional($news->attachments->first())->asset)->storage_path)
@@ -123,9 +123,10 @@
                         @endforeach
                     </div>
 
-                    <!-- Navigation -->
-                    <div class="carousel-btn next"></div>
-                    <div class="carousel-btn prev"></div>
+                    {{-- Arrows --}}
+                    <div class="news-carousel-btn news-next">&#10095;</div>
+                    <div class="news-carousel-btn news-prev">&#10094;</div>
+
                 </div>
 
 
@@ -397,18 +398,18 @@ const heroSwiper = new Swiper('.hero-swiper', {
 });
 
         // section 3
-        const swiper = new Swiper('.news-swiper', {
-            loop: true,
-            navigation: {
-                nextEl: '.carousel-btn.next',
-                prevEl: '.carousel-btn.prev',
-            },
-            autoplay: {
-                delay: 5000,
-                disableOnInteraction: false,
-            },
-            slidesPerView: 1,
-        });
+const swiper = new Swiper('.news-swiper', {
+    loop: true,
+    autoplay: {
+        delay: 5000,
+        disableOnInteraction: false,
+    },
+    slidesPerView: 1,
+    navigation: {
+        nextEl: '.news-next',
+        prevEl: '.news-prev',
+    },
+});
 
 
 // SECTION 6 JS - CAROUSEL

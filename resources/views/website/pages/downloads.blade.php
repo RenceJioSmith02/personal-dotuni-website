@@ -37,6 +37,18 @@
     margin-bottom: 6px;
     line-height: 1.6;
 }
+
+.form-category li a{
+    color: #1e1e1e;
+    text-decoration: none;
+}
+
+
+.form-category li a:hover {
+    color: blue;
+    text-decoration: underline;
+}
+
 @media (max-width: 700px) {
 
     .forms-section {
