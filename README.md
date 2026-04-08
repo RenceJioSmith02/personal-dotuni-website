@@ -12,6 +12,39 @@ This system was developed as part of academic training (OJT/Capstone) and demons
 
 ---
 
+## 📏 Scope and Limitations
+
+### ✅ Scope
+
+The **DotUni CMS** provides a centralized administrative platform for managing website content efficiently. The system covers the following functionalities:
+
+* User authentication and role-based access (Admin/User)
+* Content management modules:
+
+* DataTables integration:
+
+  * Search
+  * Sorting
+  * Pagination
+* AJAX-based CRUD operations for dynamic interaction
+* Responsive dashboard using AdminLTE
+* Secure form handling with validation and CSRF protection
+
+---
+
+### ❌ Limitations
+
+Despite its capabilities, the system has the following limitations:
+
+* No RESTful API integration
+* No real-time notifications or activity logs
+* No automated backup and restore functionality
+* Limited reporting and analytics features
+
+These limitations may be improved in future system versions.
+
+---
+
 ## 🚀 Features
 
 ### 🔐 Authentication & Authorization
@@ -19,11 +52,6 @@ This system was developed as part of academic training (OJT/Capstone) and demons
 * Secure login system
 * Role-based access control (Admin/User)
 * Protected routes using middleware
-
-### 📰 Content Management
-
-* News Management (Create, Read, Update, Delete)
-* Gallery Management (Image upload & organization)
 
 ### 📊 Data Management
 
@@ -37,12 +65,6 @@ This system was developed as part of academic training (OJT/Capstone) and demons
 * Real-time UI updates
 * CSRF protection
 * Validation handling
-
-### 🎨 User Interface
-
-* AdminLTE dashboard template
-* Responsive design
-* FontAwesome icons integration
 
 ---
 
@@ -63,7 +85,7 @@ This system was developed as part of academic training (OJT/Capstone) and demons
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/dotuni-cms.git
+git clone https://github.com/RenceJioSmith02/personal-dotuni-website.git
 cd dotuni-cms
 ```
 
@@ -92,7 +114,7 @@ APP_URL=http://127.0.0.1:8000
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=dotuni_cms
+DB_DATABASE=dotuni_db
 DB_USERNAME=root
 DB_PASSWORD=
 ```
@@ -109,12 +131,6 @@ php artisan key:generate
 php artisan migrate
 ```
 
-(Optional: Seed database)
-
-```bash
-php artisan db:seed
-```
-
 ### 6. Run the Application
 
 ```bash
@@ -125,44 +141,6 @@ Open in browser:
 
 ```
 http://127.0.0.1:8000
-```
-
----
-
-## 👤 Default Credentials (if seeded)
-
-```
-Admin Account:
-Email: admin@example.com
-Password: password
-```
-
----
-
-## 📂 Project Structure
-
-```
-app/
- ├── Http/
- │   ├── Controllers/
- │   ├── Middleware/
- │
- ├── Models/
-
-resources/
- ├── views/
- │   ├── layouts/
- │   ├── admin/
-
-routes/
- ├── web.php
-
-database/
- ├── migrations/
- ├── seeders/
-
-public/
- ├── assets/
 ```
 
 ---
@@ -191,27 +169,6 @@ The system follows the **MVC (Model-View-Controller)** architecture:
 
 ---
 
-### 🧾 Coding Practices
-
-* Use RESTful controllers
-* Follow Laravel naming conventions
-* Validate all inputs
-* Use AJAX for better UX
-* Separate logic into services when needed
-
----
-
-### 🏷️ Naming Conventions
-
-| Component  | Format     |
-| ---------- | ---------- |
-| Controller | PascalCase |
-| Model      | Singular   |
-| Table      | Plural     |
-| Route      | kebab-case |
-
----
-
 ## 📘 User Manual
 
 ### 🔐 Login
@@ -222,45 +179,11 @@ The system follows the **MVC (Model-View-Controller)** architecture:
 
 ---
 
-### 📰 Managing News
-
-* Navigate to **News Module**
-* Click **Add News**
-* Fill in required fields
-* Click **Save**
-
-Actions available:
-
-* Edit news
-* Delete news
-* Search & filter
-
----
-
-### 🖼️ Managing Gallery
-
-* Go to **Gallery Module**
-* Upload images
-* View image list
-* Edit or delete items
-
----
-
 ### 📊 Using DataTables
 
 * Use search bar to filter data
 * Click column headers to sort
 * Navigate pages using pagination controls
-
----
-
-## 🧪 Testing
-
-Run automated tests:
-
-```bash
-php artisan test
-```
 
 ---
 
@@ -315,8 +238,6 @@ chmod -R 775 storage bootstrap/cache
 * API integration
 * Role & permission management module
 * Activity logs
-* Dashboard analytics
-* File manager system
 
 ---
 
@@ -343,8 +264,8 @@ This project is intended for academic and internal use.
 
 ## 👨‍💻 Developers
 
-* Rence Dingle
-* (Add your team members here)
+* Rence Jio Smith D. Bal-ot
+* Danyela M. Verdida
 
 ---
 
@@ -352,7 +273,7 @@ This project is intended for academic and internal use.
 
 For inquiries or issues:
 
-📧 Email: [your-email@example.com](mailto:your-email@example.com)
+📧 Email: [rence.jio.smith@gmail.com](mailto:rence.jio.smith@gmail.com)
 
 ---
 
@@ -363,6 +284,7 @@ For inquiries or issues:
 * Open-source community
 
 ---
+
 
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 

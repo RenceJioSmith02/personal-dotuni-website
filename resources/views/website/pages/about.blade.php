@@ -22,42 +22,42 @@
         <nav class="about-tabs" id="aboutTabs">
             <button class="tab-btn active"
                 data-tab="clsu"
-                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                data-banner="{{ asset('assets/system_images/about/banners/banner1.png') }}">
                 CLSU
             </button>
             <button class="tab-btn"
                 data-tab="history"
-                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                data-banner="{{ asset('assets/system_images/about/banners/banner2.png') }}">
                 History
             </button>
             <button class="tab-btn"
                 data-tab="objectives"
-                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                data-banner="{{ asset('assets/system_images/about/banners/banner3.png') }}">
                 Objectives
             </button>
             <button class="tab-btn"
                 data-tab="facilities"
-                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                data-banner="{{ asset('assets/system_images/about/banners/banner4.png') }}">
                 Facilities
             </button>
             <button class="tab-btn"
                 data-tab="administration"
-                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                data-banner="{{ asset('assets/system_images/about/banners/banner5.png') }}">
                 Administration
             </button>
             <button class="tab-btn"
                 data-tab="departments"
-                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                data-banner="{{ asset('assets/system_images/about/banners/banner6.png') }}">
                 Departments
             </button>
             <button class="tab-btn"
                 data-tab="membership"
-                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                data-banner="{{ asset('assets/system_images/about/banners/banner7.png') }}">
                 Membership
             </button>
             <button class="tab-btn"
                 data-tab="contact"
-                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                data-banner="{{ asset('assets/system_images/about/banners/banner8.png') }}">
                 Contact Us
             </button>
         </nav>
@@ -109,7 +109,7 @@
     const hero        = document.getElementById('aboutHero');
     const tabBtns     = document.querySelectorAll('.tab-btn');
     const panels      = document.querySelectorAll('.tab-panel');
-    const defaultBg   = "{{ asset('assets/system_images/banners/banner1.png') }}";
+    const defaultBg   = "{{ asset('assets/system_images/about/banners/banner1.png') }}";
 
     // Set initial banner
     hero.style.backgroundImage = `url('${defaultBg}')`;
