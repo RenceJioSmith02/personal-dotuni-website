@@ -1,3 +1,369 @@
+# 🎓 DotUni CMS
+
+*A Laravel-based Content Management System with AdminLTE Dashboard*
+
+---
+
+## 📌 Overview
+
+**DotUni CMS** is a web-based Content Management System developed using Laravel and AdminLTE. It is designed to streamline the management of website content such as news, galleries, and other administrative modules through a clean and user-friendly dashboard.
+
+This system was developed as part of academic training (OJT/Capstone) and demonstrates modern web development practices including MVC architecture, AJAX interactions, and role-based authentication.
+
+---
+
+## 🚀 Features
+
+### 🔐 Authentication & Authorization
+
+* Secure login system
+* Role-based access control (Admin/User)
+* Protected routes using middleware
+
+### 📰 Content Management
+
+* News Management (Create, Read, Update, Delete)
+* Gallery Management (Image upload & organization)
+
+### 📊 Data Management
+
+* DataTables integration
+* Sorting, searching, and pagination
+* Dynamic table updates via AJAX
+
+### ⚡ System Functionality
+
+* Modal-based forms
+* Real-time UI updates
+* CSRF protection
+* Validation handling
+
+### 🎨 User Interface
+
+* AdminLTE dashboard template
+* Responsive design
+* FontAwesome icons integration
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer        | Technology               |
+| ------------ | ------------------------ |
+| Backend      | Laravel (PHP)            |
+| Frontend     | HTML, CSS, JavaScript    |
+| UI Framework | AdminLTE                 |
+| Database     | MySQL                    |
+| Libraries    | jQuery, DataTables, AJAX |
+
+---
+
+## ⚙️ Installation Guide
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/dotuni-cms.git
+cd dotuni-cms
+```
+
+### 2. Install Dependencies
+
+```bash
+composer install
+npm install
+```
+
+### 3. Setup Environment
+
+```bash
+cp .env.example .env
+```
+
+Update `.env` file:
+
+```env
+APP_NAME=DotUniCMS
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://127.0.0.1:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=dotuni_cms
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 4. Generate Application Key
+
+```bash
+php artisan key:generate
+```
+
+### 5. Run Migrations
+
+```bash
+php artisan migrate
+```
+
+(Optional: Seed database)
+
+```bash
+php artisan db:seed
+```
+
+### 6. Run the Application
+
+```bash
+php artisan serve
+```
+
+Open in browser:
+
+```
+http://127.0.0.1:8000
+```
+
+---
+
+## 👤 Default Credentials (if seeded)
+
+```
+Admin Account:
+Email: admin@example.com
+Password: password
+```
+
+---
+
+## 📂 Project Structure
+
+```
+app/
+ ├── Http/
+ │   ├── Controllers/
+ │   ├── Middleware/
+ │
+ ├── Models/
+
+resources/
+ ├── views/
+ │   ├── layouts/
+ │   ├── admin/
+
+routes/
+ ├── web.php
+
+database/
+ ├── migrations/
+ ├── seeders/
+
+public/
+ ├── assets/
+```
+
+---
+
+## 🧑‍💻 Developer Guide
+
+### 🧱 Architecture
+
+The system follows the **MVC (Model-View-Controller)** architecture:
+
+* **Model** → Handles database logic
+* **View** → Blade templates (UI)
+* **Controller** → Handles request logic
+
+---
+
+### 🔄 Typical CRUD Flow
+
+1. User clicks action (Add/Edit/Delete)
+2. Modal form appears
+3. Form submitted via AJAX
+4. Controller processes request
+5. Data stored in database
+6. JSON response returned
+7. DataTable updates dynamically
+
+---
+
+### 🧾 Coding Practices
+
+* Use RESTful controllers
+* Follow Laravel naming conventions
+* Validate all inputs
+* Use AJAX for better UX
+* Separate logic into services when needed
+
+---
+
+### 🏷️ Naming Conventions
+
+| Component  | Format     |
+| ---------- | ---------- |
+| Controller | PascalCase |
+| Model      | Singular   |
+| Table      | Plural     |
+| Route      | kebab-case |
+
+---
+
+## 📘 User Manual
+
+### 🔐 Login
+
+1. Open the system
+2. Enter credentials
+3. Click **Login**
+
+---
+
+### 📰 Managing News
+
+* Navigate to **News Module**
+* Click **Add News**
+* Fill in required fields
+* Click **Save**
+
+Actions available:
+
+* Edit news
+* Delete news
+* Search & filter
+
+---
+
+### 🖼️ Managing Gallery
+
+* Go to **Gallery Module**
+* Upload images
+* View image list
+* Edit or delete items
+
+---
+
+### 📊 Using DataTables
+
+* Use search bar to filter data
+* Click column headers to sort
+* Navigate pages using pagination controls
+
+---
+
+## 🧪 Testing
+
+Run automated tests:
+
+```bash
+php artisan test
+```
+
+---
+
+## 🚀 Deployment Guide
+
+### Requirements
+
+* PHP >= 8.x
+* Composer
+* MySQL
+* Apache/Nginx
+
+### Steps
+
+1. Upload project to server
+2. Configure `.env`
+3. Run:
+
+```bash
+php artisan migrate --force
+php artisan config:cache
+php artisan route:cache
+php artisan optimize
+```
+
+4. Set permissions:
+
+```bash
+chmod -R 775 storage bootstrap/cache
+```
+
+---
+
+## 🔐 Security Features
+
+* CSRF protection
+* Input validation
+* Authentication middleware
+* Role-based authorization
+
+---
+
+## 🐛 Known Issues
+
+* DataTable sorting issue on computed columns
+* Some AdminLTE icons may not render due to FontAwesome version mismatch
+
+---
+
+## 🔮 Future Improvements
+
+* API integration
+* Role & permission management module
+* Activity logs
+* Dashboard analytics
+* File manager system
+
+---
+
+## 🤝 Contribution Guide
+
+1. Fork the repository
+2. Create a new branch
+
+```bash
+git checkout -b feature/your-feature
+```
+
+3. Commit changes
+4. Push to GitHub
+5. Create Pull Request
+
+---
+
+## 📄 License
+
+This project is intended for academic and internal use.
+
+---
+
+## 👨‍💻 Developers
+
+* Rence Dingle
+* (Add your team members here)
+
+---
+
+## 📞 Support
+
+For inquiries or issues:
+
+📧 Email: [your-email@example.com](mailto:your-email@example.com)
+
+---
+
+## ⭐ Acknowledgements
+
+* Laravel Framework
+* AdminLTE Template
+* Open-source community
+
+---
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
