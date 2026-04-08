@@ -85,7 +85,7 @@ These limitations may be improved in future system versions.
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/RenceJioSmith02/personal-dotuni-website.git
+git clone https://github.com/rjlmontanez/dot-uni-website.git
 cd dotuni-cms
 ```
 
