@@ -17,39 +17,92 @@
     <h2 class="section-title">GALLERY</h2>
   </div>
 
-  <div class="gallery-grid" id="gallery-grid">
-
-
-  </div>
+  <div class="gallery-grid" id="gallery-grid"></div>
 
   <!-- PAGINATION -->
-  <div class="website-pagination" id="gallery-pagination">
-      <!-- AJAX pagination buttons -->
-  </div>
-
+  <div class="website-pagination" id="gallery-pagination"></div>
 
 </section>
 
 
-<!-- LIGHTBOX VIEWER -->
-<div id="gallery-lightbox" class="lightbox hidden">
+<!-- LIGHTBOX -->
+<div id="facilityLightbox" class="facility-lightbox">
+    <div class="facility-lightbox-overlay" onclick="closeLightbox()"></div>
 
-    <span class="lightbox-close">&times;</span>
+    <button class="facility-lightbox-close" onclick="closeLightbox()">&#10005;</button>
 
-    <button class="lightbox-arrow left">&#10094;</button>
+    <div class="facility-lightbox-content">
+        <button class="facility-lightbox-prev" onclick="lightboxNav(-1)">&#10094;</button>
 
-    <img class="lightbox-image" id="lightbox-image">
+        <img id="lightboxImg" src="" alt="">
 
-    <button class="lightbox-arrow right">&#10095;</button>
+        <button class="facility-lightbox-next" onclick="lightboxNav(1)">&#10095;</button>
+    </div>
 
+    <span class="facility-lightbox-caption" id="lightboxCaption"></span>
 </div>
 
 
 @endsection
 
+
 @push('js')
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+(function () {
+
+    // ==============================
+    // LIGHTBOX
+    // ==============================
+
+    let allPhotos = [];
+    let currentIndex = 0;
+
+    function collectPhotos() {
+        allPhotos = Array.from(document.querySelectorAll('.gallery-preview'));
+        allPhotos.forEach((img, i) => {
+            img.addEventListener('click', () => openLightbox(i));
+        });
+    }
+
+    window.openLightbox = function (index) {
+        currentIndex = index;
+        updateLightbox();
+        document.getElementById('facilityLightbox').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeLightbox = function () {
+        document.getElementById('facilityLightbox').classList.remove('active');
+        document.body.style.overflow = '';
+    };
+
+    window.lightboxNav = function (direction) {
+        currentIndex = (currentIndex + direction + allPhotos.length) % allPhotos.length;
+        updateLightbox();
+    };
+
+    function updateLightbox() {
+        const img = allPhotos[currentIndex];
+        const lightboxImg = document.getElementById('lightboxImg');
+        lightboxImg.style.opacity = '0';
+        setTimeout(() => {
+            lightboxImg.src = img.dataset.src || img.src;
+            lightboxImg.alt = img.alt || '';
+            document.getElementById('lightboxCaption').textContent = img.alt || '';
+            lightboxImg.style.opacity = '1';
+        }, 150);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') lightboxNav(-1);
+        if (e.key === 'ArrowRight') lightboxNav(1);
+    });
+
+
+    // ==============================
+    // GALLERY FETCH & PAGINATION
+    // ==============================
 
     const galleryGrid = document.getElementById('gallery-grid');
     const paginationContainer = document.getElementById('gallery-pagination');
@@ -66,26 +119,25 @@
 
                 res.data.forEach(item => {
 
-                    const imgSrc = item.image_url 
-                        ? item.image_url 
+                    const imgSrc = item.image_url
+                        ? item.image_url
                         : '/assets/system_images/placeholder.jpg';
 
                     const date = new Date(item.created_at)
-                        .toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric', 
-                            year: 'numeric' 
+                        .toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
                         });
 
                     const html = `
-                    <div class="gallery-item">
-                        <img src="${imgSrc}" class="gallery-preview" data-src="${imgSrc}">
-                        <div class="gallery-overlay">
-                            <span class="gallery-date">${date}</span>
+                        <div class="gallery-item">
+                            <img src="${imgSrc}" class="gallery-preview" data-src="${imgSrc}" alt="${date}">
+                            <div class="gallery-overlay">
+                                <span class="gallery-date">${date}</span>
+                            </div>
                         </div>
-                    </div>
                     `;
-
 
                     galleryGrid.insertAdjacentHTML('beforeend', html);
                 });
@@ -94,9 +146,11 @@
                     parseInt(res.current_page),
                     parseInt(res.last_page)
                 );
+
+                // Re-register lightbox listeners after each AJAX load
+                collectPhotos();
             });
     }
-
 
     function renderPagination(current, last) {
         paginationContainer.innerHTML = '';
@@ -108,124 +162,27 @@
             if (active) btn.classList.add('active');
             btn.innerText = text;
             btn.addEventListener('click', () => {
-
                 if (disabled || active) return;
-
-                // Prevent going below 1
-                if (page < 1) return;
-
-                // Prevent exceeding last page
-                if (page > window.lastPage) return;
-
+                if (page < 1 || page > window.lastPage) return;
                 currentPage = page;
                 fetchGallery(page);
             });
-
             return btn;
         };
 
-        // Prev button
         paginationContainer.appendChild(createBtn('Prev', current - 1, current === 1));
 
-        // Page numbers
         for (let i = 1; i <= last; i++) {
             paginationContainer.appendChild(createBtn(i, i, false, current === i));
         }
 
-        // Next button
         paginationContainer.appendChild(createBtn('Next', current + 1, current === last));
     }
 
     // Initial fetch
     fetchGallery(currentPage);
 
-
-
-
-
-
-    // ==============================
-    // LIGHTBOX FUNCTIONALITY
-    // ==============================
-
-    const lightbox = document.getElementById('gallery-lightbox');
-    const lightboxImage = document.getElementById('lightbox-image');
-
-    let galleryImages = [];
-    let currentIndex = 0;
-
-    // OPEN LIGHTBOX
-    galleryGrid.addEventListener('click', function(e){
-
-        if(!e.target.classList.contains('gallery-preview')) return;
-
-        galleryImages = document.querySelectorAll('.gallery-preview');
-
-        currentIndex = Array.from(galleryImages).indexOf(e.target);
-
-        showImage();
-
-        lightbox.classList.remove('hidden');
-    });
-
-    // SHOW IMAGE
-    function showImage(){
-        lightboxImage.src = galleryImages[currentIndex].dataset.src;
-    }
-
-    // CLOSE
-    document.querySelector('.lightbox-close')
-    .addEventListener('click', () => {
-        lightbox.classList.add('hidden');
-    });
-
-    // NEXT
-    document.querySelector('.lightbox-arrow.right')
-    .addEventListener('click', () => {
-
-        currentIndex++;
-
-        if(currentIndex >= galleryImages.length){
-            currentIndex = 0;
-        }
-
-        showImage();
-    });
-
-    // PREV
-    document.querySelector('.lightbox-arrow.left')
-    .addEventListener('click', () => {
-
-        currentIndex--;
-
-        if(currentIndex < 0){
-            currentIndex = galleryImages.length - 1;
-        }
-
-        showImage();
-    });
-
-    // KEYBOARD SUPPORT
-    document.addEventListener('keydown', function(e){
-
-        if(lightbox.classList.contains('hidden')) return;
-
-        if(e.key === 'ArrowRight'){
-            document.querySelector('.lightbox-arrow.right').click();
-        }
-
-        if(e.key === 'ArrowLeft'){
-            document.querySelector('.lightbox-arrow.left').click();
-        }
-
-        if(e.key === 'Escape'){
-            lightbox.classList.add('hidden');
-        }
-
-    });
-
-});
-
+})();
 </script>
 @endpush
 

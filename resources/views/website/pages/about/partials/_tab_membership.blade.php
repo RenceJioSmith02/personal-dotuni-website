@@ -8,14 +8,14 @@
 
             <div class="membership-card">
                 <div class="membership-logo-wrap">
-                    <img src="{{ asset('assets/system_images/banners/banner1.png') }}" alt="CODEPP">
+                    <img src="{{ asset('assets/system_images/about/membership/CODEPP.png') }}" alt="CODEPP">
                 </div>
                 <div class="membership-title">Consortium of Open Distance Education Providers in the Philippines</div>
             </div>
 
             <div class="membership-card">
                 <div class="membership-logo-wrap">
-                    <img src="{{ asset('assets/system_images/banners/banner1.png') }}" alt="AAOU">
+                    <img src="{{ asset('assets/system_images/about/membership/aaou.png') }}" alt="AAOU">
                 </div>
                 <div class="membership-title">Asian Association of Open Universities</div>
             </div>

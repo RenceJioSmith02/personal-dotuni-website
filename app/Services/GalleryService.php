@@ -34,7 +34,7 @@ class GalleryService
     public function listPaginated($page = 1, $perPage = 20)
     {
         $query = Gallery::with('asset')
-            ->whereNull('deleted_at') // ✅ Exclude archived
+            ->whereNull('deleted_at') 
             ->orderBy('sort_order');
 
         $total = $query->count();

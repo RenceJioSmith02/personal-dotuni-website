@@ -6,7 +6,7 @@
 
         <div class="dept-grid">
 
-            <div class="dept-card" style="background-image: url('{{ asset('assets/system_images/banners/banner1.png') }}')">
+            <div class="dept-card" style="background-image: url('{{ asset('assets/system_images/about/departments/educ.png') }}')">
                 <div class="dept-overlay"></div>
                 <div class="dept-card-content">
                     <h4>College of Education</h4>
@@ -14,7 +14,7 @@
                 </div>
             </div>
 
-            <div class="dept-card" style="background-image: url('{{ asset('assets/system_images/banners/banner1.png') }}')">
+            <div class="dept-card" style="background-image: url('{{ asset('assets/system_images/about/departments/cass.png') }}')">
                 <div class="dept-overlay"></div>
                 <div class="dept-card-content">
                     <h4>College of Arts and Social Sciences</h4>
@@ -22,7 +22,7 @@
                 </div>
             </div>
 
-            <div class="dept-card" style="background-image: url('{{ asset('assets/system_images/banners/banner1.png') }}')">
+            <div class="dept-card" style="background-image: url('{{ asset('assets/system_images/about/departments/cba.png') }}')">
                 <div class="dept-overlay"></div>
                 <div class="dept-card-content">
                     <h4>College of Business and Accountancy</h4>

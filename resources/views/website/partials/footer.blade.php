@@ -18,10 +18,10 @@
           <br>
           <p class="follow-label">Follow us</p>
           <div class="footer-social">
-            <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="#"><i class="fa-brands fa-youtube"></i></a>
-            <a href="#"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#"><i class="fa-solid fa-envelope"></i></a>
+            <a href="https://www.facebook.com/clsudotuni#" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/clsudotuni/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://x.com/DOTUni1" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="mailto: dotuni@clsu.edu.ph" target="_blank"><i class="fa-solid fa-envelope"></i></a>
           </div>
 
         </div>
@@ -56,7 +56,12 @@
           <h4>Find Us</h4>
 
           <div class="footer-map">
-            <iframe width="100%" height="650px" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyB2NIWI3Tv9iDPrlnowr_0ZqZWoAQydKJU&origin=CLSU%20Main%20Gate%2C%20University%20Avenue%2C%20Mu%C3%B1oz%2C%20Nueva%20Ecija%2C%20Philippines&destination=CLSU%20Distance%2C%20Open%2C%20and%20Transnational%20University%20(DOT-Uni)%2C%20Central%20Luzon%20State%20University%20(CLSU)%2C%20Milbuen%20Street%2C%20Mu%C3%B1oz%2C%20Nueva%20Ecija%2C%20Philippines&mode=driving&maptype=roadmap" allowfullscreen></iframe>
+            <iframe
+                src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyB2NIWI3Tv9iDPrlnowr_0ZqZWoAQydKJU&origin=CLSU%20Main%20Gate%2C%20University%20Avenue%2C%20Mu%C3%B1oz%2C%20Nueva%20Ecija%2C%20Philippines&destination=CLSU%20Distance%2C%20Open%2C%20and%20Transnational%20University%20(DOT-Uni)%2C%20Central%20Luzon%20State%20University%20(CLSU)%2C%20Milbuen%20Street%2C%20Mu%C3%B1oz%2C%20Nueva%20Ecija%2C%20Philippines&mode=driving&maptype=roadmap"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>          
           </div>
 
           <div class="footer-contact">

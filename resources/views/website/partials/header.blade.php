@@ -2,7 +2,7 @@
     <div class="container-fluid page-header">
       <div class="d-flex justify-content-between">
         <div class="header-contacts">
-          <a href="mailto: dotuni@clsu.edu.ph " class="me-3 text-white"
+          <a href="mailto: dotuni@clsu.edu.ph" class="me-3 text-white"
             ><i class="fa-solid fa-envelope"></i>  dotuni@clsu.edu.ph </a
           >
           <a href="#" class="me-3 text-white"
@@ -11,19 +11,13 @@
         </div>
         <div class="header-socials social-media">
           <a
-            href="#"
+            href="https://www.facebook.com/clsudotuni#"
             class="me-3 text-white"
             target="_blank"
             ><i class="fa-brands fa-facebook-f"></i
           ></a>
-          <a href="#" class="me-3 text-white"><i class="fa-brands fa-twitter"></i></a>
-          <a
-            href="#"
-            class="me-3 text-white"
-            target="_blank"
-            ><i class="fa-brands fa-youtube"></i
-          ></a>
-          <a href="#" class="text-white"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://twitter.com/DOTUni1" class="me-3 text-white" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+          <a href="https://www.instagram.com/clsudotuni/" class="text-white" target="_blank"><i class="fa-brands fa-instagram"></i></a>
         </div>
       </div>
     </div>
@@ -133,7 +127,7 @@
 
               <!-- Course -->
               <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('website.courses') ? 'active' : '' }}" href="{{ route('website.courses') }}">Course</a>
+                <a class="nav-link {{ request()->routeIs('website.courses') ? 'active' : '' }}" href="{{ route('website.courses') }}">Academic Programs</a>
               </li>
 
               <!-- Gallery -->
@@ -143,7 +137,7 @@
 
               <!-- News and Announcement -->
               <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('website.news') ? 'active' : '' }}" href="{{ route('website.news') }}">News and Announcement</a>
+                <a class="nav-link {{ request()->routeIs('website.news') ? 'active' : '' }}" href="{{ route('website.news') }}">News & Announcement</a>
               </li>
 
               <!-- Admission dropdown -->

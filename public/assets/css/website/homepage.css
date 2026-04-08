@@ -669,11 +669,11 @@
 }
 
 .text-box.first {
-  background: url("../../system_images/feature1.png") center/cover no-repeat;
+  background: url("../../system_images/about/feature/feature2.png") center/cover no-repeat;
 }
 .text-box.second {
   position: relative;
-  background: url("../../system_images/feature2.png") center/cover no-repeat;
+  background: url("../../system_images/about/feature/feature3.png") center/cover no-repeat;
 }
 
 .feature-overlay {

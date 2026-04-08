@@ -254,7 +254,7 @@
 
             <!-- ITEM 1 -->
             <div class="feature-item image-box">
-                <img src="{{ asset('assets/system_images/Signage.png') }}" alt="DOT-UNI Signage">
+                <img src="{{ asset('assets/system_images/about/feature/feature1.png') }}" alt="DOT-UNI feature image">
             </div>
 
             <!-- ITEM 2 -->
@@ -288,7 +288,7 @@
 
             <!-- ITEM 4 -->
             <div class="feature-item image-box">
-                <img src="{{ asset('assets/system_images/Exhibit.jpg') }}" alt="DOT-UNI Exhibit">
+                <img src="{{ asset('assets/system_images/about/feature/feature4.png') }}" alt="DOT-UNI feature image">
             </div>
 
         </div>

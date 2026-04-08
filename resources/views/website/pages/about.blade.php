@@ -18,38 +18,50 @@
 
 {{-- TAB NAVIGATION --}}
 <div class="about-tabs-wrapper">
-    <nav class="about-tabs" id="aboutTabs">
-        <button class="tab-btn active"
-            data-tab="clsu"
-            data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
-            CLSU
-        </button>
-        <button class="tab-btn"
-            data-tab="history"
-            data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
-            History
-        </button>
-        <button class="tab-btn"
-            data-tab="objectives"
-            data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
-            Objectives
-        </button>
-        <button class="tab-btn"
-            data-tab="administration"
-            data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
-            Administration
-        </button>
-        <button class="tab-btn"
-            data-tab="departments"
-            data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
-            Departments
-        </button>
-        <button class="tab-btn"
-            data-tab="membership"
-            data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
-            Membership
-        </button>
-    </nav>
+    <div class="about-tabs-scroll">
+        <nav class="about-tabs" id="aboutTabs">
+            <button class="tab-btn active"
+                data-tab="clsu"
+                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                CLSU
+            </button>
+            <button class="tab-btn"
+                data-tab="history"
+                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                History
+            </button>
+            <button class="tab-btn"
+                data-tab="objectives"
+                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                Objectives
+            </button>
+            <button class="tab-btn"
+                data-tab="facilities"
+                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                Facilities
+            </button>
+            <button class="tab-btn"
+                data-tab="administration"
+                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                Administration
+            </button>
+            <button class="tab-btn"
+                data-tab="departments"
+                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                Departments
+            </button>
+            <button class="tab-btn"
+                data-tab="membership"
+                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                Membership
+            </button>
+            <button class="tab-btn"
+                data-tab="contact"
+                data-banner="{{ asset('assets/system_images/banners/banner1.png') }}">
+                Contact Us
+            </button>
+        </nav>
+    </div>
 </div>
 
 {{-- TAB CONTENT PANELS --}}
@@ -67,6 +79,10 @@
         @include('website.pages.about.partials._tab_objectives')
     </div>
 
+    <div class="tab-panel" id="panel-facilities">
+        @include('website.pages.about.partials._tab_facilities')
+    </div>
+
     <div class="tab-panel" id="panel-administration">
         @include('website.pages.about.partials._tab_administration')
     </div>
@@ -77,6 +93,10 @@
 
     <div class="tab-panel" id="panel-membership">
         @include('website.pages.about.partials._tab_membership')
+    </div>
+
+    <div class="tab-panel" id="panel-contact">
+        @include('website.pages.about.partials._tab_contact')
     </div>
 
 </div>

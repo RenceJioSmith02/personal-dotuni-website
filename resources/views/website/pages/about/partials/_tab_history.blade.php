@@ -72,7 +72,55 @@
                 </div>
             </div>
 
+            <div class="timeline-item">
+                <div class="timeline-marker">
+                    <span class="timeline-year"></span>
+                </div>
+                <div class="timeline-body">
+                    <h4>Creation and Mandate</h4>
+                    <p>
+                        The Central Luzon State University Open University (CLSU-OU) was formally created on August 29, 1997 through CLSU Board of Regents Resolution No. 50-97 aligned to the country's goal of developing quality human resources by democratization of access to quality education. Its mandate is to provide open and distance education opportunities via degree and non-degree programs to individuals from all walks of life aspiring for higher education or for improved qualifications or credentials.
+                        <br><br>
+                        In 1998, the CLSU-OU initially offered two programs, Master of Science in Education and Master of Science in Rural Development. Early students were teachers from the various municipalities of Nueva Ecija and extension personnel of the Department of Agriculture. After two decades, the institution underwent a major transformation and was renamed into CLSU Distance, Open and Transnational University (CLSU DOT-Uni) by virtue of Board Resolution 16-2018 on February 15, 2018.
+                    </p>
+                </div>
+            </div>
 
+            <div class="timeline-item">
+                <div class="timeline-marker">
+                    <span class="timeline-year"></span>
+                </div>
+                <div class="timeline-body">
+                    <h4>Mission</h4>
+                    <p>
+                        The mission of the CLSU Open University is to provide its students with opportunities to earn formal qualifications as well as to develop in them the readiness for lifelong learning in today's knowledge society.
+                    </p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-marker">
+                    <span class="timeline-year"></span>
+                </div>
+                <div class="timeline-body">
+                    <h4>Mode of Delivery</h4>
+                    <p>
+                        Distance education is a mode of education delivery whereby teacher and learner are separated in time and space, and instruction is delivered through specially designed materials and methods using appropriate technologies, and supported by organizational and administrative structures and arrangements.
+                    </p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-marker">
+                    <span class="timeline-year"></span>
+                </div>
+                <div class="timeline-body">
+                    <h4>Learning Materials</h4>
+                    <p>
+                        The Open University students are provided with specially packaged printed instructional materials or self-learning modules (SLMs) which they study on their own most of the time. SLMs are prepared by a "quality circle" composed of a curriculum designer, subject matter specialist, content critic, language editor, and a media specialist or graphics artist.
+                    </p>
+                </div>
+            </div>
 
         </div>
     </div>
