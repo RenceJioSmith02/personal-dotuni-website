@@ -304,6 +304,8 @@ Route::prefix('admin')
 
 
 
-
-
+// custom fallback route for undefined routes to show 404 page
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
+});
 

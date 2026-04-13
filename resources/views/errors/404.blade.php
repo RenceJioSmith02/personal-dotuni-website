@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>403 – Access Denied | DoTUni</title>
+    <title>404 – Page Not Found | DoTUni</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -30,9 +30,9 @@
             font-weight: 600;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: #92400e;
-            background-color: #fef3c7;
-            border: 1px solid #fde68a;
+            color: #1e40af;
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
             border-radius: 9999px;
             padding: 0.25rem 0.9rem;
             margin-bottom: 1.5rem;
@@ -41,7 +41,7 @@
         .error-code {
             font-size: 7rem;
             font-weight: 700;
-            color: #d97706;
+            color: #3b82f6;
             line-height: 1;
             letter-spacing: -4px;
             margin-bottom: 0.75rem;
@@ -110,19 +110,15 @@
 </head>
 <body>
     <div class="container">
-        <span class="badge">Error 403</span>
-        <div class="error-code">403</div>
-        <h1 class="error-title">Access Denied</h1>
+        <span class="badge">Error 404</span>
+        <div class="error-code">404</div>
+        <h1 class="error-title">Page Not Found</h1>
         <p class="error-message">
-            You don't have permission to view this page.<br>
-            If you believe this is a mistake, please contact your system administrator.
+            The page you're looking for doesn't exist or may have been moved.<br>
+            Double-check the URL, or head back to the homepage.
         </p>
         <div class="actions">
-            @auth
-                <a href="{{ route('dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
-            @else
-                <a href="{{ route('login') }}" class="btn btn-primary">Sign In</a>
-            @endauth
+            <a href="{{ route('website.home') }}" class="btn btn-primary">Back to Home</a>
             <a href="javascript:history.back()" class="btn btn-secondary">Go Back</a>
         </div>
         <hr class="divider">
