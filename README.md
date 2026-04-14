@@ -169,16 +169,6 @@ The system follows the **MVC (Model-View-Controller)** architecture:
 
 ---
 
-## 📘 User Manual
-
-### 🔐 Login
-
-1. Open the system
-2. Enter credentials
-3. Click **Login**
-
----
-
 ### 📊 Using DataTables
 
 * Use search bar to filter data
@@ -226,17 +216,9 @@ chmod -R 775 storage bootstrap/cache
 
 ---
 
-## 🐛 Known Issues
-
-* DataTable sorting issue on computed columns
-* Some AdminLTE icons may not render due to FontAwesome version mismatch
-
----
-
 ## 🔮 Future Improvements
 
 * API integration
-* Role & permission management module
 * Activity logs
 
 ---
