@@ -7,7 +7,7 @@
 
         <div class="admin-org-chart">
             <img 
-                src="{{ asset('assets/system_images/about/org_chart.svg') }}" 
+                src="{{ asset('assets/system_images/about/org_chart.jpg') }}" 
                 alt="Organizational Chart of Administration"
                 class="admin-org-image"
             >

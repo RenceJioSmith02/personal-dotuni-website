@@ -12,8 +12,8 @@
             <img src="{{ asset('assets/system_images/logo.png') }}" alt="DOTUNI Logo">
           </div>
           <br>
-          <h5 style="margin-bottom: 0.15rem !important;">Central Luzon State University</h5>
           <h5 style="margin-bottom: 0.15rem !important;">Institute of Graduate Studies</h5>
+          <h5 style="margin-bottom: 0.15rem !important;">Central Luzon State University</h5>
           <h3 style="margin-bottom: 0.15rem !important;">Distance, Open, And Transnational University (DOT-Uni)</h3>
           <br>
           <p class="follow-label">Follow us</p>
@@ -42,7 +42,7 @@
           <ul class="footer-links">
             <li><a href="{{ route('website.downloads', 'course-prospectus') }}">Course Prospectus</a></li>
             <li><a href="{{ route('website.news') }}">News and Announcement</a></li>
-            <li><a href="https://cais.oad.clsu2.edu.ph/login">Online Application</a></li>
+            <li><a href="https://cais.oad.clsu2.edu.ph/login" target="_blank">Online Application</a></li>
             <li><a href="{{ route('website.rules-and-regulations') }}">Rules and Regulations</a></li>
             <li><a href="{{ route('website.fees') }}">Schedule of School Fees </a></li>
             <li><a href="{{ route('website.admissionRequirements') }}#Addmission Requirements">Addmission Requirements</a></li>

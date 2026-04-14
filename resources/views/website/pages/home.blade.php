@@ -46,7 +46,7 @@
                 <h1 class="hero-title">
                     CLSU Distance, Open and Transnational University <br> (DOT-Uni)
                 </h1>
-                <a href="https://cais.oad.clsu2.edu.ph/login" class="btn btn-success hero-btn mt-4">
+                <a href="https://cais.oad.clsu2.edu.ph/login" target="_blank" class="btn btn-success hero-btn mt-4">
                     Apply Now
                 </a>
             </div>
@@ -305,12 +305,13 @@
             <div class="carousel-viewport">
                 <div class="carousel-track" id="carousel">
                     @foreach($programs as $program)
-                    <div class="card">
+                    <a href="{{ route('website.course.view', $program->id) }}" class="card">
                         <img 
                         src="{{ $program->imagePath 
                                 ? asset('storage/'.$program->imagePath) 
-                                : asset('assets/system_images/placeholder.jpg') }}">
-                    </div>
+                                : asset('assets/system_images/placeholder.jpg') }}"
+                        alt="{{ $program->title }}">
+                    </a>
                     @endforeach
                 </div>
             </div>

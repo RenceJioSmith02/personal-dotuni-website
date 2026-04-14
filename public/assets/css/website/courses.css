@@ -22,7 +22,6 @@
 .course-card {
   width: 100%;
   max-width: 240px;
-  background: #fff;
   border-radius: 10px;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -39,7 +38,7 @@
 }
 
 /* Hover Effect */
-.course-card:hover {
+.course-card img:hover {
   transform: translateY(-8px);
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
 }

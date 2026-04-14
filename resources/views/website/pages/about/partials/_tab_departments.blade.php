@@ -30,6 +30,14 @@
                 </div>
             </div>
 
+            <div class="dept-card" style="background-image: url('{{ asset('assets/system_images/about/departments/cos.png') }}')">
+                <div class="dept-overlay"></div>
+                <div class="dept-card-content">
+                    <h4>College of Science</h4>
+                    <p>The CoS aims to foster equality among people and empowering communities through quality science and mathematics education. Its duty is to produce globally competent and committed scientists and educators in the different fields of science in preparation for their service in their communities.</p>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

@@ -297,10 +297,6 @@
     letter-spacing: 1px;
 }
 
-.mvp-card.featured .mvp-card-content h3 {
-    color: var(--tertiary);
-}
-
 .mvp-card-content p {
     font-size: 14px;
     line-height: 1.7;
